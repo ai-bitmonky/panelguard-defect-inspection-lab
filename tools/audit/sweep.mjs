@@ -14,7 +14,7 @@ const refCode = (id) => { let c = fill(SUBS[id].code, SUBS[id].ref || []); for (
 const run = async (id, code) => { await page.locator('.edw textarea').first().fill(code); await page.locator('#runbtn').click({ noWaitAfter: true }); const t = Date.now();
   while (true) { await page.waitForTimeout(400); const st = await ev((i) => ({ v: window.PG.VERD[i], r: window.PG.running() }), id); if (st.r == null && st.v) break;
     if (Date.now() - t > 90000) { const s = page.locator('.btn.stop'); if (await s.isVisible()) await s.click(); } if (Date.now() - t > 600000) break; }
-  await page.waitForTimeout(250); return { v: await ev((i) => window.PG.VERD[i], id), err: await ev(() => (document.getElementById('errbox') || {}).innerText || ''), sec: (Date.now() - t) / 1000 }; };
+  await page.waitForTimeout(250); return { viz: await ev(() => (document.getElementById('vizbox') || {}).innerText || ''), v: await ev((i) => window.PG.VERD[i], id), err: await ev(() => (document.getElementById('errbox') || {}).innerText || ''), sec: (Date.now() - t) / 1000 }; };
 // wrong-answer generator
 const isNum = (v) => /^-?\d+(\.\d+)?$/.test(v), isQ = (v) => /^'.*'$/.test(v), isName = (v) => /^[A-Za-z_$][\w$]*$/.test(v);
 function variants(ref) {
@@ -46,7 +46,8 @@ for (const id of ids) {
   for (const x of list) {
     const r = await run(id, fill(SUBS[id].code, x.w)); const plainMsg = r.err ? r.err.split(/Show the raw/)[0] : '';
     const flag = r.v && r.v.pass ? 'PASSED' : (RAW.test(r.v ? r.v.msg : '') || RAW.test(plainMsg.replace(/^ERROR\s*/, '')) ? 'RAW?' : (r.v ? '' : 'NO VERDICT'));
-    R[id].push({ kind: x.kind, w: x.w, pass: r.v && r.v.pass, msg: r.v && r.v.msg, err: plainMsg.slice(0, 500), flag, sec: r.sec });
+    const vb = (r.viz.match(/\bnull\b|\bundefined\b|\bNaN\b|\[object /) || [])[0];
+    R[id].push({ vizBad: vb || null, kind: x.kind, w: x.w, pass: r.v && r.v.pass, msg: r.v && r.v.msg, err: plainMsg.slice(0, 500), flag, sec: r.sec });
     log(id, x.kind, JSON.stringify(x.w), '->', flag || 'ok', '|', ((r.v && r.v.msg) || '') + (plainMsg ? ' || ' + plainMsg.replace(/\n/g, ' / ') : '').slice(0, 300));
   }
   const back = await run(id, refCode(id)); if (!back.v || !back.v.pass) log('!! reference did not pass again on', id, back.v && back.v.msg);

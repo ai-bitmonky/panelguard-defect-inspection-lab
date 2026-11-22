@@ -853,7 +853,7 @@ function renderOut() {
   o.appendChild(h('div', { id: 'whybox' }));
   o.appendChild(h('div', { class: 'conh', text: s.lang === 'js' ? 'PRINTED BY console.log' : 'PRINTED BY PYTHON' }));
   conEl = h('div', { class: 'con', id: 'con' }); o.appendChild(conEl);
-  if (OUTTXT[id]) conAdd(OUTTXT[id]); else conAdd(ss.codePass && !RES[id] ? '(rebuilding…)' : '(nothing yet — press RUN)');
+  if (OUTTXT[id]) conAdd(OUTTXT[id]); else conAdd(ss.codePass && !RES[id] ? '(rebuilding…)' : ss.codePass ? '(printed lines are not kept after a reload — press RUN to see them again)' : '(nothing yet — press RUN)');
   o.appendChild(h('div', { id: 'endbox' }));
   if (ERR[id]) showErr(ERR[id]);
   if (RES[id]) drawViz(id);
