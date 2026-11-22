@@ -262,7 +262,7 @@ await step('6e', { post: async () => { const nTr = await ev(() => window.PG.RES[
   for (let k = 0; k < 4; k++) { const role = await ev(() => { const r = window.PG.RES['6e'], m = window.PG.S.subs['6e'].mech, i = m.tk == null ? 0 : m.tk + 1; return r.trace[i].agent; }); const key = /Inspector/.test(role) ? 'inspector' : /Analyst/.test(role) ? 'analyst' : 'writer'; await F.locator(`#room6e [data-worker="${key}"]`).click(); await page.waitForTimeout(200); }
   for (let k = 0; k < nTr + 2 && !(await mech('6e')).traceEnd; k++) { await F.locator('#next6e').click(); await page.waitForTimeout(60); }
   R.live['6e_report'] = await ev(() => window.PG.RES['6e'].raw); } });
-await step('6f', { pre: async () => { await F.locator('[data-num6]').first().waitFor({ timeout: 120000 });
+await step('6f', { pre: async () => { if ((await mech('6f')).huntDone) { note('6f hunt already done earlier in this session (kept after reload)'); return; } await F.locator('[data-num6]').first().waitFor({ timeout: 120000 });
   const planted = await ev(() => { const k = window.PG.JSR.k, NS = k.NS; const f = { shift_stats: NS.shiftStats.run(), slice_table: NS.sliceTable.run(), worst_cases: NS.worstCases.run(), action_list: NS.actionList.run() }; return k.pg().plantedCopy(NS.shiftResult.raw, f).planted; });
   for (const p of planted) await F.locator(`[data-num6="${p.at}"]`).click(); await F.locator('#hunt6').click(); await page.waitForTimeout(200); (R.mech['6f'] = R.mech['6f'] || {}).found = (await mech('6f')).found; } });
 await step('6g', { pre: async () => {

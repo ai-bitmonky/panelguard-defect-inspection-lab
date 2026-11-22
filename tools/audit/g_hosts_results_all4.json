@@ -1,0 +1,93 @@
+{
+ "out": {
+  "site": {
+   "store": "ok",
+   "review": true,
+   "kern": {
+    "py": "file",
+    "js": "webgl"
+   },
+   "ran": {
+    "v3a": {
+     "pass": true,
+     "msg": "X is [2624, 64, 64, 1], values 0 to 1. Train tray 1574 photos, validation 525."
+    },
+    "v2e": {
+     "pass": true,
+     "msg": "Recall 95.2%, false-alarm rate 60.0%."
+    },
+    "stat": "Run up to here: done."
+   },
+   "storageNote": null,
+   "sec": 75.16,
+   "errors": []
+  },
+  "file": {
+   "store": "ok",
+   "review": true,
+   "kern": {
+    "py": "blobc",
+    "js": "webgl"
+   },
+   "ran": {
+    "v3a": {
+     "pass": true,
+     "msg": "X is [2624, 64, 64, 1], values 0 to 1. Train tray 1574 photos, validation 525."
+    },
+    "v2e": {
+     "pass": true,
+     "msg": "Recall 95.2%, false-alarm rate 60.0%."
+    },
+    "stat": "Run up to here: done."
+   },
+   "storageNote": null,
+   "sec": 70.853,
+   "errors": []
+  },
+  "srcdoc": {
+   "store": "ok",
+   "review": true,
+   "kern": {
+    "py": "blob",
+    "js": "webgl"
+   },
+   "ran": {
+    "v3a": {
+     "pass": true,
+     "msg": "X is [2624, 64, 64, 1], values 0 to 1. Train tray 1574 photos, validation 525."
+    },
+    "v2e": {
+     "pass": true,
+     "msg": "Recall 95.2%, false-alarm rate 60.0%."
+    },
+    "stat": "Run up to here: done."
+   },
+   "storageNote": null,
+   "sec": 88.473,
+   "errors": []
+  },
+  "srcdoc-noorigin": {
+   "store": "blocked: SecurityError",
+   "review": true,
+   "kern": {
+    "py": "blobc",
+    "js": "webgl"
+   },
+   "ran": {
+    "v3a": {
+     "pass": true,
+     "msg": "X is [2624, 64, 64, 1], values 0 to 1. Train tray 1574 photos, validation 525."
+    },
+    "v2e": {
+     "pass": true,
+     "msg": "Recall 95.2%, false-alarm rate 60.0%."
+    },
+    "stat": "Run up to here: done."
+   },
+   "storageNote": null,
+   "sec": 83.193,
+   "errors": []
+  }
+ },
+ "fails": []
+}

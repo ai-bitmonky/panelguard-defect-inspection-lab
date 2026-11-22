@@ -414,7 +414,7 @@ function sceneRecap(s, stage, out, api) {
     var r8 = api.getMech('8a'), t = D.t && D.t.trial; if (r8 && r8.rangeLocked && t) pv.appendChild(el('div', 'hint', '8a range ' + f1(r8.range[0]) + '–' + f1(r8.range[1]) + ' vs trial ' + f1(t.all.per100) + ': ' + (t.all.per100 >= r8.range[0] && t.all.per100 <= r8.range[1] ? '✓' : '✗')));
     takeHome(out);
     limits(out, D);
-    if (allSeen() && m.submitted) { var e = el('div', 'endc', '<h3 class="fh">COURSE COMPLETE — PANELGUARD v1.0</h3><p>You built a real inspection station: data, two models, gates, a flow with a person, a crew report, an operator console, an honest line trial, a drift watch and a go / no-go sheet. Every number on these pages came from your own runs.</p>'); e.id = 'done8'; out.appendChild(e); }
+    if (allSeen() && m.submitted) { var e = el('div', 'endc', '<h3 class="fh">COURSE COMPLETE — PANELGUARD</h3><p>You built a real inspection station: data, two models, gates, a flow with a person, a crew report, an operator console, an honest line trial, a drift watch and a go / no-go sheet. Every number on these pages came from your own runs.</p>'); e.id = 'done8'; out.appendChild(e); }
   }
   draw(); side();
   return {};

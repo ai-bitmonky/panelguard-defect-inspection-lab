@@ -199,7 +199,7 @@ body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
 .twcode{margin:0;padding:10px 12px;font-family:var(--fm);font-size:12.5px;line-height:19px;white-space:pre;overflow:auto;max-height:52vh;color:#cfe1f5}
 .epochs{padding:8px 12px}.epochs .btn.on{border-color:var(--cy);background:#0f2232;color:#fff}
 .goal.two{border-color:#5c4610;background:#151109;white-space:normal;max-width:620px;font-size:13px;line-height:1.15}
-@media (max-width:1400px){.goal.two{max-width:440px}}
+@media (max-width:1400px){.goal.two{max-width:440px}.goal{white-space:normal;line-height:1.15;max-width:440px}}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#1c2736;border-radius:6px}::-webkit-scrollbar-track{background:transparent}
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}.tbl th{color:#8d9bb0;font-weight:600;text-align:left;font-size:12px;padding:3px 6px;border-bottom:1px solid var(--line)}.tbl td{padding:3px 6px;border-bottom:1px solid #121a24;font-family:var(--fm);font-size:12.5px}
 </style>
@@ -211,7 +211,7 @@ body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#46e3ff"/><stop offset="1" stop-color="#3dffa0"/></linearGradient></defs><path d="M15 2 27 8v8c0 6-5 10-12 12C8 26 3 22 3 16V8z" fill="none" stroke="url(#lg)" stroke-width="2"/><rect x="9" y="9" width="12" height="12" rx="1.5" fill="#0d2233" stroke="#46e3ff"/><path d="M9 13h12M9 17h12" stroke="#46e3ff" stroke-width=".8"/></svg>
       <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v1.1</span>
     </div>
-    <div class="goal" title="The business target for every model in this course"><i>TARGET</i> catch at least&nbsp;<b>95 of every 100</b>&nbsp;defective cells, and count the good cells stopped</div>
+    <div class="goal" title="The business target for every model in this course"><i>TARGET</i><span>catch at least <b>95 of every 100</b> defective cells, and count the good cells stopped</span></div>
     <button class="btn small" id="revbtn" aria-pressed="false" title="For reviewers: open every page without answering anything. Nothing done here is saved as progress.">Review mode: OFF</button>
     <div class="kstat"><span class="kdot" id="kdot"></span><span id="ktext">Python loading…</span></div>
     <div class="kstat" id="tstat" style="min-width:0"><span class="kdot"></span>TensorFlow.js loading…</div>
@@ -9753,7 +9753,7 @@ function sceneRecap(s, stage, out, api) {
     var r8 = api.getMech('8a'), t = D.t && D.t.trial; if (r8 && r8.rangeLocked && t) pv.appendChild(el('div', 'hint', '8a range ' + f1(r8.range[0]) + '–' + f1(r8.range[1]) + ' vs trial ' + f1(t.all.per100) + ': ' + (t.all.per100 >= r8.range[0] && t.all.per100 <= r8.range[1] ? '✓' : '✗')));
     takeHome(out);
     limits(out, D);
-    if (allSeen() && m.submitted) { var e = el('div', 'endc', '<h3 class="fh">COURSE COMPLETE — PANELGUARD v1.0</h3><p>You built a real inspection station: data, two models, gates, a flow with a person, a crew report, an operator console, an honest line trial, a drift watch and a go / no-go sheet. Every number on these pages came from your own runs.</p>'); e.id = 'done8'; out.appendChild(e); }
+    if (allSeen() && m.submitted) { var e = el('div', 'endc', '<h3 class="fh">COURSE COMPLETE — PANELGUARD</h3><p>You built a real inspection station: data, two models, gates, a flow with a person, a crew report, an operator console, an honest line trial, a drift watch and a go / no-go sheet. Every number on these pages came from your own runs.</p>'); e.id = 'done8'; out.appendChild(e); }
   }
   draw(); side();
   return {};

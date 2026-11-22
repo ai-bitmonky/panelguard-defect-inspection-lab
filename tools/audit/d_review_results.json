@@ -1,0 +1,415 @@
+{
+ "pages": {
+  "0a": {
+   "cur": "0a",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "0b": {
+   "cur": "0b",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "0c": {
+   "cur": "0c",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "0d": {
+   "cur": "0d",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "1a": {
+   "cur": "1a",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "1b": {
+   "cur": "1b",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "1c": {
+   "cur": "1c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "1d": {
+   "cur": "1d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "1e": {
+   "cur": "1e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "2a": {
+   "cur": "2a",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "2b": {
+   "cur": "2b",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "2c": {
+   "cur": "2c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "2d": {
+   "cur": "2d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "2e": {
+   "cur": "2e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "3a": {
+   "cur": "3a",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "3b": {
+   "cur": "3b",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "3c": {
+   "cur": "3c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "3d": {
+   "cur": "3d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "3e": {
+   "cur": "3e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "3f": {
+   "cur": "3f",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "3g": {
+   "cur": "3g",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "4a": {
+   "cur": "4a",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "4b": {
+   "cur": "4b",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "4c": {
+   "cur": "4c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "4d": {
+   "cur": "4d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "4e": {
+   "cur": "4e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "4f": {
+   "cur": "4f",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "5a": {
+   "cur": "5a",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "5b": {
+   "cur": "5b",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "5c": {
+   "cur": "5c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "5d": {
+   "cur": "5d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "5e": {
+   "cur": "5e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "5f": {
+   "cur": "5f",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "5g": {
+   "cur": "5g",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "6a": {
+   "cur": "6a",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "6b": {
+   "cur": "6b",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "6c": {
+   "cur": "6c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "6d": {
+   "cur": "6d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "6e": {
+   "cur": "6e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "6f": {
+   "cur": "6f",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "6g": {
+   "cur": "6g",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "7a": {
+   "cur": "7a",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  },
+  "7b": {
+   "cur": "7b",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "7c": {
+   "cur": "7c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "7d": {
+   "cur": "7d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "7e": {
+   "cur": "7e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "7f": {
+   "cur": "7f",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "7g": {
+   "cur": "7g",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "8a": {
+   "cur": "8a",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "8b": {
+   "cur": "8b",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "8c": {
+   "cur": "8c",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "8d": {
+   "cur": "8d",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "8e": {
+   "cur": "8e",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "8f": {
+   "cur": "8f",
+   "bad": null,
+   "newErrors": [],
+   "hint": true
+  },
+  "8g": {
+   "cur": "8g",
+   "bad": null,
+   "newErrors": [],
+   "hint": false
+  }
+ },
+ "runs": {
+  "1e": {
+   "sec": 2.129,
+   "pass": true,
+   "msg": "Pixels now run 0 to 1. Xflat is 2,624 rows × 4,096 numbers.",
+   "stat": "Run up to here: done.",
+   "bad": null
+  },
+  "2e": {
+   "sec": 45.022,
+   "pass": true,
+   "msg": "Recall 95.2%, false-alarm rate 60.0%.",
+   "stat": "Run up to here: done.",
+   "bad": null
+  },
+  "3g": {
+   "sec": 727.746,
+   "pass": true,
+   "msg": "Gates 0.334 and 0.532: 8 of 165 defects pass (4.8%); 549 of every 1,000 cells go to a person.",
+   "stat": "Run up to here: done.",
+   "bad": null
+  },
+  "4e": {
+   "sec": 110.165,
+   "pass": true,
+   "msg": "Slice table ready: 4 groups counted at your gates (low 0.334, high 0.532).",
+   "stat": "Run up to here: done.",
+   "bad": null
+  },
+  "5g": {
+   "sec": 16.912,
+   "pass": true,
+   "msg": "Shift done: 525 cells. Poly defects passed: 5 of 84 → 4 of 84 with the poly gate; cells to a person: 288 → 297.",
+   "stat": "Run up to here: done.",
+   "bad": null
+  },
+  "6f": {
+   "sec": 1.439,
+   "pass": true,
+   "msg": "Planted copy: both planted numbers caught (2.1, 340). Real report: every number found in the tool facts. Guardrail: the sloppy draft was sent back once (9, 568), the second draft passed.",
+   "stat": "Run up to here: done.",
+   "bad": null
+  },
+  "7g": {
+   "sec": 3.962,
+   "pass": true,
+   "msg": "Both bugs fixed. Every fault shows the safe default: camera fault → CHECK, model not loaded → NO VERDICT, flow error → NO VERDICT, empty queue → nothing happens; a cell back from the person is counted once. Full console at 1920×1080: lamp word 156 px (next biggest 45 px), readable from about 5.2 m.",
+   "stat": "Run up to here: done.",
+   "bad": null
+  },
+  "8e": {
+   "sec": 110.334,
+   "pass": true,
+   "msg": "Learning curve: 157 photos → 0.833, 393 photos → 0.866, 787 photos → 0.876, 1574 photos → 0.877 (ranking score on validation, SVC (RBF)).",
+   "stat": "Run up to here: done.",
+   "bad": null
+  }
+ },
+ "fails": [
+  "empty browser: no saved progress"
+ ],
+ "errors": [],
+ "twin8e": {
+  "has_features": false,
+  "has_SKF": true,
+  "has_best": true,
+  "has_F": true,
+  "ran": true,
+  "va": [
+   0.776,
+   0.84,
+   0.843,
+   0.87
+  ],
+  "sizes": [
+   125,
+   314,
+   629,
+   1259
+  ]
+ }
+}

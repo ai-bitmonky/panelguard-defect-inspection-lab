@@ -1,4 +1,4 @@
-# PanelGuard — builder handover (state at v1.0, Steps 0–8 built — the course is complete)
+# PanelGuard — builder handover (state at v1.1, Steps 0–8 built — the course is complete)
 
 Browser-only course app. No server code. `site/` is the app; `dist/PanelGuard_Defect_Inspection_Lab_vX.Y.html` is the same app as one file.
 Repo: `/home/claude/panelguard` (git, no remote). Commit after every milestone.
@@ -168,3 +168,7 @@ LangGraph bundle: `cd tools/lg && npm ci && sh build.sh`. `entry.mjs` exports on
 - **Global CSS class names**: the app's own CSS uses `.main`, `.why`, `.brand`, `.verdict`, `.t`, `.endc`. Student console code must not use them (that is why the console has `.screen-main` / `.screen-side` / `.reason` / `.station` / `.target` / `.lbl`).
 - Step 7 previews: `pg.screen(id)` hosts live across re-renders; re-running a cell or reloading REBUILDS the queue/counters (a new shift), but the mech progress (`7c.ran`, `7d.answered`) only grows. The keyboard goes to the LAST `queueView` created (`pg.keys`); the full view saves and restores it.
 - The 7g probe and the fault panel set `NS.model = null` for a moment (always restored in `finally`) and stop the belt.
+
+## 11. Independent audit (v1.1)
+`tools/audit/`: `a_student.mjs` (single file, student mode, ONE session, every code cell: gaps blocked, every FILLS wrong answer + a typo, reference, card; live training with the app's Quick setting, NO fixture; reloads mid Steps 3/5/8; `FROM=id` resumes on the same `PROFILE`), `d_review.mjs` (review mode from an empty browser), `g_hosts.mjs` (site / file / srcdoc / srcdoc without same-origin), `g_sizes.mjs` (every page at 1366×768 and 1920×1080 + overflow checks), `t_rerun.mjs` (re-runs of the fixed checks), `twin5/6/7/8_displayed.py` + `py_cells_desktop.py` (the Python twins EXACTLY as displayed, `twins.json` from `dump_twins.mjs`), `wasm_block_v11.mjs`.
+v1.1 fixes: 6f hidden test no longer picks a fact that ends in 5 (0.0405 → 0.041 sat on the 0.5 limit: the reference answer failed with a live model = dead end); 3f check also compares bestFar (pSvc[0] passed when the true best weight was 0.1); 4c probe also compares once with the last layer's weights flipped (abs() passed when every block-3 weight was positive); plain message for the WebGL texture-size error; 1c message for a cut that makes every cell 1; footer note when storage is blocked; goal bar wraps at ≤1400 px; end card has no version; twins 6c–6f (fresh agents/tasks per crew: crewai 1.15.44 reruns lose steps and context), 7b (no next_no), 7d (answer returns the 6 outputs), 7f (report_crew), 8b (edges written out), 8e (features() defined) now run as displayed.

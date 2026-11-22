@@ -1,0 +1,27 @@
+{
+ "out": {
+  "srcdoc-noorigin": {
+   "store": "blocked: SecurityError",
+   "review": true,
+   "kern": {
+    "py": "blobc",
+    "js": "webgl"
+   },
+   "ran": {
+    "v3a": {
+     "pass": true,
+     "msg": "X is [2624, 64, 64, 1], values 0 to 1. Train tray 1574 photos, validation 525."
+    },
+    "v2e": {
+     "pass": true,
+     "msg": "Recall 95.2%, false-alarm rate 60.0%."
+    },
+    "stat": "Run up to here: done."
+   },
+   "storageNote": "Progress is NOT saved in this viewer (it blocks browser storage): a reload starts again. Open the downloaded file directly to keep your work.",
+   "sec": 78.234,
+   "errors": []
+  }
+ },
+ "fails": []
+}

@@ -1914,7 +1914,7 @@
      "pass": false,
      "msg": "Your checker lets 8 (no fact is that number) through: the allowed gap is too wide. Allow only half of the last written digit: 0.5.",
      "err": "",
-     "sec": 0.32,
+     "sec": 0.353,
      "bad": null
     },
     {
@@ -1924,9 +1924,9 @@
       "guardrail"
      ],
      "pass": false,
-     "msg": "Your checker refuses 0.0405 written as 0.041 — but that is the same fact, rounded the way the text writes it. Allow half of the last written digit: 0.5.",
+     "msg": "Your checker refuses 0.0622 written as 0.062 — but that is the same fact, rounded the way the text writes it. Allow half of the last written digit: 0.5.",
      "err": "",
-     "sec": 0.344,
+     "sec": 0.333,
      "bad": null
     },
     {
@@ -1938,7 +1938,7 @@
      "pass": false,
      "msg": "JavaScript stopped with an error. Read the red box below.",
      "err": "ERROR\nThe report job failed its guardrail every time, but the list of wrong numbers was EMPTY. The check must say ok when the wrong list is empty: length 0. (line 39)\nShow the raw JavaScript message",
-     "sec": 0.345,
+     "sec": 0.328,
      "bad": null
     },
     {
@@ -1950,7 +1950,7 @@
      "pass": false,
      "msg": "JavaScript stopped with an error. Read the red box below.",
      "err": "ERROR\nTask has no option “callback”. Its options: description, expected_output, agent, context, guardrail, guardrail_max_retries, name. (line 30)\nShow the raw JavaScript message",
-     "sec": 0.362,
+     "sec": 0.37,
      "bad": null
     },
     {
@@ -1962,7 +1962,7 @@
      "pass": false,
      "msg": "JavaScript stopped with an error. Read the red box below.",
      "err": "ERROR\nJavaScript could not read this code (Invalid or unexpected token). Check brackets ( ) [ ] { }, quotes and commas.",
-     "sec": 0.387,
+     "sec": 0.32,
      "bad": null
     }
    ],
@@ -1973,23 +1973,536 @@
    ],
    "lang": "js",
    "blank": "Line 16 still has a blank ____ . Type your answer there, then press Run.",
-   "pass": false,
-   "msg": "Your checker refuses 0.0405 written as 0.041 — but that is the same fact, rounded the way the text writes it. Allow half of the last written digit: 0.5.",
-   "sec": 0.353,
+   "pass": true,
+   "msg": "Planted copy: both planted numbers caught (2.1, 321). Real report: every number found in the tool facts. Guardrail: the sloppy draft was sent back once (9, 537), the second draft passed.",
+   "sec": 0.335,
    "viz": "YOUR CHECKER ON THE PLANTED COPY\nRed = numbers your checkReport() could not find in the tool facts.\nSHIFT QUALITY REPORT — for the plant manager\nRESULT: 2.1 defects passed per 100 (7 of 165). Target: at most 5 per 100 → TARGET MET.\nCOST: 321 person checks per 1,000 cells (281 this shift).\nWHERE IT FAILS: poly cells — 5 of 84 defects passed (6 per 100) at the first gates, before the poly gate.\nTOP ACTIONS:\n• More poly defect photos for training (5 of 84 poly defects passed).\n• Expert re-check of the unsure labels (1 of 17 unsure defects passed).\n• Work the action list: 14 mistakes sorted — 4 “need more photos like this”, 4 “ask the expert to re-check the label”, 3 “needs a sharper photo”, 3 “model looked at the wrong place”.\nNOTE: person answers — a perfect checker: the expert label answered every paused cell. Real people make mistakes.\n2 / 2\nplanted numbers caught\n0\nright numbers flagged\n2 / 2\nyou found by eye\nYOUR CHECKER ON THE REAL REPORT (6e)\nEvery number was found in the tool facts.\nSHIFT QUALITY REPORT — for the plant manager\nRESULT: 4.2 defects passed per 100 (7 of 165). Target: at most 5 per 100 → TARGET MET.\nCOST: 535 person checks per 1,000 cells (281 this shift).\nWHERE IT FAILS: poly cells — 5 of 84 defects passed (6 per 100) at the first gates, before the poly gate.\nTOP ACTIONS:\n• More poly defect photos for training (5 of 84 poly defects passed).\n• Expert re-check of the unsure labels (1 of 17 unsure defects passed).\n• Work the action list: 14 mistakes sorted — 4 “need more photos like this”, 4 “ask the expert to re-check the label”, 3 “needs a sharper photo”, 3 “model looked at the wrong place”.\nNOTE: person answers — a perfect checker: the expert label answered every paused cell. Real people make mistakes.\nTHE GUARDRAIL AT WORK — A SLOPPY SCRIPTED WRITER\nIts first draft has 2 numbers changed on purpose. The guardrail runs your checkReport() before the report is handed on.\nDRAFT 1 · CHECK FAILED ✗\nSHIFT QUALITY REPORT — for the plant manager\nRESULT: 4.2 defects passed per 100 (9 of 165). Target: at most 5 per 100 → TARGET MET.\nCOST: 537 person checks per 1,000 cells (281 this shift).\nWHERE IT FAILS: poly cells — 5 of 84 defects passed (6 per 100) at the first gates, before the poly gate.\nTOP ACTIONS:\n• More poly defect photos for training (5 of 84 poly defects passed).\n• Expert re-check of the unsure labels (1 of 17 unsure defects passed).\n• Work the action list: 14 mistakes sorted — 4 “need more photos like this”, 4 “ask the expert to re-check the label”, 3 “needs a sharper photo”, 3 “model looked at the wrong place”.\nNOTE: person answers — a perfect checker: the expert label answered every paused cell. Real people make mistakes.\nSent back once: “These numbers are not in the tool results: 9, 537”. As in CrewAI, the writer gets only this message and its old draft.\nDRAFT 2 · CHECK PASSED ✓\nSHIFT QUALITY REPORT — for the plant manager\nRESULT: 4.2 defects passed per 100 ([removed] of 165). Target: at most 5 per 100 → TARGET MET.\nCOST: ",
    "vizLen": 3895,
    "cardBad": null,
    "example": "collapsed",
-   "why": "none"
+   "why": "collapsed"
   },
   "7b": {
    "id": "7b",
-   "wrong": [],
+   "wrong": [
+    {
+     "w": [
+      "p",
+      "LAMPS.none"
+     ],
+     "pass": false,
+     "msg": "Cell 2567 is in the pass lane, but the lamp showed NO VERDICT. Look the lamp up by the lane the flow wrote: out.lane (gap 1: lane).",
+     "err": "",
+     "sec": 0.876,
+     "bad": null
+    },
+    {
+     "w": [
+      "lane",
+      "LAMPS.pass"
+     ],
+     "pass": false,
+     "msg": "For nothing came back the lamp showed PASS. Never show PASS when something is unknown: a defect could go out. The safe default is NO VERDICT: type LAMPS.none.",
+     "err": "",
+     "sec": 0.827,
+     "bad": null
+    },
+    {
+     "w": [
+      "lane",
+      "LAMPS.person"
+     ],
+     "pass": false,
+     "msg": "For nothing came back the lamp showed CHECK. CHECK hides that something broke. The safe default is NO VERDICT: type LAMPS.none.",
+     "err": "",
+     "sec": 0.795,
+     "bad": null
+    },
+    {
+     "w": [
+      "lanex",
+      "LAMPS.none"
+     ],
+     "pass": false,
+     "msg": "Cell 2567 is in the pass lane, but the lamp showed NO VERDICT. Look the lamp up by the lane the flow wrote: out.lane (gap 1: lane).",
+     "err": "",
+     "sec": 0.849,
+     "bad": null
+    }
+   ],
    "ref": [
     "lane",
     "LAMPS.none"
    ],
-   "lang": "js"
+   "lang": "js",
+   "blank": "Line 13 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "Lamp right for 6 real cells (pass, check and stop lanes), CHECK for the spoiled photo, NO VERDICT for all 4 broken answers. Measured on a 1920×1080 screen: lamp word 126 px — readable from about 4.2 m.",
+   "sec": 0.8,
+   "viz": "LIVE PREVIEW · your cell view\nYour code draws this. One real cell, scored live by your model, routed by your flow.\nPASS\ncell 2567 · poly\nNo colour (colour-blind view)\nFrom 2 m\n▶ Next real cell\nWHAT YOUR LAMP DID\nReal cells (from your Step 5 logbook lanes), a spoiled photo, and broken answers.\ncell\tflow lane\tlamp\tlive score\t3f score\tms\n2567\tpass\tPASS\t0.0790\t0.0790\t54\n1876\tpass\tPASS\t0.1021\t0.1021\t56\n986\tperson\tCHECK\t0.4198\t0.4198\t57\n2532\tperson\tCHECK\t0.1109\t0.1109\t53\n23\tstop\tSTOP\t0.9263\t0.9263\t55\n255\tstop\tSTOP\t0.7724\t0.7724\t66\nSpoiled photo F1 (too dark): CHECK · nothing came back → NO VERDICT · an empty answer {} → NO VERDICT · a flow error {error: 'camera PC lost'} → NO VERDICT · an unknown lane {lane: 'banana'} → NO VERDICT\n126 px\nlamp word (1920×1080)\n34.5 px\nnext biggest text\n24.2 mm\nletter height (24 inch)\n≈ 4.2 m\nreadable from\n\nMeasured from the real page layout on a hidden 1920×1080 screen. Assumption: a 24-inch monitor (0.27 mm per pixel) and 20 arc-minutes per letter for easy reading (11.6 mm at 2 m).",
+   "vizLen": 1024,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "none"
+  },
+  "7c": {
+   "id": "7c",
+   "wrong": [
+    {
+     "w": [
+      "word"
+     ],
+     "pass": false,
+     "msg": "After 5 cells the counters are {\"pass\":0,\"person\":0,\"stop\":0,\"none\":0,\"total\":5,\"byPerson\":0,\"PASS\":null,\"CHECK\":null}: the four lamps add up to 0, not 5. Each cell must go under its lamp's counter: type key.",
+     "err": "",
+     "sec": 0.683,
+     "bad": null
+    },
+    {
+     "w": [
+      "shape"
+     ],
+     "pass": false,
+     "msg": "After 5 cells the counters are {\"pass\":0,\"person\":0,\"stop\":0,\"none\":0,\"total\":5,\"byPerson\":0,\"circle\":null,\"triangle\":null}: the four lamps add up to 0, not 5. Each cell must go under its lamp's counter: type key.",
+     "err": "",
+     "sec": 0.744,
+     "bad": null
+    },
+    {
+     "w": [
+      "keyx"
+     ],
+     "pass": false,
+     "msg": "After 5 cells the counters are {\"pass\":0,\"person\":0,\"stop\":0,\"none\":0,\"total\":5,\"byPerson\":0,\"undefined\":null}: the four lamps add up to 0, not 5. Each cell must go under its lamp's counter: type key.",
+     "err": "",
+     "sec": 0.725,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "key"
+   ],
+   "lang": "js",
+   "blank": "Line 5 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "5 real cells counted: pass 3, person 2, stop 0, none 0. A flow error counts as NO VERDICT. Median decision 60 ms.",
+   "sec": 0.642,
+   "viz": "LIVE PREVIEW · the line\nYour counters and your cell view. Cells come from the validation tray, one by one, through your real flow.\nPASS\n3\nCHECK\n2\nSTOP\n0\nNO VERDICT\n0\nCELLS\n5\nBY PERSON\n0\nPASS\ncell 2567 · poly\n10\n20\n30\n60\n120\n600\nMAX\nCELLS / MIN\n▶ Start\n■ Stop\n30 cells / min = one cell every 2.0 s.\n0 of 30 cells run with Start.\nHOW FAST IS ONE REAL DECISION?\n60 ms\nmedian decision\n64 ms\nslow cells (95%)\n943\ncells / min possible\n5\ndecisions measured\n\nThe plant line needs 30 cells per minute (2 s per cell). One decision here takes 60 ms (slow ones 64 ms), so this browser keeps up with about 943 cells per minute — plenty for the line. Your knob (30/min) is inside that.\n\nMeasured with performance.now() around each real decision (software graphics here, so a plant PC with a graphics chip is faster). The person's time is measured in 7d.",
+   "vizLen": 839,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "none"
+  },
+  "7d": {
+   "id": "7d",
+   "wrong": [
+    {
+     "w": [
+      "update",
+      "'stop'"
+     ],
+     "pass": false,
+     "msg": "Answering a queued cell failed: Expected cmd.update to be a dict mapping channel names to update values. The Command option that hands the answer to the paused flow is resume.",
+     "err": "",
+     "sec": 1.986,
+     "bad": null
+    },
+    {
+     "w": [
+      "resume",
+      "'pass'"
+     ],
+     "pass": false,
+     "msg": "The keys are {\"p\":\"pass\",\"s\":\"pass\"}. P must mean pass and S must mean stop: type 'stop'.",
+     "err": "",
+     "sec": 1.966,
+     "bad": null
+    },
+    {
+     "w": [
+      "resumex",
+      "'stop'"
+     ],
+     "pass": false,
+     "msg": "Answering a queued cell failed: Received empty Command input. The Command option that hands the answer to the paused flow is resume.",
+     "err": "",
+     "sec": 1.518,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "resume",
+    "'stop'"
+   ],
+   "lang": "js",
+   "blank": "Line 11 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "The answer resumed the paused flow (cell 986 → human_check → record: stop). 12 real cells are waiting for you.",
+   "sec": 1.791,
+   "viz": "LIVE PREVIEW · the person's queue\nYour queue view. Big buttons, or the keys P (pass) / S (stop); H shows why. The clock starts when a cell is shown.\nQUEUE · 12 waiting · cell 1224 (mono)\n● PASS P\n■ STOP S\nWHY? H\n▶ Run the line until 10 more wait\nCAN ONE CHECKER KEEP UP?\n0 / 10\ncells you cleared\n12\nstill waiting\n—\nagree with the expert",
+   "vizLen": 336,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "none"
+  },
+  "7e": {
+   "id": "7e",
+   "wrong": [
+    {
+     "w": [
+      "decision",
+      "'pass'"
+     ],
+     "pass": false,
+     "msg": "The blocks add up to pass 364 / check 0 / stop 161, but the logbook has 171 / 281 / 73. Count each row in its lane: row.lane.",
+     "err": "",
+     "sec": 0.368,
+     "bad": null
+    },
+    {
+     "w": [
+      "lane",
+      "'stop'"
+     ],
+     "pass": false,
+     "msg": "The board says 158 defects passed, the logbook says 7 of 165. A defect got out when its final decision was 'pass'.",
+     "err": "",
+     "sec": 0.332,
+     "bad": null
+    },
+    {
+     "w": [
+      "lanex",
+      "'pass'"
+     ],
+     "pass": false,
+     "msg": "The blocks add up to pass 0 / check 0 / stop 0, but the logbook has 171 / 281 / 73. Count each row in its lane: row.lane.",
+     "err": "",
+     "sec": 0.36,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "lane",
+    "'pass'"
+   ],
+   "lang": "js",
+   "blank": "Line 6 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "525 logbook rows counted: 7 of 165 defects passed = 4.2 per 100 → target met. Mono 3.7 vs poly 4.8 per 100.",
+   "sec": 0.337,
+   "viz": "LIVE PREVIEW · the shift board\nYour SVG charts, counted from the real Step 5 logbook.\nLANES OVER THE SHIFT · 11 blocks of 50 cells\nstart\nend of shift\n● pass (bottom)\n▲ check (middle)\n■ stop (top)\nDEFECTS PASSED · TARGET AT MOST 5 PER 100\nall 7 of 165 = 4.2 per 100\ntarget 5\n● TARGET MET\nMONO VS POLY · DEFECTS PASSED PER 100\nmono 3 of 81 = 3.7 per 100\npoly 4 of 84 = 4.8 per 100\nTHE MANAGER'S ANSWERS\nRead straight from your charts.\nBusier? To a person: 55% in the first 3 blocks, 54% in the last 3 — about the same. (The tray is in random order, so a real shift could differ.)\nTarget? 7 of 165 defects passed = 4.2 per 100 → target met.\nPoly worse? mono 3.7 vs poly 4.8 per 100 → yes, poly is worse.",
+   "vizLen": 700,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "collapsed"
+  },
+  "7f": {
+   "id": "7f",
+   "wrong": [
+    {
+     "w": [
+      "facts",
+      "ok"
+     ],
+     "pass": false,
+     "msg": "The real report was held back (numbers not in the tool results: 4.2, 165, 5, 281, 5, 84, 6, 5, 84, 1, 17, 14, 4, 4, 3, 3). Check it against facts() and hold it only when the check is not ok.",
+     "err": "",
+     "sec": 0.376,
+     "bad": null
+    },
+    {
+     "w": [
+      "facts()",
+      "wrong"
+     ],
+     "pass": false,
+     "msg": "A report with a planted wrong number was SHOWN. The safe default: show it only when check.ok is true. Type ok.",
+     "err": "",
+     "sec": 0.551,
+     "bad": null
+    },
+    {
+     "w": [
+      "facts()x",
+      "ok"
+     ],
+     "pass": false,
+     "msg": "JavaScript stopped with an error. Read the red box below.",
+     "err": "ERROR\nJavaScript could not read this code (missing ) after argument list). Check brackets ( ) [ ] { }, quotes and commas.",
+     "sec": 0.36,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "facts()",
+    "ok"
+   ],
+   "lang": "js",
+   "blank": "Line 12 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "Report ready in 2 drafts (the checker removed 9, 537 from draft 1); every number checked. A copy with a planted number was held back.",
+   "sec": 0.347,
+   "viz": "LIVE PREVIEW · one button, one report\nYour REPORT button runs the crew, the checker, then shows the report — or holds it back.\nREPORT\nCOPY\nNo report yet.\nWHAT THE CHECK DID\n2\ndrafts written\n9, 537\nnumbers removed\nheld back\ncopy with a planted number\n—\ncopied\n\nThe scripted writer slips 2 numbers in draft 1 on purpose (from 6f); the guardrail sent it back. The badge is what the operator sees.",
+   "vizLen": 393,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "none"
+  },
+  "7g": {
+   "id": "7g",
+   "wrong": [],
+   "ref": [],
+   "lang": "js",
+   "blank": "NO GAPS (planted bugs): Fault drill — camera fault copy (lens cap on): the lamp still shows PASS (want CHECK). The screen kept the verdict of the cell before. That is BUG 1: replace  r.out && r.out.lane ? lampOf(r.out) : last  with  lampOf(r.out).",
+   "pass": true,
+   "msg": "Both bugs fixed. Every fault shows the safe default: camera fault → CHECK, model not loaded → NO VERDICT, flow error → NO VERDICT, empty queue → nothing happens; a cell back from the person is counted once. Full console at 1920×1080: lamp word 156 px (next biggest 45 px), readable from about 5.2 m.",
+   "sec": 0.762,
+   "viz": "LIVE PREVIEW · the whole console\nFixed console. Fire every fault again to prove the safe default.\nPANELGUARD · EL STATION 1\nPASS\n40\nCHECK\n67\nSTOP\n19\nNO VERDICT\n0\nCELLS\n126\nBY PERSON\n10\nLINE STOPPED\nNO VERDICT\ncell - · waiting\nQUEUE · 2 waiting · cell 506 (mono)\n● PASS P\n■ STOP S\nWHY? H\n▶ START LINE\n■ STOP LINE\nMAX cells / min\nSHIFT BOARD\nREPORT\n\nThis is your console at 1280×720, shrunk to fit. “Open the console” (after the fix) shows it full screen.\n\nFAULT PANEL · FIXED CODE\nEach button makes a real fault in the real console. Then say if the screen is right.\n⚡ Camera fault copy\n⚡ Model not loaded\n⚡ Flow error\n⚡ Empty queue\nWATCH THE CELLS COUNTER\nAnswer a queued cell with PASS / STOP in the console above. Does CELLS go up? It should not: that cell was counted when it arrived.\nDRILL LOG\nfault\tstarter code\tfixed code\nCamera fault copy\t—\t—\nModel not loaded\t—\t—\nFlow error\t—\t—\nEmpty queue\t—\t—\n⛶ Open the console",
+   "vizLen": 919,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "none"
+  },
+  "8b": {
+   "id": "8b",
+   "wrong": [
+    {
+     "w": [
+      "idx_val",
+      "bestW",
+      "routePoly"
+     ],
+     "pass": false,
+     "msg": "The Step 2 scores are for the VALIDATION cells (idx_val), not the sealed ones. Type idx_test.",
+     "err": "",
+     "sec": 39.274,
+     "bad": null
+    },
+    {
+     "w": [
+      "idx_test",
+      "0.7",
+      "routePoly"
+     ],
+     "pass": false,
+     "msg": "Your blend uses CNN weight 0.7. The frozen 3f weight is bestW = 0.1. Picking a new weight now would tune on the test tray. Type bestW.",
+     "err": "",
+     "sec": 42.956,
+     "bad": null
+    },
+    {
+     "w": [
+      "idx_test",
+      "bestW",
+      "route"
+     ],
+     "pass": false,
+     "msg": "14 poly and 0 mono cells took a different lane than your frozen flow. The frozen route station is the one with the poly gate: routePoly.",
+     "err": "",
+     "sec": 42.57,
+     "bad": null
+    },
+    {
+     "w": [
+      "idx_testx",
+      "bestW",
+      "routePoly"
+     ],
+     "pass": false,
+     "msg": "Python said: NameError: name 'idx_testx' is not defined",
+     "err": "",
+     "sec": 0.461,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "idx_test",
+    "bestW",
+    "routePoly"
+   ],
+   "lang": "js",
+   "blank": "Line 7 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "Trial done: 525 sealed cells, 7 of 164 defects passed = 4.3 per 100 (target at most 5) → target MET on the test tray. Validation was 4.2.",
+   "sec": 37.674,
+   "viz": "🔒 Frozen since the seal broke (23/11/2026 01:02): model, blend, gates and flow unchanged.\nLINE TRIAL · 525 SEALED CELLS\nFrozen model, blend, gates and flow. One run. A perfect checker answers the person's queue (an assumption).\n4.3\nTARGET MET on the test tray\ndefects passed per 100 · 7 of 164 defects went out · target at most 5\n\tVALIDATION\ngates tuned here\tTEST\nsealed, never used\nDefects passed per 100\t4.2 (7/165)\t4.3 (7/164)\nAuto-pass per 1,000\t326\t297\nTo a person per 1,000\t535\t552\nAuto-stop per 1,000\t139\t150\nGood cells stopped\t3 of 360\t12 of 361\nMono: defects passed per 100\t3.7 (3/81)\t7.2 (5/69)\nPoly: defects passed per 100\t4.8 (4/84)\t2.1 (2/95)\nyour guess\n0\n5\n10\n15\n20\ntarget 5\nvalidation 4.2\ntest 4.3\nYour guess (8a): 2.0 to 7.0 per 100 → inside.\nWHAT THIS MEANS\n\nThe target is met on new cells: 4.3 per 100 (validation 4.2).\n\nBut the tray has only 164 defects: one more escape moves the number by 0.6. 8c checks how sure this is. The test number is worse than validation — normal, because the gates were tuned on validation.\n\nTHE DEFECTS THAT WENT OUT\n7 real defects on the test tray passed. 3 of them the experts were unsure about (score 0.67).\ncell 2542\npoly · 0.065\ncell 1080\nmono · 0.106\ncell 1104\nmono · 0.112\ncell 1109\nmono · 0.101\ncell 2427\nmono · 0.105\ncell 1502\nmono · 0.121\ncell 2548\npoly · 0.061",
+   "vizLen": 1320,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "collapsed"
+  },
+  "8c": {
+   "id": "8c",
+   "wrong": [
+    {
+     "w": [
+      "1.645",
+      "kPassed",
+      "1"
+     ],
+     "pass": false,
+     "msg": "z = 1.645 gives a 90% interval: too narrow. 95% needs 1.96.",
+     "err": "",
+     "sec": 2.02,
+     "bad": null
+    },
+    {
+     "w": [
+      "1.96",
+      "nDefects",
+      "1"
+     ],
+     "pass": false,
+     "msg": "Your interval is 97.7 to 100.0 per 100. It must be built from the defects that passed (7 of 164): type kPassed.",
+     "err": "",
+     "sec": 1.6,
+     "bad": null
+    },
+    {
+     "w": [
+      "1.96",
+      "kPassed",
+      "0"
+     ],
+     "pass": false,
+     "msg": "underTarget says true, but the interval goes up to 8.5 per 100 (target 5). Compare the TOP end: position 1.",
+     "err": "",
+     "sec": 1.912,
+     "bad": null
+    },
+    {
+     "w": [
+      "1.96x",
+      "kPassed",
+      "1"
+     ],
+     "pass": false,
+     "msg": "JavaScript stopped with an error. Read the red box below.",
+     "err": "ERROR\nJavaScript could not read this code (Invalid or unexpected token). Check brackets ( ) [ ] { }, quotes and commas.",
+     "sec": 0.331,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "1.96",
+    "kPassed",
+    "1"
+   ],
+   "lang": "js",
+   "blank": "Line 5 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "Between 2.1 and 8.5 defects passed per 100 (Wilson 95%; bootstrap 1.3 to 7.5). The interval reaches above the target of 5: the trial cannot promise the target.",
+   "sec": 1.581,
+   "viz": "🔒 Frozen since the seal broke (23/11/2026 01:02): model, blend, gates and flow unchanged.\nHOW SURE · DEFECTS PASSED PER 100\nFrom one tray of 164 real defects (7 passed).\ndots: your 40 lever pulls · orange: the trial (4.3)\nWilson 95%\nbootstrap 95%\nplain ±1.96 spread (Wald)\n0\n2\n4\n6\n8\n10\n12\ntarget 5\nBetween 2.1 and 8.5 defects passed per 100.\nThe interval crosses the target of 5: the trial cannot promise the target.\n\nWhy Wilson: with a small count (7) the plain rule is too narrow and can go below 0. Wilson stays between 0 and 100 and is close to the bootstrap from 2,000 redrawn shifts. Your lever dots are the same idea, by hand.",
+   "vizLen": 634,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "collapsed"
+  },
+  "8d": {
+   "id": "8d",
+   "wrong": [
+    {
+     "w": [
+      "rk",
+      "0.25"
+     ],
+     "pass": false,
+     "msg": "Photos at 65% brightness give a PSI of only 0.000 on brightness. Inside the log you need today's share in bin k: N[k].",
+     "err": "",
+     "sec": 38.617,
+     "bad": null
+    },
+    {
+     "w": [
+      "N[k]",
+      "0.1"
+     ],
+     "pass": false,
+     "msg": "ALARM is 0.1. The rule of thumb to ACT is above 0.25 (0.1 to 0.25 means watch). Type 0.25.",
+     "err": "",
+     "sec": 38.584,
+     "bad": null
+    },
+    {
+     "w": [
+      "N[k]x",
+      "0.25"
+     ],
+     "pass": false,
+     "msg": "JavaScript stopped with an error. Read the red box below.",
+     "err": "ERROR\nJavaScript could not read this code (missing ) after argument list). Check brackets ( ) [ ] { }, quotes and commas.",
+     "sec": 0.343,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "N[k]",
+    "0.25"
+   ],
+   "lang": "js",
+   "blank": "Line 19 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "Drift alarm works. Today (the test tray): calm, highest PSI 0.037. Simulated changes that ring at least one alarm: 4 of 4.",
+   "sec": 36.287,
+   "viz": "🔒 Frozen since the seal broke (23/11/2026 01:02): model, blend, gates and flow unchanged.\nTODAY · THE TEST TRAY AS ONE SHIFT\nSame factory, cells the model never saw. Reference: the validation tray. PSI: below 0.1 calm · 0.1–0.25 watch · above 0.25 act (rules of thumb, not laws).\nScore\n0.037\nBrightness\n0.025\nContrast\n0.031\nSharpness\n0.029\nToday: no alarm rings — as it should for cells from the same factory.\nFOUR CHANGES · SIMULATED\nBuilt here from real test photos. They show what each alarm can see. They are NOT real factory data.\nDarker exposure\nevery photo at 65% brightness (lamp ageing, wrong exposure time)\n→\nBlurred lens\nevery photo smoothed with a 3 × 3 blur, twice (focus drifted)\n→\nOnly poly cells\nthe same photos, but today the line runs only poly cells (a new order)\n→\nCamera fault copies\n1 cell in 4 replaced by a fogged-lens copy (contrast squeezed to 25%)\n→\nWHICH ALARM CATCHES WHICH CHANGE?\nTap a box to tick “I expect this alarm to ring” (PSI above 0.25). Leave it empty if you expect calm. Then one check.\nchange\tScore\tBrightness\tContrast\tSharpness\nDarker exposure\t·\t·\t·\t·\nBlurred lens\t·\t·\t·\t·\nOnly poly cells\t·\t·\t·\t·\nCamera fault copies\t·\t·\t·\t·\nCheck my matrix One try.",
+   "vizLen": 1193,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "none"
+  },
+  "8e": {
+   "id": "8e",
+   "wrong": [
+    {
+     "w": [
+      "part",
+      "idx_test"
+     ],
+     "pass": false,
+     "msg": "You scored on the TEST tray. The test tray is for the one trial only — choosing how many photos to buy is a choice: score on validation, idx_val.",
+     "err": "",
+     "sec": 3.022,
+     "bad": null
+    },
+    {
+     "w": [
+      "order",
+      "idx_val"
+     ],
+     "pass": false,
+     "msg": "Python stopped with an error. Read the red box below.",
+     "err": "ERROR\nFeatures and labels have different lengths (1574 vs 157). They must be the same cells, in the same order. (line 19)\nShow the raw Python message",
+     "sec": 0.376,
+     "bad": null
+    },
+    {
+     "w": [
+      "partx",
+      "idx_val"
+     ],
+     "pass": false,
+     "msg": "Python stopped with an error. Read the red box below.",
+     "err": "ERROR\nPython does not know the name “partx”. Check the spelling. If it comes from an earlier substep, run that one again. (line 19)\nShow the raw Python message",
+     "sec": 0.35,
+     "bad": null
+    }
+   ],
+   "ref": [
+    "part",
+    "idx_val"
+   ],
+   "lang": "py",
+   "blank": "Line 19 still has a blank ____ . Type your answer there, then press Run.",
+   "pass": true,
+   "msg": "Learning curve: 157 photos → 0.833, 393 photos → 0.866, 787 photos → 0.876, 1574 photos → 0.877 (ranking score on validation, SVC (RBF)).",
+   "sec": 2.939,
+   "viz": "WHAT MORE LABELLED PHOTOS BUY\nThe Step 2 inspector (SVC (RBF)) trained on part of the train tray, scored on the same 525 validation cells. Measured just now.\n0.833\n64.7%\n157 photos\n10% · 48 defects\n0.866\n63.3%\n393 photos\n25% · 116 defects\n0.876\n53.9%\n787 photos\n50% · 230 defects\n0.877\n60.0%\n1574 photos\n100% · 492 defects\n— ranking score (validation)\n- - good cells stopped at 95%\nLast doubling (787 → 1574 photos): ranking score +0.001, good cells stopped 53.9% → 60.0%. Almost flat: more of the SAME kind of photo buys little. Better labels and new kinds of defects may buy more. (One random order; another order could move these by a little.)\nYOUR OWN PHOTO\nLoad a photo from your computer. It is resized to 64 × 64 grey and scored by your frozen system. Nothing leaves this browser.\nWarning: this model only knows electroluminescence (EL) photos of one solar cell — taken in the dark, the cell glowing under current, cut out and straightened, 64 × 64 grey. A phone photo of a panel still gets a number, but the number means nothing.\nSample: a sealed test cell\nSample: not an EL photo\n it is a poly cell\nTHE DATA SHOPPING LIST\nYour Step 4f to-do boxes become what to buy next. Tap “Add” on each box.\nNeed more photos like this · 4 cells\nAdd\nAsk the expert to re-check the label · 4 cells\nAdd\nNeeds a sharper photo · 3 cells\nAdd\nModel looked at the wrong place · 3 cells\nAdd\n⧉ Copy the list",
+   "vizLen": 1393,
+   "cardBad": null,
+   "example": "collapsed",
+   "why": "none"
   }
  },
  "mech": {
@@ -2332,31 +2845,148 @@
    "lock": {
     "next": "6g",
     "stayed": true,
-    "tip": "Locked. First finish 6f “Never trust, check”: find the planted numbers in the report copy above, then tap “Done”."
+    "tip": "Locked. First finish 6f “Never trust, check”: run the code until the check passes."
    },
    "found": 2,
-   "done": false
+   "done": true
   },
   "6g": {
    "lock": {
     "next": "7a",
-    "stayed": false,
-    "tip": "Locked. First finish 6f “Never trust, check”: run the code until the check passes."
-   }
+    "stayed": true,
+    "tip": "Locked. First finish 6g “Plug in a real model (optional)”: run the crew with a real model, or tap “Skip — no key”."
+   },
+   "mock": {
+    "calls": 9,
+    "stat": "",
+    "side": true
+   },
+   "done": true
   },
   "7a": {
    "lock": {
     "next": "7b",
-    "stayed": false,
-    "tip": "6b Make a tool: done ✓"
-   }
+    "stayed": true,
+    "tip": "Locked. First finish 7a “Sketch the screen”: put all 7 blocks in a place the rules accept, then look at the sketch from 2 metres."
+   },
+   "done": true
   },
   "7b": {
    "lock": {
     "next": "7c",
-    "stayed": false,
-    "tip": "6c Hire the workers: done ✓"
-   }
+    "stayed": true,
+    "tip": "Locked. First finish 7b “Show one cell”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "7c": {
+   "lock": {
+    "next": "7d",
+    "stayed": true,
+    "tip": "Locked. First finish 7c “Run the line”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "7d": {
+   "lock": {
+    "next": "7e",
+    "stayed": true,
+    "tip": "Locked. First finish 7d “The person's queue”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "7e": {
+   "lock": {
+    "next": "7f",
+    "stayed": true,
+    "tip": "Locked. First finish 7e “The shift board”: answer the prediction question."
+   },
+   "pred": {
+    "locked": true,
+    "good": 1
+   },
+   "done": true
+  },
+  "7f": {
+   "lock": {
+    "next": "7g",
+    "stayed": true,
+    "tip": "Locked. First finish 7f “One button, one report”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "7g": {
+   "lock": {
+    "next": "8a",
+    "stayed": true,
+    "tip": "Locked. First finish 7g “Break it before the plant does”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "8a": {
+   "lock": {
+    "next": "8b",
+    "stayed": true,
+    "tip": "Locked. First finish 8a “Freeze, then break the seal”: lock all 6 lines of the freeze sheet, lock your range on the number line, then press and hold the seal until it breaks."
+   },
+   "done": true
+  },
+  "8b": {
+   "lock": {
+    "next": "8c",
+    "stayed": true,
+    "tip": "Locked. First finish 8b “The line trial”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "8c": {
+   "lock": {
+    "next": "8d",
+    "stayed": true,
+    "tip": "Locked. First finish 8c “How sure is that number?”: pull the lever until 40 redrawn shifts are on the number line (0 of 40)."
+   },
+   "done": true
+  },
+  "8d": {
+   "lock": {
+    "next": "8e",
+    "stayed": true,
+    "tip": "Locked. First finish 8d “Watch for drift”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "8e": {
+   "lock": {
+    "next": "8f",
+    "stayed": true,
+    "tip": "Locked. First finish 8e “Your own factory photos”: run the code until the check passes."
+   },
+   "done": true
+  },
+  "8f": {
+   "lock": {
+    "next": "8g",
+    "stayed": true,
+    "tip": "Locked. First finish 8f “Go or no-go”: pick go / go with conditions / no-go, tick the conditions, and stamp a decision that fits the numbers."
+   },
+   "go": "The sheet refuses this decision:\n“Go” with no conditions is refused: the interval reaches 8.5 per 100, above the target of 5.\n“Go” is refused: 3 of the defects that passed had unsure expert labels.",
+   "cond": "Stamped 11/23/2026, 1:12:07 AM with: A bigger trial on a NEW sealed tray before full speed · A second checker on every shift · Watch poly cells separately on the shift board · Experts re-check the unsure labels · Run the drift alarm every shift; stop and re-check when it rings.\nStamped. The decision",
+   "stamped": {
+    "dec": "cond",
+    "ticks": [
+     "c_bigger",
+     "c_second",
+     "c_poly",
+     "c_labels",
+     "c_drift"
+    ],
+    "at": "11/23/2026, 1:12:07 AM"
+   },
+   "done": true
+  },
+  "8g": {
+   "copy": "✓ Copied",
+   "done": true
   }
  },
  "fails": [
@@ -2406,12 +3036,17 @@
   "7b: 7b opens in order",
   "7b: next part 7c locked before 7b is done; tooltip: “6c Hire the workers: done ✓”",
   "7b: starter code with gaps does not run: “undefined”",
-  "7b: 7b driver threw: page.waitForFunction: Target page, context or browser has been closed"
+  "7b: 7b driver threw: page.waitForFunction: Target page, context or browser has been closed",
+  "6f: 6f driver threw: locator.click: Timeout 30000ms exceeded.",
+  "6g: 6g opens in order",
+  "6g: next part 7a locked before 6g is done; tooltip: “Locked. First finish 6f “Never trust, check”: run the code until the check passes.”",
+  "6g: 6g driver threw: locator.fill: Target page, context or browser has been closed"
  ],
  "notes": [
   "5b wrong [\"push\",\"[]\"] card shows “null”: …e. / plain field lane — last value wins / — / reducer field log — values are combined / null / Fields on your card: id kind photo ",
   "5b wrong [\"concat\",\"null\"] card shows “null”: …e. / plain field lane — last value wins / — / reducer field log — values are combined / null / Fields on your card: id kind photo ",
-  "5b wrong [\"concatx\",\"[]\"] card shows “null”: …e. / plain field lane — last value wins / — / reducer field log — values are combined / null / Fields on your card: id kind photo "
+  "5b wrong [\"concatx\",\"[]\"] card shows “null”: …e. / plain field lane — last value wins / — / reducer field log — values are combined / null / Fields on your card: id kind photo ",
+  "6f hunt already done earlier in this session (kept after reload)"
  ],
  "live": {
   "2a": [
@@ -2770,7 +3405,316 @@
    ]
   },
   "6e_trace": 21,
-  "6e_report": "SHIFT QUALITY REPORT — for the plant manager\nRESULT: 4.2 defects passed per 100 (7 of 165). Target: at most 5 per 100 → TARGET MET.\nCOST: 535 person checks per 1,000 cells (281 this shift).\nWHERE IT FAILS: poly cells — 5 of 84 defects passed (6 per 100) at the first gates, before the poly gate.\nTOP ACTIONS:\n• More poly defect photos for training (5 of 84 poly defects passed).\n• Expert re-check of the unsure labels (1 of 17 unsure defects passed).\n• Work the action list: 14 mistakes sorted — 4 “need more photos like this”, 4 “ask the expert to re-check the label”, 3 “needs a sharper photo”, 3 “model looked at the wrong place”.\nNOTE: person answers — a perfect checker: the expert label answered every paused cell. Real people make mistakes."
+  "6e_report": "SHIFT QUALITY REPORT — for the plant manager\nRESULT: 4.2 defects passed per 100 (7 of 165). Target: at most 5 per 100 → TARGET MET.\nCOST: 535 person checks per 1,000 cells (281 this shift).\nWHERE IT FAILS: poly cells — 5 of 84 defects passed (6 per 100) at the first gates, before the poly gate.\nTOP ACTIONS:\n• More poly defect photos for training (5 of 84 poly defects passed).\n• Expert re-check of the unsure labels (1 of 17 unsure defects passed).\n• Work the action list: 14 mistakes sorted — 4 “need more photos like this”, 4 “ask the expert to re-check the label”, 3 “needs a sharper photo”, 3 “model looked at the wrong place”.\nNOTE: person answers — a perfect checker: the expert label answered every paused cell. Real people make mistakes.",
+  "7c": {
+   "cells": 35,
+   "medianMs": 62,
+   "slowMs": 94.5,
+   "maxPerMinute": 634
+  },
+  "7d_queue": 12,
+  "7d": {
+   "answered": 10,
+   "medianSeconds": 0.4605,
+   "perHour": 7817,
+   "share": 0.5352380952380953,
+   "perMinute": 30,
+   "neededPerHour": 963,
+   "keepsUp": true,
+   "checkers": 1
+  },
+  "7e": {
+   "all": {
+    "defects": 165,
+    "passed": 7,
+    "per100": 4.2
+   },
+   "mono": {
+    "defects": 81,
+    "passed": 3,
+    "per100": 3.7
+   },
+   "poly": {
+    "defects": 84,
+    "passed": 4,
+    "per100": 4.8
+   },
+   "cells": 525
+  },
+  "7f": "● EVERY NUMBER CHECKED · the checker removed 9, 537 from draft 1",
+  "8a": {
+   "model": "40a00667",
+   "params": 98001,
+   "bestW": 0.1,
+   "low": 0.12097616651635355,
+   "high": 0.7504503894266252,
+   "lowPoly": 0.10593639911464534,
+   "flow": "db35e02c",
+   "maxTries": 2,
+   "rules": [
+    20,
+    3,
+    12
+   ]
+  },
+  "8b": {
+   "all": {
+    "n": 525,
+    "def": 164,
+    "defPassed": 7,
+    "good": 361,
+    "goodStopped": 12,
+    "person": 290,
+    "per100": 4.2682926829268295,
+    "goodStopPer100": 3.3240997229916895
+   },
+   "mono": {
+    "n": 209,
+    "def": 69,
+    "defPassed": 5,
+    "good": 140,
+    "goodStopped": 7,
+    "person": 90,
+    "per100": 7.246376811594203,
+    "goodStopPer100": 5
+   },
+   "poly": {
+    "n": 316,
+    "def": 95,
+    "defPassed": 2,
+    "good": 221,
+    "goodStopped": 5,
+    "person": 200,
+    "per100": 2.1052631578947367,
+    "goodStopPer100": 2.262443438914027
+   },
+   "per1000": {
+    "pass": 297.14285714285717,
+    "person": 552.3809523809524,
+    "stop": 150.47619047619048
+   },
+   "n": 525,
+   "unsureEscapes": 3
+  },
+  "8c": {
+   "wilson": [
+    2.082673424599193,
+    8.547349168131097
+   ],
+   "boot": [
+    1.2738853503184713,
+    7.453416149068323
+   ],
+   "under": false
+  },
+  "8d": {
+   "today": {
+    "score": 0.0366,
+    "bright": 0.0249,
+    "contrast": 0.0309,
+    "sharp": 0.0291,
+    "ring": []
+   },
+   "alarms": {
+    "dark": {
+     "score": 2.2037,
+     "bright": 6.5724,
+     "contrast": 3.6377,
+     "sharp": 1.4033,
+     "ring": [
+      "score",
+      "bright",
+      "contrast",
+      "sharp"
+     ]
+    },
+    "blur": {
+     "score": 0.6604,
+     "bright": 0.0286,
+     "contrast": 1.3505,
+     "sharp": 3.2288,
+     "ring": [
+      "score",
+      "contrast",
+      "sharp"
+     ]
+    },
+    "poly": {
+     "score": 0.1193,
+     "bright": 0.0679,
+     "contrast": 0.0514,
+     "sharp": 0.6438,
+     "ring": [
+      "sharp"
+     ]
+    },
+    "fault": {
+     "score": 0.2583,
+     "bright": 0.0291,
+     "contrast": 0.291,
+     "sharp": 0.3439,
+     "ring": [
+      "score",
+      "contrast",
+      "sharp"
+     ]
+    }
+   },
+   "nRight": 7
+  },
+  "8e": [
+   {
+    "share": 0.1,
+    "photos": 157,
+    "defects": 48,
+    "auc": 0.8332,
+    "far": 0.6472,
+    "sec": 0.1
+   },
+   {
+    "share": 0.25,
+    "photos": 393,
+    "defects": 116,
+    "auc": 0.8661,
+    "far": 0.6333,
+    "sec": 0.2
+   },
+   {
+    "share": 0.5,
+    "photos": 787,
+    "defects": 230,
+    "auc": 0.8764,
+    "far": 0.5389,
+    "sec": 0.3
+   },
+   {
+    "share": 1,
+    "photos": 1574,
+    "defects": 492,
+    "auc": 0.877,
+    "far": 0.6,
+    "sec": 1
+   }
+  ],
+  "8e_own": "■ STOP\nyour photo: upload_test.png (300 × 300 px)\nscore 0.760 (CNN 0.788, Step 2 0.757) · pass below 0.121 · stop from 0.750\nphoto number\tthis photo\ttraining photos (validation)\twhere it falls\nbrightness\t71.2\t31.9 to 228.1\tpercentile 1\ncontrast\t54.0\t23.0 to 177.0\tlower than 99% of them\nsharpness\t2.6",
+  "8g_line": "Your line, start to end. Tap every stage: what you built there and its real number.\nPhotos\nStep 1 ✓\nFeatures + SVC\nStep 2 ✓\nCNN\nStep 3 ✓\nBlend + gates\nStep 3 ✓\nWhy maps\nStep 4 ✓\nLangGraph flow\nStep 5 ✓\nCrew report\nStep 6 ✓\nOperator console\nStep 7 ✓\nLine trial\nStep 8 ✓\nDrift watch\nStep 8 ✓\nDrift watch · Step 8\nPSI alarms on score, brightness, contrast, sharpness; act above 0.25. Today: calm.\n10 of 10 stages seen.\nFINAL TEST · 15 questions · Steps 1–8\n\nEvery question says what to do. Each has one Check: then it shows the correct answer and locks. Questions you have not checked stay open until you press Submit at the end.\n\nQUESTION 1 · STEP 1\nA photo is 64 × 64 grey pixels. Type how many numbers one photo is.\n numbers\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 2 · STEP 1\nTap the tray you use to CHOOSE settings, like a cutoff or a gate.\nTRAIN TRAY\nVALIDATION TRAY\nTEST TRAY\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 3 · STEP 2\nTap the 4 steps in the order you do them.\nScore the validation cells\nTurn all photos into features with that PCA\nTrain the model on the train features\nFit PCA on the train tray\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 4 · STEP 2\nThe validation tray has 80 real defects. Your cutoff stops 76 of them. Type the recall in %.\n %\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 5 · STEP 3\nTap the reason we divide the pixels by 255 before training the CNN.\nTo make the photo smaller\nSo every input is between 0 and 1, which keeps training stable\nTo remove the defects\n255 is the number of photos\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 6 · STEP 3\nLow gate 0.19, high gate 0.71. A mono cell scores 0.15. Tap its lane.\n● PASS\n▲ CHECK\n■ STOP\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 7 · STEP 4\nTap True or False for each line.\nA heat map shows where the model looked.\nTrue\nFalse\nA hot spot on a crack proves the label is right.\nTrue\nFalse\nCovering the hottest pixels should move the score more than covering random pixels.\nTrue\nFalse\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 8 · STEP 5\nComplete the code that resumes a paused flow with the person's answer. Type the missing word.\nline.invoke(new Command({ ____: 'stop' }), config)\nCheck\nOne check. Then it locks.\nWorked example (other values)\nQUESTION 9 · STEP 5\nMAX_TRIES = 2. A photo is too dark every time. Type how man",
+  "8g_qs": [
+   {
+    "id": "q1",
+    "fmt": "num",
+    "ans": 4096,
+    "q": "A photo is 64 × 64 grey pixels. Type how many numbers one photo is."
+   },
+   {
+    "id": "q2",
+    "fmt": "tray",
+    "ans": "validation",
+    "q": "Tap the tray you use to CHOOSE settings, like a cutoff or a gate."
+   },
+   {
+    "id": "q3",
+    "fmt": "order",
+    "q": "Tap the 4 steps in the order you do them."
+   },
+   {
+    "id": "q4",
+    "fmt": "num",
+    "ans": 95,
+    "q": "The validation tray has 80 real defects. Your cutoff stops 76 of them. Type the recall in %."
+   },
+   {
+    "id": "q5",
+    "fmt": "pick",
+    "ans": 1,
+    "q": "Tap the reason we divide the pixels by 255 before training the CNN."
+   },
+   {
+    "id": "q6",
+    "fmt": "lane",
+    "ans": "pass",
+    "q": "Low gate 0.19, high gate 0.71. A mono cell scores 0.15. Tap its lane."
+   },
+   {
+    "id": "q7",
+    "fmt": "tf",
+    "q": "Tap True or False for each line."
+   },
+   {
+    "id": "q8",
+    "fmt": "type",
+    "ans": "resume",
+    "q": "Complete the code that resumes a paused flow with the person's answer. Type the missing word.line.invoke(new Command({ ____: 'stop' }), config)"
+   },
+   {
+    "id": "q9",
+    "fmt": "num",
+    "ans": 2,
+    "q": "MAX_TRIES = 2. A photo is too dark every time. Type how many photos are taken before the cell goes to a person."
+   },
+   {
+    "id": "q10",
+    "fmt": "pick",
+    "ans": 0,
+    "q": "The writer's report says 9 defects passed; the tool said 6. Tap what the guardrail does."
+   },
+   {
+    "id": "q11",
+    "fmt": "lamp",
+    "ans": "none",
+    "q": "The camera PC is lost: the flow returns an error. Tap the lamp the screen must show."
+   },
+   {
+    "id": "q12",
+    "fmt": "num",
+    "ans": 4.3,
+    "q": "Your line trial: 7 of 164 test defects passed. Type defects passed per 100 (one decimal)."
+   },
+   {
+    "id": "q13",
+    "fmt": "yn",
+    "ans": "no",
+    "q": "Your 95% interval is 2.1 to 8.5 defects passed per 100. The target is at most 5. Can the target be promised? Tap Yes or No."
+   },
+   {
+    "id": "q14",
+    "fmt": "scale",
+    "ans": "act",
+    "q": "A drift alarm reads PSI 0.31. Tap calm, watch or act."
+   },
+   {
+    "id": "q15",
+    "fmt": "pick",
+    "ans": 1,
+    "q": "A line trial missed the target. Tap the honest next step."
+   }
+  ],
+  "8g_score": "SCORECARD\nFinal.\n11 / 15\nright\n15\nchecked\nyes\nsubmitted\n#\tstep\tyour answer\tcorrect answer\t\n1\t1\t4096 numbers\t4096 numbers\t✓\n2\t1\tvalidation\tvalidation\t✓\n3\t2\tright order\t1. Fit PCA on the train tray 2. Turn all photos into features with that PCA 3. Train the model on the train features 4. Score the validation cells\t✓\n4\t2\t95 %\t95 %\t✓\n5\t3\tTo remove the defects\tSo every input is between 0 and 1, which keeps training stable\t✗\n6\t3\tPASS\tPASS\t✓\n7\t4\tT F T\tTrue · False · True\t✓\n8\t5\tresume\tresume\t✓\n9\t5\t2 photos\t2 photos\t✓\n10\t6\tSends the report back, naming the wrong number\tSends the report back, naming the wrong number\t✓\n11\t7\tNO VERDICT\tNO VERDICT\t✓\n12\t8\t4.3 per 100\t4.3 per 100\t✓\n13\t8\tnot answered\tNo\t✗\n14\t8\tnot answered\tact\t✗\n15\t8\tnot answered\tReport the miss; improve on train / validation; test once on a NEW sealed tray\t✗",
+  "8g_files": [
+   [
+    "README.md",
+    1585
+   ],
+   [
+    "requirements.txt",
+    248
+   ],
+   [
+    "train.py",
+    7309
+   ],
+   [
+    "flow.py",
+    8364
+   ],
+   [
+    "crew.py",
+    4624
+   ],
+   [
+    "app.py",
+    4676
+   ]
+  ]
  },
  "errors": [],
  "order": [
@@ -2872,5 +3816,48 @@
   "8c",
   "8d",
   "8e"
- ]
+ ],
+ "twins": {
+  "1a": null,
+  "1b": null,
+  "1c": null,
+  "1d": null,
+  "1e": null,
+  "2a": null,
+  "2b": null,
+  "2c": null,
+  "2d": null,
+  "2e": null,
+  "3a": "import numpy as np\nimport keras\nfrom keras import layers\n\n# [photos, rows, columns, channels], floats 0..1\nX4 = X.reshape(2624, 64, 64, 1).astype('float32') / 255.0\n\nx_train, y_train = X4[idx_train], y[idx_train].astype('float32')\nx_val, y_val = X4[idx_val], y[idx_val]\nprint('X4', X4.shape, '  x_train', x_train.shape, '  x_val', x_val.shape)\nprint('smallest', X4.min(), '  largest', X4.max())\n",
+  "3c": "model = keras.Sequential()\nmodel.add(keras.Input(shape=(64, 64, 1)))\n\nfor filters in [16, 32, 64, 128]:\n    model.add(layers.Conv2D(filters, 3, padding='same', use_bias=False))\n    model.add(layers.BatchNormalization())\n    model.add(layers.Activation('relu'))\n    model.add(layers.MaxPooling2D(2))\n\nmodel.add(layers.GlobalAveragePooling2D())\nmodel.add(layers.Dropout(0.3))\nmodel.add(layers.Dense(1, activation='sigmoid'))\n\nmodel.summary()\n",
+  "3d": "rng = np.random.default_rng(0)\n\ndef flip_some(batch):\n    n = len(batch)\n    lr = rng.random(n) < 0.5\n    out = np.where(lr[:, None, None, None], np.flip(batch, axis=2), batch)   # left-right\n    ud = rng.random(n) < 0.5\n    out = np.where(ud[:, None, None, None], np.flip(out, axis=1), out)       # up-down\n    return out\n\ndemo = flip_some(x_train[:8])\nprint('demo batch', demo.shape)\n",
+  "3e": "from sklearn.metrics import roc_auc_score\n\nmodel.compile(optimizer=keras.optimizers.Adam(0.001), loss='binary_crossentropy')\n\nn_def = int(y_train.sum())\nn_ok = len(y_train) - n_def\nclass_weight = {0: len(y_train) / (2 * n_ok), 1: len(y_train) / (2 * n_def)}\n\nEPOCHS = 30\nbest_auc, best_epoch, best_weights = -1, 0, None\nfor epoch in range(1, EPOCHS + 1):\n    x_aug = flip_some(x_train)\n    hist = model.fit(x_aug, y_train, epochs=1, batch_size=32, shuffle=True, class_weight=class_weight, verbose=0)\n    p = model.predict(x_val, batch_size=128, verbose=0).ravel()\n    auc = roc_auc_score(y_val, p)\n    print(f'epoch {epoch:2d}  train loss {hist.history[\"loss\"][0]:.3f}  validation ranking score {auc:.3f}')\n    if auc > best_auc:\n        best_auc, best_epoch, best_weights = auc, epoch, model.get_weights()\nmodel.set_weights(best_weights)\nprint('best epoch:', best_epoch, '  validation ranking score:', round(best_auc, 3))\n",
+  "3f": "from sklearn.metrics import precision_recall_curve\n\ndef false_alarm_at_95(y_true, score):\n    pr, rc, cut = precision_recall_curve(y_true, score)\n    c = cut[rc[:-1] >= 0.95].max()\n    stop = score >= c\n    return float((stop & (y_true == 0)).sum() / (y_true == 0).sum())\n\np_cnn = model.predict(x_val, batch_size=128, verbose=0).ravel()\np_svc = p_val                     # Step 2 scores, same cells, same order\n\nbest_w, best_far = 0, 1\nfor k in range(11):\n    w = k / 10\n    blend = w * p_cnn + (1 - w) * p_svc\n    far = false_alarm_at_95(y_val, blend)\n    if far < best_far:\n        best_far, best_w = far, w\np_blend = best_w * p_cnn + (1 - best_w) * p_svc\nprint('CNN weight:', best_w, '  false-alarm rate at 95% recall:', round(best_far, 3))\n",
+  "3g": "def_scores = np.sort(p_blend[y_val == 1])\nlow = def_scores[int(np.floor(0.05 * len(def_scores)))]\n\norder = np.argsort(-p_blend)                          # highest first\ncaught = np.cumsum(y_val[order])\nshare_real = caught / np.arange(1, len(order) + 1)\nok = np.where(share_real >= 0.95)[0]\nhigh = p_blend[order[ok.max()]] if len(ok) else np.inf\n\nauto_pass = p_blend < low\nauto_stop = p_blend >= max(high, low)\nperson = ~auto_pass & ~auto_stop\nprint(f'low gate {low:.3f}   high gate {high:.3f}')\nprint('defects passed by mistake:', int((auto_pass & (y_val == 1)).sum()), 'of', int((y_val == 1).sum()))\nprint(f'per 1,000 cells: auto-pass {1000 * auto_pass.mean():.0f}   person {1000 * person.mean():.0f}   auto-stop {1000 * auto_stop.mean():.0f}')\n",
+  "4b": "SIZE, STEP = 8, 4\nN = (64 - SIZE) // STEP + 1                            # 15 spots across, 15 down\n\ndef gray_patch(img, r, c, size):\n    out = img.copy()\n    out[r:r + size, c:c + size] = img.mean()\n    return out\n\ndef cover_up(img):                                     # img: (64, 64, 1)\n    base = float(model.predict(img[None], verbose=0)[0, 0])\n    covered = np.stack([gray_patch(img, r * STEP, c * STEP, SIZE) for r in range(N) for c in range(N)])\n    return base - model.predict(covered, verbose=0).ravel()\n\nPAINT_CELLS = [496, 1088, 379]\nval_ids = [rows[i][0] for i in idx_val]\ncover_map = cover_up(x_val[val_ids.index(PAINT_CELLS[0])])\nprint('spots:', cover_map.size, '  biggest drop:', round(float(cover_map.max()), 3))\n",
+  "4c": "import tensorflow as tf\n\nL = model.layers\nacts = [l for l in L if isinstance(l, layers.Activation)]   # the ReLU after each block\ncut = L.index(acts[2])                                       # block 3 (count from 0)\nfront, back = L[:cut + 1], L[cut + 1:]\n\ndef run(ls, x):\n    for l in ls:\n        x = l(x, training=False)\n    return x\n\ndef grad_cam(img):                                    # img (64, 64, 1)  ->  map (16, 16)\n    A = run(front, tf.constant(img[None]))             # block-3 feature maps (1, 16, 16, 64)\n    with tf.GradientTape() as tape:\n        tape.watch(A)\n        s = tf.reduce_sum(run(back, A))\n    g = tape.gradient(s, A)                            # how much each value pushes the score up\n    w = tf.reduce_mean(g, axis=(0, 1, 2))              # one weight per feature map\n    cam = tf.reduce_sum(A * w, axis=-1)[0]             # weighted sum of the 64 maps\n    return tf.nn.relu(cam).numpy()                     # keep only what pushes towards \"defect\"\n\ncam0 = grad_cam(x_val[val_ids.index(PAINT_CELLS[0])])\nprint('Grad-CAM grid:', cam0.shape)\n",
+  "4d": "K = round(0.1 * 4096)                                  # 10% of the 4,096 pixels\ndef_idx = np.where(y_val == 1)[0]\nrng = np.random.default_rng(0)\nhot_imgs, rand_imgs = [], []\nfor i in def_idx:\n    img = x_val[i]\n    cam = tf.image.resize(grad_cam(img)[..., None], (64, 64), method='bilinear').numpy().ravel()\n    hot = np.argsort(-cam)[:K]                         # hottest pixels first\n    rnd = rng.choice(4096, K, replace=False)\n    a = img.ravel().copy(); a[hot] = img.mean(); hot_imgs.append(a.reshape(64, 64, 1))\n    b = img.ravel().copy(); b[rnd] = img.mean(); rand_imgs.append(b.reshape(64, 64, 1))\ns0 = model.predict(x_val[def_idx], verbose=0).ravel()\ndrop_hot = float((s0 - model.predict(np.array(hot_imgs), verbose=0).ravel()).mean())\ndrop_rand = float((s0 - model.predict(np.array(rand_imgs), verbose=0).ravel()).mean())\nprint('defects:', len(def_idx), '  drop (hottest 10%):', round(drop_hot, 3), '  drop (random 10%):', round(drop_rand, 3))\n",
+  "4e": "kind_v, prob_v = kind[idx_val], prob[idx_val]\nlane = np.where(p_blend < low, 'pass', np.where(p_blend >= max(high, low), 'stop', 'person'))\n\ndef lanes_for(keep):\n    d, g = keep & (y_val == 1), keep & (y_val == 0)\n    return dict(n=int(keep.sum()), defects=int(d.sum()), defects_passed=int((d & (lane == 'pass')).sum()),\n                good=int(g.sum()), good_stopped=int((g & (lane == 'stop')).sum()), person=int((keep & (lane == 'person')).sum()))\n\nsure = np.isin(prob_v, [0, 1])\nfor name, keep in [('mono', kind_v == 'mono'), ('poly', kind_v == 'poly'), ('sure', sure), ('unsure', ~sure)]:\n    print(name, lanes_for(keep))\n",
+  "5b": "import operator\nfrom typing import Annotated, Optional, TypedDict\n\nclass Cell(TypedDict, total=False):\n    id: int                  # cell number\n    kind: str                # 'mono' or 'poly'\n    photo: list              # the 4,096 pixel values (0 to 255)\n    problem: Optional[str]   # what is wrong with the photo, or None\n    tries: int               # photos taken so far\n    p: float                 # defect score 0 to 1\n    lane: str                # 'pass', 'person' or 'stop'\n    decision: str            # the final answer: 'pass' or 'stop'\n    log: Annotated[list, operator.add]   # each station ADDS one line (list + list)\n",
+  "5c": "from langgraph.graph import StateGraph, START, END\n\nDARK, BLANK, FLAT = 20, 3, 12\ndef photo_problem(photo):\n    a = np.asarray(photo, dtype=float); s = np.sort(a)\n    mean, spread, contrast = a.mean(), a.std(), s[int(0.95 * a.size)] - s[int(0.05 * a.size)]\n    if mean < DARK: return 'too dark'\n    if spread < BLANK: return 'almost blank'\n    if contrast < FLAT: return 'low contrast'\n    return None\n\ndef check_photo(state: Cell) -> dict:                 # return ONLY what changes\n    problem = photo_problem(state['photo'])\n    return {'problem': problem, 'log': ['check_photo: ' + (problem or 'photo ok')]}\n\ndef score(state: Cell) -> dict:\n    p = float(p_blend[val_ids.index(state['id'])])\n    return {'p': p, 'log': [f'score: {p:.3f}']}\n\ng = StateGraph(Cell)\ng.add_node('check_photo', check_photo)\ng.add_node('score', score)\ng.add_edge(START, 'check_photo')\ng.add_edge('check_photo', 'score')\ng.add_edge('score', END)\nline1 = g.compile()\n\nfor mode, chunk in line1.stream(card(496), stream_mode=['updates', 'values']):\n    print(mode, list(chunk))\n",
+  "5d": "def route(state: Cell) -> dict:                      # the fork station\n    lane = 'pass' if state['p'] < low else 'stop' if state['p'] >= high else 'person'\n    return {'lane': lane, 'log': ['route: ' + lane]}\n\ndef human_check(state: Cell) -> dict:                # made real in 5f\n    return {'lane': 'person', 'decision': 'waiting', 'log': ['human_check: a person will decide (5f)']}\n\naudit_log = []\ndef record(state: Cell) -> dict:\n    decision = state.get('decision') or state['lane']\n    audit_log.append({k: state.get(k) for k in ('id', 'kind', 'p', 'lane', 'tries')} | {'decision': decision})\n    return {'decision': decision, 'log': ['record: ' + decision]}\n\ng = StateGraph(Cell)\nfor name, fn in [('check_photo', check_photo), ('score', score), ('route', route), ('human_check', human_check), ('record', record)]:\n    g.add_node(name, fn)\ng.add_edge(START, 'check_photo'); g.add_edge('check_photo', 'score'); g.add_edge('score', 'route')\ng.add_conditional_edges('route', lambda s: s['lane'], {'pass': 'record', 'person': 'human_check', 'stop': 'record'})\ng.add_edge('human_check', 'record'); g.add_edge('record', END)\nline2 = g.compile()\n\nN = len(val_ids)\ntwenty = [line2.invoke(card(val_ids[k * N // 20])) for k in range(20)]\nprint('lanes:', ' '.join(c['lane'] for c in twenty))\n",
+  "5e": "from langgraph.errors import GraphRecursionError\n\nMAX_TRIES = 2                        # try float(\"inf\") to see the endless loop\n\ndef reshoot(state: Cell) -> dict:\n    return {'photo': shoot(state['id']), 'tries': state['tries'] + 1, 'log': [f\"reshoot: photo {state['tries'] + 1}\"]}\n\ndef after_check(state: Cell) -> str:\n    if not state.get('problem'): return 'score'\n    if state['tries'] >= MAX_TRIES: return 'human_check'\n    return 'reshoot'\n\ng = StateGraph(Cell)\nfor name, fn in [('check_photo', check_photo), ('reshoot', reshoot), ('score', score), ('route', route), ('human_check', human_check), ('record', record)]:\n    g.add_node(name, fn)\ng.add_edge(START, 'check_photo')\ng.add_conditional_edges('check_photo', after_check, ['score', 'reshoot', 'human_check'])\ng.add_edge('reshoot', 'check_photo'); g.add_edge('score', 'route')\ng.add_conditional_edges('route', lambda s: s['lane'], {'pass': 'record', 'person': 'human_check', 'stop': 'record'})\ng.add_edge('human_check', 'record'); g.add_edge('record', END)\nline3 = g.compile()\n\ntry:\n    trails = [line3.invoke(c, {\"recursion_limit\": 25}) for c in fault_cards + [card(1896), card(496)]]\nexcept GraphRecursionError as e:\n    print('STOPPED by LangGraph:', e)\n",
+  "5f": "from langgraph.checkpoint.memory import MemorySaver\nfrom langgraph.types import interrupt, Command\n\ndef human_check(state: Cell) -> dict:            # the flow PAUSES here\n    answer = interrupt({'id': state['id'], 'p': state.get('p'), 'problem': state.get('problem')})\n    return {'lane': state.get('lane') or 'person', 'decision': answer, 'log': ['human_check: a person said ' + answer]}\n\ndef build_line(route_station, saver):\n    g = StateGraph(Cell)\n    for name, fn in [('check_photo', check_photo), ('reshoot', reshoot), ('score', score),\n                     ('route', route_station), ('human_check', human_check), ('record', record)]:\n        g.add_node(name, fn)\n    g.add_edge(START, 'check_photo')\n    g.add_conditional_edges('check_photo', after_check, ['score', 'reshoot', 'human_check'])\n    g.add_edge('reshoot', 'check_photo'); g.add_edge('score', 'route')\n    g.add_conditional_edges('route', lambda s: s['lane'], {'pass': 'record', 'person': 'human_check', 'stop': 'record'})\n    g.add_edge('human_check', 'record'); g.add_edge('record', END)\n    return g.compile(checkpointer=saver)\n\nmemory = MemorySaver()\nline = build_line(route, memory)\n\nthreads = []\nfor cid in unsure_cells(5):\n    config = {'configurable': {'thread_id': f'cell-{cid}'}}\n    line.invoke(card(cid), config)              # pauses: result has __interrupt__\n    threads.append(config)\n\ndef decide(config, answer):\n    return line.invoke(Command(resume=answer), config)\n",
+  "5g": "def run_shift(graph, checker, name):\n    audit_log.clear()\n    for cid in val_ids:\n        config = {'configurable': {'thread_id': f'{name}-{cid}'}}\n        out = graph.invoke(card(cid), config)\n        while '__interrupt__' in out:               # paused at human_check\n            ask = out['__interrupt__'][0].value\n            out = graph.invoke(Command(resume=checker(ask)), config)\n    return shift_report(audit_log)\n\nperfect = lambda ask: 'stop' if label_of(ask['id']) == 1 else 'pass'\nshift_line = build_line(route, MemorySaver())\nshift1 = run_shift(shift_line, perfect, 'shift1')\nshift2 = run_shift(shift_line, right_nine_in_ten(perfect, 7), 'shift2')\n\npoly_def = np.sort(p_blend[(y_val == 1) & (kind_v == 'poly')])\nlow_poly = poly_def[int(np.floor(0.05 * len(poly_def)))]\ndef route_poly(state: Cell) -> dict:\n    lo = low_poly if state['kind'] == 'poly' else low\n    lane = 'pass' if state['p'] < lo else 'stop' if state['p'] >= high else 'person'\n    return {'lane': lane, 'log': ['route: ' + lane]}\nshift3 = run_shift(build_line(route_poly, MemorySaver()), perfect, 'shift3')\n",
+  "6b": "import json\nfrom crewai.tools import tool\n\n@tool(\"shift_stats\")\ndef shift_stats() -> str:\n    \"\"\"Facts of the last shift from the Step 5 logbook: cells, lanes per 1,000 cells,\n    defects passed, good cells stopped, person checks, reshoots.\"\"\"\n    R = shift_report(audit_log)                  # counts every row of the logbook\n    return json.dumps({\n        'cells': R['n'],\n        'per_1000': {k: js_round(v) for k, v in R['per1000'].items()},\n        'defects': R['all']['def'],\n        'defects_passed': R['all']['defPassed'],\n        'defects_passed_per_100': js_round(1000 * R['all']['defPassed'] / R['all']['def']) / 10,\n        'target_max_per_100': 5,\n        'good_cells': R['all']['good'], 'good_cells_stopped': R['all']['goodStopped'],\n        'person_checks': R['lanes']['person'], 'reshoots': R['reshoots'],\n        'person_answers': 'a perfect checker: the expert label answered every paused cell'})\n\n@tool(\"slice_table\")\ndef slice_table() -> str:\n    \"\"\"Defects passed and good cells stopped per group (mono / poly, expert sure / unsure), from the Step 4e slices.\"\"\"\n    return json.dumps(slice_facts(slices))\n\n# worst_cases and action_list: the same pattern (tools/research/step6_twin.py)\n",
+  "6c": "from crewai import Agent\nfrom crewai.llms.base_llm import BaseLLM\n\nclass ScriptedLLM(BaseLLM):           # rules, NOT a language model: no key, no network\n    slips: int = 0                    # 6f: change this many numbers in a first draft, on purpose\n    def call(self, messages, tools=None, callbacks=None, available_functions=None,\n             from_task=None, from_agent=None, response_model=None):\n        return scripted_step(messages, self.slips)   # \"Action: <next tool>\" or \"Final Answer: <pattern for the role>\"\n\nbrain = ScriptedLLM(model=\"scripted-rules\")\n\ndef hire():                           # crewai: an Agent runs right in ONE crew, so each crew gets fresh workers\n    inspector = Agent(role=\"Line Inspector\",\n        goal=\"State the facts of the last shift, with the exact numbers from your tool.\",\n        backstory=\"You watch the solar-cell line every shift. You never guess a number: you read it from the logbook.\",\n        tools=[shift_stats], llm=brain)\n    analyst = Agent(role=\"Root-cause Analyst\",\n        goal=\"Find where the failures cluster, and give the evidence numbers.\",\n        backstory=\"You compare groups of cells to find the weak spots. Every claim you make has a number from a tool.\",\n        tools=[slice_table, worst_cases], llm=brain)\n    writer = Agent(role=\"Report Writer\",\n        goal=\"Write a one-page shift quality report for the plant manager.\",\n        backstory=\"You write short and plain. You use only numbers from your tools and from the other workers.\",\n        tools=[action_list], llm=brain)\n    return inspector, analyst, writer\n\ninspector, analyst, writer = hire()\n",
+  "6d": "from crewai import Task, Crew, Process\n\ndef jobs(inspector, analyst, writer, writer_context=None, **extra):   # fresh Task objects for each crew\n    inspect_shift = Task(description=\"Read the facts of the last shift with your tool and state them.\",\n        expected_output=\"Cells checked, lanes per 1,000 cells, defects passed (per 100, with the target), good cells stopped, person checks, reshoots.\",\n        agent=inspector)\n    find_causes = Task(description=\"Find where the failures cluster: mono vs poly, expert-sure vs expert-unsure cells. List the missed defects.\",\n        expected_output=\"The weaker group in each pair with its numbers, the missed defects and the worst false alarms with ids and scores.\",\n        agent=analyst, context=[inspect_shift])\n    write_report = Task(description=\"Write the shift quality report for the plant manager.\",\n        expected_output=\"One page: result vs the target (at most 5 of 100 defects pass), cost in person checks, where it fails, top 3 actions.\",\n        agent=writer, context=[inspect_shift, find_causes] if writer_context is None else writer_context, **extra)   # run 1: writer_context=[]\n    return inspect_shift, find_causes, write_report\n\ninspect_shift, find_causes, write_report = jobs(inspector, analyst, writer)\norder_crew = Crew(agents=[inspector, analyst, writer],\n                  tasks=[inspect_shift, find_causes, write_report],   # run 1: write_report first\n                  process=Process.sequential)\norder_result = order_crew.kickoff()\nprint(order_result.raw)\n# Writer first WITH context=[inspect_shift, find_causes] -> ValueError at Crew(...):\n# \"... has a context dependency on a future task ..., which is not allowed.\"\n",
+  "6e": "from crewai import Crew, Process\n\ntrace = []\n# crewai 1.15.44: Agents and Tasks that already ran in 6d give NO steps and lose the context in a second crew,\n# so this crew gets fresh workers and fresh jobs (hire() from 6c, jobs() from 6d).\ninspector, analyst, writer = hire()\ninspect_shift, find_causes, write_report = jobs(inspector, analyst, writer)\nquality_crew = Crew(agents=[inspector, analyst, writer],\n                    tasks=[inspect_shift, find_causes, write_report],\n                    process=Process.sequential,\n                    step_callback=lambda step: trace.append(step))   # AgentAction / ToolResult objects\nshift_result = quality_crew.kickoff()\nprint(len(trace), \"steps ·\", len(shift_result.tasks_output), \"jobs\")\nprint(shift_result.raw)\n",
+  "6f": "import json, re\n\ndef facts():\n    return {n: json.loads(t.run()) for n, t in [(\"shift_stats\", shift_stats), (\"slice_table\", slice_table),\n                                               (\"worst_cases\", worst_cases), (\"action_list\", action_list)]}\ndef fact_numbers(v):\n    if isinstance(v, bool): return []\n    if isinstance(v, (int, float)): return [v]\n    if isinstance(v, dict): v = list(v.values())\n    return [x for item in v for x in fact_numbers(item)] if isinstance(v, list) else []\n\ndef check_report(text, f):\n    known = fact_numbers(f)\n    clean = re.sub(r\"(\\d),(\\d{3})\", r\"\\1\\2\", re.sub(r\"per 1,000|per 100\", \" \", text))\n    wrong = []\n    for tok in re.findall(r\"\\d+(?:\\.\\d+)?\", clean):\n        dp = len(tok.split(\".\")[1]) if \".\" in tok else 0\n        if not any(abs(k - float(tok)) <= 0.5 * 10 ** -dp for k in known): wrong.append(tok)\n    return {\"ok\": len(wrong) == 0, \"wrong\": wrong}\n\ndef report_guardrail(output):                       # CrewAI guardrail: (bool, result or error)\n    c = check_report(output.raw, facts())\n    return (True, output.raw) if c[\"ok\"] else (False, \"These numbers are not in the tool results: \" + \", \".join(c[\"wrong\"]))\n\ninspector, analyst, writer = hire()                 # fresh workers and jobs for this crew (see 6e)\nsloppy_writer = Agent(role=writer.role, goal=writer.goal, backstory=writer.backstory,\n                      tools=writer.tools, llm=ScriptedLLM(model=\"scripted-rules\", slips=2))\ninspect_shift, find_causes, checked_report = jobs(inspector, analyst, sloppy_writer,\n                      guardrail=report_guardrail, guardrail_max_retries=1)\nguarded = Crew(agents=[inspector, analyst, sloppy_writer], tasks=[inspect_shift, find_causes, checked_report]).kickoff()\n",
+  "7b": "import gradio as gr                    # gradio 6.32.0 — the whole app: tools/research/step7_gradio_app.py\nLAMPS = {'pass': ('PASS', 'circle', '#2ee07a'), 'person': ('CHECK', 'triangle', '#ffb21e'),\n         'stop': ('STOP', 'square', '#ff5050'), 'none': ('NO VERDICT', 'ring', '#a3afbf')}\n\ndef lamp_of(out):\n    if out and '__interrupt__' in out: return 'person'            # paused: a person decides\n    lane = out.get('lane') if out and 'error' not in out else None\n    return lane if lane in ('pass', 'person', 'stop') else 'none'  # unknown, missing or broken\n\ndef live_score(state):                     # the Keras model looks at THIS photo now\n    if STATE['model'] is None: raise RuntimeError('model not loaded')\n    x = np.asarray(state['photo'], dtype='float32').reshape(1, 64, 64, 1) / 255.0\n    cnn = float(STATE['model'](x, training=False).numpy()[0, 0])\n    p = best_w * cnn + (1 - best_w) * float(p_svc[VAL[state['id']]])\n    return {'p': p, 'log': [f'score (live): {p:.3f}']}\n# console_line = the Step 5 StateGraph with live_score as 'score', route_poly, log_row\n\nn_thread = [0]                             # a new thread id for every decision\ndef decide_cell(c):                        # ONE real decision, timed\n    n_thread[0] += 1; config = {'configurable': {'thread_id': f\"console-{c['id']}-{n_thread[0]}\"}}\n    t0 = time.perf_counter()\n    try: out = console_line.invoke(c, config)\n    except Exception as e: out = {'error': str(e)}\n    return {'card': c, 'config': config, 'out': out, 'lamp': lamp_of(out), 'ms': 1000 * (time.perf_counter() - t0)}\n\nwith gr.Blocks(title='PanelGuard · operator console') as demo:\n    with gr.Row():\n        photo = gr.Image(type='numpy', height=300, interactive=False, show_label=False)\n        lamp = gr.HTML(lamp_html('none'))        # word + SVG shape, coloured by the lamp key\n# smoke test (real run): F1 -> CHECK; {}, None, {'error'}, {'lane': 'banana'} -> NO VERDICT\n",
+  "7c": "def new_session():\n    return {'counts': {'pass': 0, 'person': 0, 'stop': 0, 'none': 0, 'total': 0, 'byPerson': 0},\n            'queue': [], 'answers': [], 'next': 0, 'times': [], 'shown_at': None}\n\ndef on_result(S, r):                       # ONCE per arriving cell, under its lamp\n    S['counts'][r['lamp']] += 1\n    S['counts']['total'] += 1\n    S['times'].append(r['ms'])\n\ndef next_cell(S):                          # one cell from the validation tray\n    S = S or new_session()\n    r = decide_cell(card(val_ids[S['next'] % len(val_ids)])); S['next'] += 1\n    on_result(S, r)\n    return S, photo_img(r['card']['photo']), lamp_html(r['lamp']), counters_html(S)\n\nwith gr.Blocks() as demo:\n    S = gr.State(None)                     # one session per browser tab\n    ...\n    timer = gr.Timer(2.0, active=False)    # 2 s per cell = 30 cells per minute\n    timer.tick(next_cell, S, [S, photo, lamp, counters], api_name='next_cell')\n    start.click(lambda: gr.Timer(active=True), None, timer)\n    halt.click(lambda: gr.Timer(active=False), None, timer)\n# smoke test (the course's own test model, Keras on CPU): 30 real cells, median 18.6 ms per decision\n",
+  "7d": "from langgraph.types import Command\n\ndef answer(S, said):                       # resume the SAME paused flow with the person's answer\n    if not S['queue']: return (S, counters_html(S)) + queue_view(S)   # empty queue: nothing happens\n    it = S['queue'].pop(0)\n    secs = time.perf_counter() - S['shown_at'] if S['shown_at'] else None\n    if '__interrupt__' in (it['out'] or {}):\n        console_line.invoke(Command(resume=said), it['config'])\n    else:                                  # the flow broke: log the person's answer\n        console_log.append({'id': it['card']['id'], 'lane': 'none', 'decision': said})\n    S['counts']['byPerson'] += 1           # NOT total: counted when it arrived\n    S['answers'].append({'id': it['card']['id'], 'said': said, 'seconds': secs})\n    return (S, counters_html(S)) + queue_view(S)   # the new state + what the screen shows\n\npass_b = gr.Button('● PASS  [P]', elem_id='pass-btn')\nstop_b = gr.Button('■ STOP  [S]', elem_id='stop-btn', variant='stop')\nwhy_b = gr.Button('WHY?  [H]', elem_id='why-btn')       # score, gates + Grad-CAM on demand\nq_out = [S, counters, qhead, qphoto, pass_b, stop_b]   # 6 outputs = the 6 values answer() returns\npass_b.click(lambda s: answer(s, 'pass'), S, q_out)\nstop_b.click(lambda s: answer(s, 'stop'), S, q_out)\n# keys: gradio has no hotkey option, so a small script in launch(head=...) clicks the buttons\nKEYS_JS = \"\"\"<script>document.addEventListener('keydown', (e) => {\n  const id = { p: 'pass-btn', s: 'stop-btn', h: 'why-btn' }[e.key.toLowerCase()];\n  const b = id && document.querySelector('#' + id); if (b && !b.disabled) b.click(); });</script>\"\"\"\n",
+  "7e": "def shift_board(log, size=50):\n    blocks = []\n    for i in range(0, len(log), size):\n        b = {'pass': 0, 'person': 0, 'stop': 0}\n        for row in log[i:i + size]: b[row['lane']] += 1\n        blocks.append(b)\n    def group(rs):\n        d = [r for r in rs if label_of(r['id']) == 1]\n        e = [r for r in d if r['decision'] == 'pass']\n        return {'defects': len(d), 'passed': len(e), 'per100': round(1000 * len(e) / len(d)) / 10 if d else 0}\n    return {'cells': len(log), 'blocks': blocks, 'all': group(log), 'target': 5,\n            'mono': group([r for r in log if r['kind'] == 'mono']),\n            'poly': group([r for r in log if r['kind'] == 'poly'])}\n\nboard = gr.HTML()                          # the same three charts, as an SVG string\nboard_b.click(lambda: board_html()[0], None, board)\n# smoke test (the course's own test model): 6 of 165 defects passed = 3.6 per 100, as in its JS logbook; yours shows your model's numbers\n",
+  "7f": "def report_crew():                         # a FRESH 6f crew for each press (crewai: workers and jobs run right once)\n    inspector, analyst, writer = hire()\n    sloppy = Agent(role=writer.role, goal=writer.goal, backstory=writer.backstory,\n                   tools=writer.tools, llm=ScriptedLLM(model='scripted-rules', slips=2))\n    return Crew(agents=[inspector, analyst, sloppy],\n                tasks=list(jobs(inspector, analyst, sloppy, guardrail=report_guardrail, guardrail_max_retries=1)))\n\ndef make_report():                         # the Step 6 CrewAI crew + check_report, then show or hold\n    try:\n        result = report_crew().kickoff()   # inspector, analyst, writer; the report task has the guardrail\n    except Exception as e:\n        return f'■ REPORT HELD BACK: {e}', ''\n    check = check_report(result.raw, facts())          # check AGAIN, before a person reads it\n    if not check['ok']:\n        return '■ REPORT HELD BACK: numbers not in the tool results: ' + ', '.join(check['wrong']), ''\n    return '● EVERY NUMBER CHECKED', result.raw\n\nreport_b = gr.Button('REPORT')\nbadge, paper = gr.HTML(), gr.Textbox(label='report', lines=8, interactive=False)\nreport_b.click(make_report, None, [badge, paper])\n",
+  "7g": "def build():\n    with gr.Blocks(title='PanelGuard · operator console') as demo:\n        ...                                # photo + lamp, counters, queue + 3 buttons, START / STOP LINE, board, report\n    return demo\n\ndef smoke():                               # the fault drill, for real, in Python\n    f1 = decide_cell(card('F1'))                              # camera fault copy -> CHECK\n    STATE['model'] = None; nm = decide_cell(card(val_ids[3])); STATE['model'] = model   # -> NO VERDICT\n    fe = decide_cell({'id': 'X9', 'kind': 'mono', 'tries': 1, 'photo': None})          # flow error -> NO VERDICT\n    e = new_session(); answer(e, 'pass')                     # empty queue -> nothing changes\n    demo = build()\n    demo.launch(server_name='127.0.0.1', server_port=port, prevent_thread_lock=True, css=CSS, head=KEYS_JS)\n    Client(f'http://127.0.0.1:{port}/').predict(api_name='/next_cell')   # a real request to the real server\n    demo.close()\n# gradio 6: css / head / theme moved from gr.Blocks(...) to launch(...)\n",
+  "8b": "# the same trial in Python: scikit-learn + Keras + LangGraph (tools/research/step8_twin.py runs it)\np_svc_test = best.predict_proba(F[idx_test])[:, 1]                      # Step 2, test cells\np_cnn_test = model.predict(X[idx_test].reshape(-1, 64, 64, 1) / 255.0, verbose=0).ravel()\np_test = best_w * p_cnn_test + (1 - best_w) * p_svc_test                # the frozen 3f blend\nTEST = {c: i for i, c in enumerate(cell_id[idx_test])}\n\ndef trial_score(state):\n    p = float(p_test[TEST[state['id']]])\n    return {'p': p, 'log': [f'score (test): {p:.3f}']}\n\ng = StateGraph(Cell)\nfor name, fn in [('check_photo', check_photo), ('reshoot', reshoot), ('score', trial_score),\n                 ('route', route_poly), ('human_check', human_check), ('record', trial_record)]:\n    g.add_node(name, fn)\ng.add_edge(START, 'check_photo')                                       # the same edges as Step 5\ng.add_conditional_edges('check_photo', after_check, ['score', 'reshoot', 'human_check'])\ng.add_edge('reshoot', 'check_photo'); g.add_edge('score', 'route')\ng.add_conditional_edges('route', lambda s: s['lane'], {'pass': 'record', 'person': 'human_check', 'stop': 'record'})\ng.add_edge('human_check', 'record'); g.add_edge('record', END)\ntrial_line = g.compile(checkpointer=MemorySaver())\nfor c in cell_id[idx_test]:\n    config = {'configurable': {'thread_id': f'trial-{c}'}}\n    out = trial_line.invoke(card(c), config)\n    while '__interrupt__' in out:                                         # the perfect checker\n        out = trial_line.invoke(Command(resume='stop' if y_test_of(c) else 'pass'), config)\n",
+  "8c": "from statsmodels.stats.proportion import proportion_confint\nk, n = trial['defects_passed'], trial['defects']\nlo, hi = proportion_confint(k, n, alpha=0.05, method='wilson')   # the same Wilson interval\nprint(f'between {100 * lo:.1f} and {100 * hi:.1f} per 100')\n\nrng = np.random.default_rng(1)                  # bootstrap: redraw the shift 2,000 times\ny_t, passed = np.array(y_rows), np.array(passed_rows)\nboot = []\nfor _ in range(2000):\n    i = rng.integers(0, len(y_t), len(y_t))\n    d = y_t[i] == 1\n    boot.append(100 * (d & passed[i]).sum() / d.sum())\nprint('bootstrap:', np.percentile(boot, [2.5, 97.5]).round(1))\nunder_target = 100 * hi <= 5                    # the WHOLE interval under the target?\n",
+  "8d": "def looks(photo):                                   # photo: 64 x 64 uint8\n    p = photo.astype(float); s = np.sort(p.ravel())\n    return {'bright': p.mean(), 'contrast': s[int(0.95 * s.size)] - s[int(0.05 * s.size)],\n            'sharp': np.abs(np.diff(p, axis=1)).mean()}\n\ndef psi(ref, now, bins=10):\n    edges = np.sort(ref)[[int((k + 1) * len(ref) / bins) for k in range(bins - 1)]]\n    R = np.maximum(np.bincount(np.searchsorted(edges, ref, side='right'), minlength=bins) / len(ref), 1e-4)\n    N = np.maximum(np.bincount(np.searchsorted(edges, now, side='right'), minlength=bins) / len(now), 1e-4)\n    return float(((N - R) * np.log(N / R)).sum())\n\nALARM = 0.25                                        # a rule of thumb, not a law\nref_score = p_cnn                                  # your CNN on validation (3f)\ndef drift(photos, scores=None):\n    if scores is None: scores = model.predict(photos[..., None] / 255.0, verbose=0).ravel()\n    out = {'score': psi(ref_score, scores)}\n    L = [looks(p) for p in photos]\n    for k in ('bright', 'contrast', 'sharp'):\n        out[k] = psi([looks(p)[k] for p in X[idx_val]], [l[k] for l in L])\n    return out\n",
+  "8e": "from sklearn.model_selection import learning_curve, StratifiedKFold   # scikit-learn's own helper does the same idea with folds\nsizes, tr, va = learning_curve(best, F[idx_train], y[idx_train], train_sizes=[0.1, 0.25, 0.5, 1.0],\n                               cv=StratifiedKFold(5, shuffle=True, random_state=0), scoring='roc_auc')\nprint(sizes, va.mean(axis=1).round(3))\n# The cell on the left scores on idx_val instead of folds, so its numbers match the rest of the course.\n# Your own photo: resize to 64 x 64 grey, same features, same model\nfrom PIL import Image\ndef features(imgs):                        # the same A + B + C features as 2a, for new photos (0..1)\n    small = imgs.reshape(len(imgs), 32, 2, 32, 2).mean(axis=(2, 4)).reshape(len(imgs), -1)\n    return np.hstack([line_finder(imgs), dark_map(imgs), pca.transform(small)])\nimg = np.asarray(Image.open('my_cell.png').convert('L').resize((64, 64), Image.BILINEAR))\np_svc = best.predict_proba(features(img[None] / 255.0))[0, 1]\n"
+ }
 }
