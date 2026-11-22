@@ -12,3 +12,12 @@ export const FILLS = {
   '2e': { right: ['cut', 'tn'], wrong: [['0.5', 'tn'], ['cut', 'tp'], ['0.05', 'tn']] },
 };
 export function fill(code, vals) { let i = 0; return code.replace(/____/g, () => vals[i++]); }
+// Step 3 (JavaScript cells)
+Object.assign(FILLS, {
+  '3a': { right: ['[2624, 64, 64, 1]', '255'], wrong: [['[64, 64, 2624, 1]', '255'], ['[2624, 64, 64]', '255'], ['[2624, 64, 64, 1]', '256'], ['[2624, 64, 64, 3]', '255']] },
+  '3c': { right: ['1', '64', '1'], wrong: [['3', '64', '1'], ['1', '48', '1'], ['1', '64', '2']] },
+  '3d': { right: ['2'], wrong: [['1'], ['0'], ['3']] },
+  '3e': { right: ['binaryCrossentropy', 'nDef'], wrong: [['meanSquaredError', 'nDef'], ['binaryCrossEntropy', 'nDef'], ['binaryCrossentropy', 'nOk']] },
+  '3f': { right: ['i', 'bestFar'], wrong: [['0', 'bestFar'], ['i', '1'], ['i', 'far']] },
+  '3g': { right: ['0.05', '0.95'], wrong: [['5', '0.95'], ['0.95', '0.95'], ['0.05', '0.5']] },
+});

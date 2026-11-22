@@ -127,7 +127,7 @@ await codeStep('2e', null, async () => {
 await page.locator('#out').evaluate((e) => { e.scrollTop = e.scrollHeight; }); await page.waitForTimeout(300); await shot('2e_end');
 const rep = await page.evaluate(() => { const r = window.PG.RES['2e']; return { tp: r.tp, fn: r.fn, fp: r.fp, tn: r.tn, rec: r.rec, far: r.far, cut: r.cut }; });
 log('REPORT', JSON.stringify(rep));
-const all = await page.evaluate(() => window.PG.ORDER.filter((i) => !window.PG.passed(i)));
+const all = await page.evaluate(() => window.PG.ORDER.filter((i) => i < '3' && !window.PG.passed(i)));
 log('not passed:', JSON.stringify(all));
 
 // ---------- reload: state must come back (localStorage + replay) ----------

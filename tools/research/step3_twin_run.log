@@ -1,0 +1,95 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1795328502.196849     386 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1795328504.650874     386 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+X4 (2624, 64, 64, 1)   x_train (1574, 64, 64, 1)   x_val (525, 64, 64, 1)
+smallest 0.03529412   largest 1.0
+Model: "sequential"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ conv2d (Conv2D)                 │ (None, 64, 64, 16)     │           144 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization             │ (None, 64, 64, 16)     │            64 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation (Activation)         │ (None, 64, 64, 16)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d (MaxPooling2D)    │ (None, 32, 32, 16)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_1 (Conv2D)               │ (None, 32, 32, 32)     │         4,608 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_1           │ (None, 32, 32, 32)     │           128 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation_1 (Activation)       │ (None, 32, 32, 32)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_1 (MaxPooling2D)  │ (None, 16, 16, 32)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_2 (Conv2D)               │ (None, 16, 16, 64)     │        18,432 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_2           │ (None, 16, 16, 64)     │           256 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation_2 (Activation)       │ (None, 16, 16, 64)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_2 (MaxPooling2D)  │ (None, 8, 8, 64)       │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_3 (Conv2D)               │ (None, 8, 8, 128)      │        73,728 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_3           │ (None, 8, 8, 128)      │           512 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation_3 (Activation)       │ (None, 8, 8, 128)      │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_3 (MaxPooling2D)  │ (None, 4, 4, 128)      │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ global_average_pooling2d        │ (None, 128)            │             0 │
+│ (GlobalAveragePooling2D)        │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout (Dropout)               │ (None, 128)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 1)              │           129 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 98,001 (382.82 KB)
+ Trainable params: 97,521 (380.94 KB)
+ Non-trainable params: 480 (1.88 KB)
+demo batch (8, 64, 64, 1)
+epoch  1  train loss 0.669  validation ranking score 0.768
+epoch  2  train loss 0.642  validation ranking score 0.552
+epoch  3  train loss 0.608  validation ranking score 0.433
+epoch  4  train loss 0.572  validation ranking score 0.498
+epoch  5  train loss 0.562  validation ranking score 0.774
+epoch  6  train loss 0.548  validation ranking score 0.760
+epoch  7  train loss 0.539  validation ranking score 0.820
+epoch  8  train loss 0.519  validation ranking score 0.817
+epoch  9  train loss 0.517  validation ranking score 0.827
+epoch 10  train loss 0.508  validation ranking score 0.828
+epoch 11  train loss 0.500  validation ranking score 0.814
+epoch 12  train loss 0.484  validation ranking score 0.804
+epoch 13  train loss 0.492  validation ranking score 0.859
+epoch 14  train loss 0.490  validation ranking score 0.815
+epoch 15  train loss 0.493  validation ranking score 0.852
+epoch 16  train loss 0.479  validation ranking score 0.865
+epoch 17  train loss 0.473  validation ranking score 0.848
+epoch 18  train loss 0.473  validation ranking score 0.854
+epoch 19  train loss 0.469  validation ranking score 0.849
+epoch 20  train loss 0.459  validation ranking score 0.865
+epoch 21  train loss 0.455  validation ranking score 0.858
+epoch 22  train loss 0.454  validation ranking score 0.841
+epoch 23  train loss 0.460  validation ranking score 0.861
+epoch 24  train loss 0.450  validation ranking score 0.833
+epoch 25  train loss 0.450  validation ranking score 0.684
+epoch 26  train loss 0.458  validation ranking score 0.825
+epoch 27  train loss 0.443  validation ranking score 0.872
+epoch 28  train loss 0.440  validation ranking score 0.758
+epoch 29  train loss 0.441  validation ranking score 0.852
+epoch 30  train loss 0.440  validation ranking score 0.755
+best epoch: 27   validation ranking score: 0.872
+CNN weight: 0.5   false-alarm rate at 95% recall: 0.469
+low gate 0.191   high gate 0.707
+defects passed by mistake: 8 of 165
+per 1,000 cells: auto-pass 379   person 457   auto-stop 164
+TOTAL seconds 115
+{"best_epoch": 27, "cnn_auc": 0.872, "cnn_far": 0.586, "svc_far": 0.6, "blend_w": 0.5, "blend_far": 0.469, "low": 0.19077805193961156, "high": 0.7065941710696, "person_per_1000": 457, "def_passed": 8}
+EXIT 0
