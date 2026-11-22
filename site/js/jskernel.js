@@ -58,6 +58,7 @@ function friendly(e) {
   if (t === 'Stopped') return m || 'You stopped the run.';
   if (t === 'Check') return m;
   if (t === 'SyntaxError') return 'JavaScript could not read this code (' + m + '). Check brackets ( ) [ ] { }, quotes and commas.';
+  if (t === 'ReferenceError' && (x = m.match(/^(.+?) is not defined/)) && G.PG_NAME_FROM && G.PG_NAME_FROM[x[1]]) return 'This cell uses “' + x[1] + '”, which is made in ' + G.PG_NAME_FROM[x[1]] + '. Run ' + G.PG_NAME_FROM[x[1]] + ' first (in review mode: press “Run up to here”).';
   if (t === 'ReferenceError' && (x = m.match(/^(.+?) is not defined/))) return 'JavaScript does not know the name “' + x[1] + '”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again.';
   if ((x = m.match(/Based on the provided shape, \[(.*?)\], the tensor should have (\d+) values but has (\d+)/))) return 'The sizes do not fit: the data has ' + (+x[3]).toLocaleString('en-US') + ' values, but shape [' + x[1] + '] needs ' + (+x[2]).toLocaleString('en-US') + '. Check the gap.';
   if ((x = m.match(/Cannot read propert(?:y|ies) of (undefined|null) \(reading '(.+?)'\)/))) return 'Something is ' + x[1] + ' just before “.' + x[2] + '”. Usually a name is misspelled, or a list index is past the end.';
@@ -65,7 +66,23 @@ function friendly(e) {
   if ((x = m.match(/index value (-?\d+) is not in \[0, (\d+)\]/))) return 'There is no position ' + x[1] + ' there: that axis has only ' + (+x[2] + 1) + ' entries. Check the order of the numbers in the shape: the photo count comes first.';
   if ((x = m.match(/Unknown loss (\S+)/))) return 'TensorFlow.js has no loss called “' + x[1] + '”. Check the spelling letter by letter: capital letters count.';
   if ((x = m.match(/Axis must be|axis.*out of range|Invalid axis/i))) return 'That axis does not exist here: ' + m;
+  if ((x = lgFriendly(m))) return x;
   return t + ': ' + m;
+}
+/* LangGraph errors in plain words (Step 5). Returns null for other messages. */
+function lgFriendly(m) {
+  var f = String(m || '').split('\n')[0], x;
+  if ((x = f.match(/Node `(.+?)` is not reachable/))) return 'No arrow leads to the station “' + x[1] + '”, so it can never run. Check where each arrow (and each lane of a fork) goes.';
+  if ((x = f.match(/Found edge (?:ending|starting) at unknown node `(.+?)`/))) return 'An arrow uses “' + x[1] + '”, but there is no station with that name. Arrows join station names (text in quotes).';
+  if ((x = f.match(/^(.+?) is already being used as a state attribute/))) return 'A station cannot have the same name as a card field (“' + x[1] + '”). Rename the station.';
+  if (/No checkpointer set/.test(f)) return 'interrupt() can only pause a flow that has a memory to keep it in. Compile the line with a checkpointer: compile({ checkpointer: … }).';
+  if (/Called interrupt\(\) outside the context/.test(f)) return 'interrupt() lost track of its station. In the browser, call interrupt() first in the station, before any await.';
+  if ((x = f.match(/Recursion limit of (\d+) reached/))) return 'The flow went round and round and never reached END. LangGraph stopped it after ' + x[1] + ' steps (its recursion limit). A loop needs a way out.';
+  if (/Branch condition returned unknown or null destination/.test(f)) return 'A fork function returned a station that is not in its list of next stations. Return one of the names in that list.';
+  if (/Expected cmd\.update/.test(f)) return 'Command({ update }) changes card fields; it does not carry an answer into a paused flow.';
+  if ((x = f.match(/Invalid update for channel (\S+)/))) return 'A station returned something LangGraph cannot write on the card field ' + x[1] + '.';
+  if (/Troubleshooting URL: https:\/\/docs\.langchain\.com/.test(m)) return 'LangGraph stopped: ' + f;
+  return null;
 }
 
 /* ---------- code rewrite: top-level declarations become notebook names ---------- */
@@ -201,5 +218,5 @@ function trainer(J, tf, hooks) {
   return T;
 }
 
-G.PGJS = { create: create, trainer: trainer, auc: auc, cutAt: cutAt, rates: rates, falseAlarmAt95: falseAlarmAt95, twoGates: twoGates, bce: bce, friendly: friendly, rewrite: rewrite, fmt: fmt, CheckError: CheckError, StopError: StopError };
+G.PGJS = { create: create, trainer: trainer, auc: auc, cutAt: cutAt, rates: rates, falseAlarmAt95: falseAlarmAt95, twoGates: twoGates, bce: bce, friendly: friendly, lgFriendly: lgFriendly, rewrite: rewrite, fmt: fmt, CheckError: CheckError, StopError: StopError };
 })(typeof window !== 'undefined' ? window : globalThis);

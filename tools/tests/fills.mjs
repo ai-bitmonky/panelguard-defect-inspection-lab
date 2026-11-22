@@ -28,3 +28,12 @@ Object.assign(FILLS, {
   '4d': { right: ['0.1', 'K'], wrong: [['10', 'K'], ['0.01', 'K'], ['0.1', '4096']] },
   '4e': { right: ["'pass'", "'poly'"], wrong: [["'stop'", "'poly'"], ["'pass'", "'mono'"], ["'person'", "'poly'"]] },
 });
+// Step 5 (JavaScript cells, LangGraph)
+Object.assign(FILLS, {
+  '5b': { right: ['concat', '[]'], wrong: [['push', '[]'], ['concat', 'null'], ['concat', "''"]] },
+  '5c': { right: ['p', "'score'"], wrong: [['score', "'score'"], ['p', 'END'], ['p', 'score']] },
+  '5d': { right: ['high', "'human_check'"], wrong: [['low', "'human_check'"], ['high', "'record'"], ['high', "'person'"]] },
+  '5e': { right: ['2', "'human_check'"], wrong: [['Infinity', "'human_check'"], ['2', "'reshoot'"], ['2', "'record'"], ['3', "'human_check'"]] },
+  '5f': { right: ['memory', 'resume'], wrong: [['undefined', 'resume'], ['memory', 'goto'], ['memory', 'update']] },
+  '5g': { right: ['0.05', "'poly'"], wrong: [['5', "'poly'"], ['0.05', "'mono'"], ['0.5', "'poly'"]] },
+});
