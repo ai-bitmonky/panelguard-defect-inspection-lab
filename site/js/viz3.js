@@ -494,12 +494,19 @@ function blend(r, host, api) {
 /* ================= 3g: two gates ================= */
 function twoGate(host, y, s, ids, st, onChange, opt) {
   opt = opt || {};
-  var W = 440, Hh = 250, mid = 120, L = 14, R = W - 10, SQ = function (v) { return Math.sqrt(Math.max(0, v)); };
-  var X = function (v) { return L + (R - L) * SQ(Math.min(1, v)); }, XI = function (p) { var t = Math.max(0, Math.min(1, (p - L) / (R - L))); return t * t; };
-  var nb = 70, idx = s.map(function (v, i) { return i; }).sort(function (a, b) { return s[a] - s[b]; }), maxS = 1, cnt = {};
-  idx.forEach(function (i) { var b = Math.min(nb - 1, Math.floor(SQ(s[i]) * nb)), k = b + (y[i] ? 'd' : 'g'); cnt[k] = (cnt[k] || 0) + 1; maxS = Math.max(maxS, cnt[k]); });
-  var dot = Math.min((R - L) / nb, (mid - 22) / maxS);
+  /* the score line spans the real range of these scores (so bunched-up scores still spread out) */
+  var W = 440, Hh = 250, mid = 120, L = 14, R = W - 10;
+  var smin = Math.min.apply(null, s), smax = Math.max.apply(null, s), pad = Math.max(1e-3, 0.03 * (smax - smin));
+  var lo0 = Math.max(0, smin - pad), hi0 = Math.min(1, smax + pad);
+  var X = function (v) { return L + (R - L) * (Math.max(lo0, Math.min(hi0, v)) - lo0) / (hi0 - lo0); }, XI = function (p) { return lo0 + (hi0 - lo0) * Math.max(0, Math.min(1, (p - L) / (R - L))); };
+  var nb = 64, BIN = function (v) { return Math.min(nb - 1, Math.max(0, Math.floor((v - lo0) / (hi0 - lo0) * nb))); };
+  var idx = s.map(function (v, i) { return i; }).sort(function (a, b) { return s[a] - s[b]; }), maxS = 1, cnt = {};
+  idx.forEach(function (i) { var k = BIN(s[i]) + (y[i] ? 'd' : 'g'); cnt[k] = (cnt[k] || 0) + 1; maxS = Math.max(maxS, cnt[k]); });
+  var dot = Math.min((R - L) / nb, (mid - 30) / maxS);
+  if (st.low == null || st.low < lo0 || st.low > hi0) st.low = s.slice().sort(function (a, b) { return a - b; })[Math.floor(0.3 * s.length)];
+  if (st.high == null || (st.high <= 1 && (st.high < st.low || st.high > hi0))) st.high = s.slice().sort(function (a, b) { return a - b; })[Math.floor(0.8 * s.length)];
   var cv = document.createElement('canvas'), dpr = window.devicePixelRatio || 1; cv.width = W * dpr; cv.height = Hh * dpr; cv.style.cssText = 'width:100%;touch-action:none;cursor:ew-resize;display:block';
+  cv.__st = st; cv.setAttribute('data-lo', lo0); cv.setAttribute('data-hi', hi0); cv.setAttribute('data-l', L); cv.setAttribute('data-r', R); cv.setAttribute('data-w', W);
   host.appendChild(cv);
   var info = el('div'); host.appendChild(info);
   var drag = null;
@@ -507,30 +514,31 @@ function twoGate(host, y, s, ids, st, onChange, opt) {
     var x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, Hh);
     var lo = st.low, hi = Math.max(st.high, st.low);
     x.fillStyle = 'rgba(61,255,160,.06)'; x.fillRect(L, 0, X(lo) - L, Hh - 22);
-    x.fillStyle = 'rgba(255,181,71,.08)'; x.fillRect(X(lo), 0, X(Math.min(1, hi)) - X(lo), Hh - 22);
-    x.fillStyle = 'rgba(255,77,106,.08)'; if (hi <= 1) x.fillRect(X(hi), 0, R - X(hi) + 10, Hh - 22);
+    x.fillStyle = 'rgba(255,181,71,.08)'; x.fillRect(X(lo), 0, X(Math.min(hi0, hi)) - X(lo), Hh - 22);
+    x.fillStyle = 'rgba(255,77,106,.08)'; if (hi <= hi0) x.fillRect(X(hi), 0, R - X(hi) + 10, Hh - 22);
     var fill = {};
     idx.forEach(function (i) {
-      var b = Math.min(nb - 1, Math.floor(SQ(s[i]) * nb)), k = b + (y[i] ? 'd' : 'g'); fill[k] = (fill[k] || 0) + 1;
+      var b = BIN(s[i]), k = b + (y[i] ? 'd' : 'g'); fill[k] = (fill[k] || 0) + 1;
       var pxx = L + (b + 0.5) * (R - L) / nb, py = y[i] ? mid - 6 - fill[k] * dot : mid + 6 + (fill[k] - 1) * dot;
       var lane = s[i] < lo ? 'p' : s[i] >= hi ? 's' : 'h';
       x.fillStyle = y[i] ? (lane === 'p' ? '#ff2d55' : lane === 'h' ? '#ffd0d8' : '#ff8a9c') : (lane === 's' ? '#ffb547' : lane === 'h' ? '#8ac0a5' : '#2f8a5f');
-      if (y[i] && lane === 'p') { x.fillRect(pxx - dot / 2 - 0.5, py - 1, dot + 1, dot + 1); x.fillStyle = '#fff'; x.fillRect(pxx - dot / 2 + 1.5, py + 1, Math.max(1, dot - 5), Math.max(1, dot - 5)); }
-      else x.fillRect(pxx - dot / 2 + 0.5, py, Math.max(1, dot - 1), Math.max(1, dot - 1));
+      if (y[i] && lane === 'p') { x.fillRect(pxx - dot / 2 - 0.5, py - 0.5, dot + 1, dot < 3 ? dot + 0.5 : dot + 1); if (dot >= 5) { x.fillStyle = '#fff'; x.fillRect(pxx - dot / 2 + 1.5, py + 1, dot - 5, dot - 5); } }
+      else x.fillRect(pxx - dot / 2 + 0.5, py, Math.max(1, dot - 1), dot < 3 ? dot + 0.4 : dot - 1);
     });
     x.strokeStyle = '#3a4658'; x.beginPath(); x.moveTo(L, mid); x.lineTo(R, mid); x.stroke();
     x.font = '10px Space Mono, monospace'; x.fillStyle = '#8d9bb0'; x.textAlign = 'center';
-    [0, 0.02, 0.05, 0.1, 0.2, 0.4, 0.6, 0.8, 1].forEach(function (t) { x.fillText(String(t), X(t), Hh - 8); });
+    for (var q = 0; q <= 5; q++) { var tv = lo0 + (hi0 - lo0) * q / 5; x.textAlign = q === 0 ? 'left' : q === 5 ? 'right' : 'center'; x.fillText(tv.toFixed(2), X(tv), Hh - 8); }
     x.textAlign = 'left'; x.fillStyle = '#ff8a9c'; x.fillText('defects', L, 12); x.fillStyle = '#3dffa0'; x.fillText('good cells', L, Hh - 26);
+    x.textAlign = 'right'; x.fillStyle = '#5d6b80'; x.fillText('score →', R, Hh - 26);
     [['low', lo, '#3dffa0'], ['high', hi, '#ff4d6a']].forEach(function (g) {
-      if (g[1] > 1) return; var gx = X(g[1]); x.strokeStyle = g[2]; x.lineWidth = 3; x.beginPath(); x.moveTo(gx, 16); x.lineTo(gx, Hh - 22); x.stroke(); x.lineWidth = 1;
+      if (g[1] > hi0) return; var gx = X(g[1]); x.strokeStyle = g[2]; x.lineWidth = 3; x.beginPath(); x.moveTo(gx, 16); x.lineTo(gx, Hh - 22); x.stroke(); x.lineWidth = 1;
       x.fillStyle = g[2]; x.fillRect(gx - 24, g[0] === 'low' ? mid - 30 : mid + 8, 48, 20); x.fillStyle = '#001018'; x.font = 'bold 11px Orbitron, Arial'; x.textAlign = 'center'; x.fillText(g[1].toFixed(3), gx, g[0] === 'low' ? mid - 16 : mid + 22);
     });
     x.font = '10px Orbitron, Arial'; x.textAlign = 'center';
     x.fillStyle = '#3dffa0'; x.fillText('AUTO-PASS', (L + X(lo)) / 2, 26);
-    if (X(Math.min(1, hi)) - X(lo) > 50) { x.fillStyle = '#ffb547'; x.fillText('PERSON', (X(lo) + X(Math.min(1, hi))) / 2, 26); }
-    if (hi <= 1 && R - X(hi) > 40) { x.fillStyle = '#ff4d6a'; x.fillText('AUTO-STOP', (X(hi) + R) / 2, 26); }
-    var g2 = window.PGJS.twoGates(y, s, lo, st.high > 1 ? Infinity : st.high);
+    if (X(Math.min(hi0, hi)) - X(lo) > 50) { x.fillStyle = '#ffb547'; x.fillText('PERSON', (X(lo) + X(Math.min(hi0, hi))) / 2, 26); }
+    if (hi <= hi0 && R - X(hi) > 40) { x.fillStyle = '#ff4d6a'; x.fillText('AUTO-STOP', (X(hi) + R) / 2, 26); }
+    var g2 = window.PGJS.twoGates(y, s, lo, st.high);
     info.innerHTML = '';
     var okP = g2.passRate <= 0.05 + 1e-12;
     tiles(info, [[g2.defPass + ' of ' + g2.nDef + ' (' + pct(g2.passRate) + ')', 'defects passed by mistake' + (okP ? ' ✓' : ' — over 5%!'), okP ? 'g' : 'r'],
@@ -545,10 +553,10 @@ function twoGate(host, y, s, ids, st, onChange, opt) {
   }
   function at(ev) { var b = cv.getBoundingClientRect(); return XI((ev.clientX - b.left) * W / b.width); }
   cv.addEventListener('pointerdown', function (ev) {
-    var v = at(ev), dl = Math.abs(SQ(v) - SQ(st.low)), dh = Math.abs(SQ(v) - SQ(Math.min(1, st.high)));
+    var v = at(ev), dl = Math.abs(X(v) - X(st.low)), dh = Math.abs(X(v) - X(Math.min(hi0, st.high)));
     drag = dl <= dh ? 'low' : 'high'; cv.setPointerCapture(ev.pointerId); move(ev);
   });
-  function move(ev) { if (!drag) return; var v = at(ev); if (drag === 'low') st.low = Math.min(v, st.high > 1 ? 1 : st.high); else st.high = Math.max(v, st.low); st.moved = st.moved || {}; st.moved[drag] = 1; draw(); }
+  function move(ev) { if (!drag) return; var v = at(ev); if (drag === 'low') st.low = Math.min(v, st.high > 1 ? hi0 : st.high); else st.high = v >= hi0 - 1e-9 ? Infinity : Math.max(v, st.low); st.moved = st.moved || {}; st.moved[drag] = 1; draw(); }
   cv.addEventListener('pointermove', move);
   cv.addEventListener('pointerup', function () { drag = null; opt.onUp && opt.onUp(); });
   draw();
@@ -556,9 +564,9 @@ function twoGate(host, y, s, ids, st, onChange, opt) {
 }
 function twoGatePlay(box, api) {
   var r3f = api.res('3f'), m = api.mech;
-  var c = card(box, 'TRY IT: TWO GATES ON THE REAL SCORES', 'Every square is a real validation cell, placed by its blend score from 3f. Drag the green LOW gate and the red HIGH gate. Rule: at most 5 of every 100 defects may land left of the low gate (white-centred squares).');
+  var c = card(box, 'TRY IT: TWO GATES ON THE REAL SCORES', 'Every real validation cell is stacked at its blend score from 3f: defects above the line, good cells below. Drag the green LOW gate and the red HIGH gate. Rule: at most 5 of every 100 defects may land left of the low gate (bright red).');
   if (!r3f || !r3f.blendScores) { c.appendChild(el('p', 'hint', 'Waiting for your 3f scores… (if this stays, run 3f again)')); return; }
-  var st = m.play || { low: 0.2, high: 0.6 };
+  var st = m.play ? { low: m.play.low, high: m.play.high == null ? Infinity : m.play.high, moved: m.play.moved } : { low: null, high: null };
   twoGate(c, r3f.y, r3f.blendScores, null, st, function (g) {
     var done = g.passRate <= 0.05 + 1e-12 && st.moved && st.moved.low && st.moved.high;
     if (done && !m.twoDone) setTimeout(function () { api.setMech({ twoDone: 1, play: { low: st.low, high: st.high, moved: st.moved } }); c.appendChild(el('div', 'verdict good', '✓ At most 5% of defects pass. Now let the code find the best gates by rule.')); }, 0);
@@ -581,7 +589,7 @@ function twoGateResult(r, host, api) {
   if (!m.cap) setTimeout(function () { api.setMech({ cap: cap }); }, 0);
   var opt = bestForCap(r.y, r.scores, r.ref.low, cap);
   var c2 = card(host, 'CHALLENGE: ONE HUMAN CHECKER', 'Your line has one checker. She can look at <b>' + cap + ' of every 1,000 cells</b>, no more. Set the gates so that (1) at most 5% of defects pass, (2) at most ' + cap + ' per 1,000 go to her, and (3) as few good cells as possible are auto-stopped. Then tap “Check my gates”. Try as often as you like.');
-  var st = m.capSt || { low: r.ref.low, high: r.ref.high > 1 ? 1 : r.ref.high };
+  var st = m.capSt ? { low: m.capSt.low, high: m.capSt.high == null ? Infinity : m.capSt.high } : { low: r.ref.low, high: r.ref.high };
   var last = null;
   twoGate(c2, r.y, r.scores, null, st, function (g) { last = g; }, { cap: cap, onUp: function () { api.setMech({ capSt: { low: st.low, high: st.high } }); } });
   var fb = el('div'); c2.appendChild(fb);

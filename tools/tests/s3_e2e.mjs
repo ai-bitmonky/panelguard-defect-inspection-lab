@@ -165,12 +165,14 @@ await F.locator('#out').evaluate((e) => { e.scrollTop = 520; }); await shot('3f'
 // ---------- 3g ----------
 await open('3g');
 log('top bar target:', await F.locator('.goal').innerText());
-{ const c = F.locator('#prebox canvas').first(); await c.scrollIntoViewIfNeeded(); const b = await c.boundingBox();
+const gateMap = async (c) => { await c.scrollIntoViewIfNeeded(); const b = await c.boundingBox(); const a = await c.evaluate((e) => ({ lo: +e.dataset.lo, hi: +e.dataset.hi, l: +e.dataset.l, r: +e.dataset.r, w: +e.dataset.w, st: { low: e.__st.low, high: e.__st.high } }));
+  return { b, a, X: (v) => b.x + b.width * (a.l + (a.r - a.l) * (Math.max(a.lo, Math.min(a.hi, v)) - a.lo) / (a.hi - a.lo)) / a.w }; };
+const dragGate = async (G, from, to) => { const y = G.b.y + 100; await page.mouse.move(G.X(from), y); await page.mouse.down(); await page.mouse.move(G.X(to), y, { steps: 6 }); await page.mouse.up(); await page.waitForTimeout(120); };
+{ const G = await gateMap(F.locator('#prebox canvas').first());
   const lowV = await ev(() => { const r = window.PG.RES['3f']; return window.PG_STEP3_gatesFor(r.y, r.blendScores).low; });
-  const X = (v) => b.x + b.width * (14 + (426 - 14) * Math.sqrt(v)) / 440;
-  await page.mouse.move(X(0.2), b.y + 100); await page.mouse.down(); await page.mouse.move(X(lowV * 0.97), b.y + 100, { steps: 6 }); await page.mouse.up();   // low gate
-  await page.mouse.move(X(0.6), b.y + 100); await page.mouse.down(); await page.mouse.move(X(0.85), b.y + 100, { steps: 6 }); await page.mouse.up();         // high gate
-  await page.waitForTimeout(300); log('3g play gates done:', (await mech('3g')).twoDone, JSON.stringify((await mech('3g')).play)); }
+  await dragGate(G, G.a.st.low, lowV - (G.a.hi - G.a.lo) * 0.004);                 // low gate just under the 5% point
+  await dragGate(G, G.a.st.high, G.a.st.high + (G.a.hi - G.a.st.high) * 0.5);   // high gate further right
+  log('3g play gates done:', (await mech('3g')).twoDone, JSON.stringify((await mech('3g')).play)); }
 await shot('3g_play');
 await codeStep('3g', { wrongs: 3 });
 const r3g = await ev(() => { const r = window.PG.RES['3g'], L = r.lanes; return { low: r.low, high: r.high, defPass: L.defPass, nDef: L.nDef, human: L.human, autoPass: L.autoPass, autoStop: L.autoStop, stopPrec: L.stopPrec, okStop: L.okStop, base: { human: r.base.human, defPass: r.base.defPass, stopPrec: r.base.stopPrec } }; });
@@ -178,15 +180,13 @@ log('3g LIVE lanes:', JSON.stringify(r3g));
 // challenge: one checker. Try the code gates first (too many for her), then move the high gate left step by step.
 const chk = async () => { await F.locator('#vizbox button', { hasText: 'Check my gates' }).click(); await page.waitForTimeout(150); return (await F.locator('#vizbox .vc').last().locator('.verdict').last().innerText()).slice(0, 140); };
 log('3g challenge cap', (await mech('3g')).cap, '| code gates ->', await chk());
-{ const c = F.locator('#vizbox .vc').last().locator('canvas').first(); await c.scrollIntoViewIfNeeded(); const b = await c.boundingBox();
-  const X = (v) => b.x + b.width * (14 + (426 - 14) * Math.sqrt(v)) / 440;
-  let hi = Math.min(1, r3g.high === null || r3g.high > 1 ? 1 : r3g.high), msg = '';
-  for (let k = 0; k < 120 && !(await mech('3g')).capOk; k++) {
-    const from = X(hi); hi = Math.max(r3g.low, hi - 0.004);
-    await page.mouse.move(from, b.y + 140); await page.mouse.down(); await page.mouse.move(X(hi), b.y + 140, { steps: 2 }); await page.mouse.up();
+{ let G = await gateMap(F.locator('#vizbox .vc').last().locator('canvas').first()); let hi = G.a.st.high > G.a.hi ? G.a.hi : G.a.st.high, msg = '';
+  for (let k = 0; k < 150 && !(await mech('3g')).capOk; k++) {
+    const to = Math.max(G.a.st.low, hi - (G.a.hi - G.a.lo) * 0.006); await dragGate(G, hi, to); hi = to;
     msg = await chk();
   }
   log('3g challenge ->', msg); }
+await F.locator('#vizbox .vc').last().scrollIntoViewIfNeeded(); await page.waitForTimeout(150); await shot('3g_challenge');
 await F.locator('#out').evaluate((e) => { e.scrollTop = e.scrollHeight; }); await page.waitForTimeout(200); await shot('3g_end');
 await expectPass('3g');
 log('end card:', (await F.locator('.endc').innerText()).replace(/\n/g, ' | ').slice(0, 700));
