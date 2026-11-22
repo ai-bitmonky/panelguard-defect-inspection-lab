@@ -2,3 +2,5 @@ tools/node_modules/
 tools/py/*.npy
 tools/shots/
 tools/lg/node_modules/
+tools/audit/shots/
+tools/audit/shots_sizes/

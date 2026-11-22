@@ -1,0 +1,1 @@
+"import json as _json, base64 as _b64m\ndef _pg_b64(a):\n    import numpy as _np\n    return _b64m.b64encode(_np.ascontiguousarray(a).astype(_np.uint8).tobytes()).decode()\ndef _pg_has(*names):\n    return [n for n in names if n not in globals()]"

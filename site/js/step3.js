@@ -413,13 +413,14 @@ var s3f = { id: '3f', name: 'Score it and blend it', kind: 'code', lang: 'js',
     function row(name, s) { var r = P.rates(y, s, P.cutAt(y, s, 0.95)); r.name = name; r.auc = P.auc(y, s); return r; }
     var bl = row('Blend', pb), pick = function (t, p) { var o = []; for (var i = 0; i < y.length; i++) if (y[i] === t && (pb[i] >= bl.cut ? 1 : 0) === p) o.push([pg.cell_val[i], pg.prob_val[i], pg.kind_val[i], Math.round(pb[i] * 1000) / 1000]); return o; };
     var card = { tp: bl.tp, fn: bl.fn, fp: bl.fp, tn: bl.tn, rec: bl.rec, far: bl.far, cut: bl.cut, n: y.length, TP: pick(1, 1), FN: pick(1, 0), FP: pick(0, 1), TN: pick(0, 0) };
-    return { blendScores: pb, y: y.slice(), cnnOk: cnnOk, blendOk: blendOk, wOk: Math.abs(NS.bestW - bw) < 1e-9, bestW: NS.bestW, refW: bw, refFar: bf, ws: ws, n: y.length, nTrain: pg.idx_train.length,
+    return { blendScores: pb, y: y.slice(), cnnOk: cnnOk, blendOk: blendOk, wOk: Math.abs(NS.bestW - bw) < 1e-9, farOk: Math.abs(NS.bestFar - bf) < 1e-9, bestFar: NS.bestFar, bestW: NS.bestW, refW: bw, refFar: bf, ws: ws, n: y.length, nTrain: pg.idx_train.length,
       base: row(pg.baseline, ps), cnn: row('CNN', ref), blend: bl, card: card, baseline: pg.baseline,
       cells: pg.cell_val.map(function (id, i) { return [id, Math.round(ref[i] * 1e4) / 1e4, y[i], pg.prob_val[i], pg.kind_val[i]]; }) };
   },
   check: function (r) {
     if (r.missing) return { pass: false, msg: 'Missing: ' + r.missing.join(', ') + '. Run the whole cell.' };
     if (!r.cnnOk) return { pass: false, msg: 'pCnn is not the CNN’s score for each validation cell. Keep line 2 as it is.' };
+    if (r.wOk && r.blendOk && r.farOk === false) return { pass: false, msg: 'Your loop found a best false-alarm rate of ' + pc(r.bestFar) + ', but mixing each CNN score with the Step 2 score of the SAME cell gives ' + pc(r.refFar) + ' (at weight ' + r.refW + '). Gap 1 must pick the Step 2 score of cell i, not of one fixed cell.' };
     if (!r.wOk || !r.blendOk) return { pass: false, msg: 'Your loop kept CNN weight ' + r.bestW + ', but the fewest false alarms come at weight ' + r.refW + ' (' + pc(r.refFar) + '). Mix each CNN score with the Step 2 score of the same cell, and keep a weight only when it beats the best so far.' };
     return { pass: true, msg: 'Blend found: CNN weight ' + r.bestW + '. False-alarm rate at 95% recall: Step 2 ' + pc(r.base.far) + ', CNN ' + pc(r.cnn.far) + ', blend ' + pc(r.blend.far) + '.' };
   },

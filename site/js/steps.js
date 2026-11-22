@@ -187,7 +187,7 @@ var step1 = {
     check: function (r) {
       if (r.missing) return { pass: false, msg: 'y is missing. Run the cell.' };
       var want = r.bins[2] + r.bins[3];
-      if (r.uniq.join() !== '0,1') return { pass: false, msg: 'y must hold only 0 and 1. Now it holds: ' + r.uniq.join(', ') + '.' };
+      if (r.uniq.join() !== '0,1') return { pass: false, msg: r.uniq.length === 1 ? 'y must hold 0 (good) and 1 (defect). Now EVERY cell gets ' + r.uniq[0] + ': your cut puts all cells on one side. Move your cut.' : 'y must hold only 0 and 1. Now it holds: ' + r.uniq.join(', ') + '.' };
       if (r.n_def !== want) return { pass: false, msg: 'y marks ' + r.n_def + ' defects. Our rule (0.67 and 1.0) gives ' + want + '. Move your cut.' };
       return { pass: true, msg: 'y marks ' + r.n_def + ' defects and ' + (r.n - r.n_def) + ' OK cells.' };
     },

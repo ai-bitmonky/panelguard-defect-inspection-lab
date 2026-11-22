@@ -215,6 +215,17 @@ var s4c = { id: '4c', name: 'Ask the network directly', kind: 'code', lang: 'js'
       mine.dispose(); ref.dispose(); img.dispose();
       out[k].up = Array.prototype.slice.call(up);
     }
+    /* A well-trained-enough model can have only positive weights w at block 3: then abs() and relu() give the same map.
+       So also compare once with the last layer's weights flipped (w < 0, the map turns negative), then put them back exactly. */
+    if (ok && pick.length) {
+      var lastL = NS.model.layers[NS.model.layers.length - 1], W0 = lastL.getWeights().map(function (t) { return t.clone(); }), neg0 = W0[0].neg();
+      try {
+        lastL.setWeights([neg0].concat(W0.slice(1)));
+        var img2 = cellOf(NS, pick[0].i), m2 = NS.gradCam(img2), r2 = pg.refGradCam(NS.model, img2), a2 = await m2.data(), b2 = await r2.data();
+        if (!close(a2, b2, 1e-4 * Math.max(1e-3, Math.max.apply(null, b2)) + 1e-6)) ok = false;
+        m2.dispose(); r2.dispose(); img2.dispose();
+      } finally { lastL.setWeights(W0); W0.forEach(function (t) { t.dispose(); }); neg0.dispose(); }
+    }
     return { ok: ok, grid: grid, cut: cut, cells: out, rough: pg.rough, neg: Array.prototype.some.call(await NS.cam0.data(), function (v) { return v < 0; }) };
   },
   check: function (r) {
