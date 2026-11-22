@@ -1,0 +1,10 @@
+import { chromium } from 'playwright'; import { spawn } from 'child_process';
+const srv = spawn('node', ['serve.mjs', '../site', '8766']); await new Promise((r) => srv.stdout.once('data', r));
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
+const p = await b.newPage({ viewport: { width: 1366, height: 768 } });
+p.on('pageerror', (e) => console.log('PAGEERR', e.message));
+await p.goto('http://localhost:8766/index.html'); await p.waitForTimeout(1500);
+await p.evaluate(() => { const s = window.PG.S.subs; s['0a'] = { mech: { done: true } }; location.hash = '#sub-0b'; }); await p.waitForTimeout(800);
+await p.locator('#stage button').nth(2).click(); await p.waitForTimeout(800);
+console.log(await p.evaluate(() => [...document.querySelectorAll('#out img')].map((i) => [i.naturalWidth, i.clientWidth, i.clientHeight])));
+await p.screenshot({ path: 'shots/dbg2.png' }); await b.close(); srv.kill();

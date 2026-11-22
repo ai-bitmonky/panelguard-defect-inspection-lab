@@ -1,0 +1,22 @@
+import { chromium } from 'playwright'; import { spawn } from 'child_process'; import http from 'http';
+const site = spawn('node', ['../serve.mjs', '../../site', '8768'], { env: { ...process.env, CORS: '1' } }); await new Promise((r) => site.stdout.once('data', r));
+const html = `<!doctype html><iframe id=f sandbox="allow-scripts" src="http://localhost:8768/index.html" style="width:800px;height:600px"></iframe>`;
+const hs = http.createServer((q, s) => { s.writeHead(200, { 'content-type': 'text/html' }); s.end(html); }).listen(8799);
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true }); const p = await b.newPage();
+p.on('console', (m) => console.log('C', m.text().slice(0, 200)));
+await p.goto('http://127.0.0.1:8799/'); await p.waitForTimeout(2000);
+const fr = p.frames().find((x) => x.url().includes('8768'));
+const out = await fr.evaluate(async () => {
+  const tryW = (url, opts) => new Promise((res) => { try { const w = new Worker(url, opts); w.onmessage = (e) => res('msg: ' + JSON.stringify(e.data)); w.onerror = (e) => res('onerror: ' + (e.message || 'no message')); setTimeout(() => res('timeout'), 8000); } catch (e) { res('throw: ' + e.name + ' ' + e.message); } });
+  const r = {};
+  r.fileModule = await tryW('js/pyworker.js', { type: 'module' });
+  const blob = URL.createObjectURL(new Blob(['postMessage("hi")'], { type: 'text/javascript' }));
+  r.blobModuleTrivial = await tryW(blob, { type: 'module' });
+  r.blobClassicTrivial = await tryW(blob);
+  const base = new URL('./', location.href).href;
+  const b2 = URL.createObjectURL(new Blob([`import("${base}pyodide/pyodide.mjs").then(m=>postMessage("import ok "+typeof m.loadPyodide), e=>postMessage("import fail "+e))`], { type: 'text/javascript' }));
+  r.blobModuleImport = await tryW(b2, { type: 'module' });
+  r.origin = String(self.origin);
+  return r;
+});
+console.log(JSON.stringify(out, null, 1)); await b.close(); site.kill(); hs.close();

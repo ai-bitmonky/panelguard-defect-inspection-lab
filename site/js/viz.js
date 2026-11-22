@@ -78,8 +78,8 @@ function sceneDefects(s, stage, out, api) {
       var row = el('div', null); row.style.cssText = 'display:flex;gap:10px';
       [cd.id, cd.id === 447 ? 74 : 447].forEach(function (id, k) {
         var f = el('figure', null); f.style.cssText = 'margin:0;flex:1;text-align:center;font-size:13px;color:#8d9bb0';
-        var im = new Image(); im.style.cssText = 'width:100%;border-radius:6px;border:1px solid #263346';
-        api.full(id).then(function (u) { if (u) im.src = u; });
+        var im = new Image(); im.style.cssText = 'width:100%;aspect-ratio:1;display:block;border-radius:6px;border:1px solid #263346';
+        api.full(id).then(function (u) { im.src = u || api.canvas(id).toDataURL(); });
         f.appendChild(im); f.appendChild(el('figcaption', null, k ? 'Compare: ' + (id === 447 ? 'good mono cell' : 'good poly cell') : 'Cell ' + id + ' · expert score ' + api.meta(id).prob));
         row.appendChild(f);
       });

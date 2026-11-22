@@ -113,6 +113,9 @@ if (typeof WorkerGlobalScope !== 'undefined' && G instanceof WorkerGlobalScope) 
   G.onmessage = function (ev) {
     var m = ev.data;
     if (m.cmd === 'init') {
+      // Classic worker (used inside opaque-origin sandboxes, where module blob workers fail):
+      // Pyodide 314 probes importScripts() to refuse classic workers, so hide it; Pyodide itself only uses import().
+      if (typeof G.importScripts === 'function') G.importScripts = function () { throw new Error('importScripts is disabled in the PanelGuard kernel'); };
       import(m.base + 'pyodide/pyodide.mjs').then(function (mod) {
         handle = Core(function (x) { postMessage(x); }, mod.loadPyodide, m.help);
         handle(m); queue.forEach(handle); queue = [];

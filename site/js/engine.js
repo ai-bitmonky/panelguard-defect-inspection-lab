@@ -49,7 +49,7 @@ function lockText(id) { var b = firstBlock(id); return b ? 'Locked. First finish
 function stepDone(st) { return st.substeps.length && st.substeps.every(function (s) { return passed(s.id); }); }
 
 /* ---------- data ---------- */
-var PACK = null, LAB = null, ID2I = {}, FULL = {}, FULLIDS = [], D = null;
+var PACK = null, LAB = null, ID2I = {}, FULL = {}, D = null;
 var prog = { dataMB: 0, dataTotal: 10.75, pyMB: 0, pyTotal: 33.8, text: '' };
 function showProg() {
   var done = prog.dataMB + prog.pyMB, tot = prog.dataTotal + prog.pyTotal;
@@ -68,9 +68,6 @@ function loadData() {
     LAB.rows.forEach(function (r, i) { ID2I[r[0]] = i; });
     var n = LAB.rows.length, nd = LAB.rows.filter(function (r) { return r[1] >= 0.5; }).length;
     D = { n: n, nDef: nd, nOk: n - nd };
-    return fetch('data/full/index.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
-  }).then(function (ids) {
-    FULLIDS = ids;
     return fetch('data/cells64.u8');
   }).then(function (r) {
     if (!r.ok) throw new Error('cells64.u8: HTTP ' + r.status);
@@ -95,11 +92,13 @@ function cellCanvas(id) {
   x.putImageData(im, 0, 0); return (CC[id] = c);
 }
 function drawCell(ctx, id, x, y, s) { var c = cellCanvas(id); if (c) ctx.drawImage(c, x, y, s, s); }
+var fullIdsP = fetch('data/full/index.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
 function fullURL(id) {
   if (FULL[id]) return FULL[id];
-  if (FULLIDS.indexOf(id) < 0) return (FULL[id] = Promise.resolve(null));
-  var name = 'data/full/cell' + ('000' + id).slice(-4) + '.png';
-  return (FULL[id] = fetch(name).then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) { return b ? URL.createObjectURL(b) : null; }).catch(function () { return null; }));
+  return (FULL[id] = fullIdsP.then(function (ids) {
+    if (ids.indexOf(id) < 0) return null;
+    return fetch('data/full/cell' + ('000' + id).slice(-4) + '.png').then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) { return b ? URL.createObjectURL(b) : null; });
+  }).catch(function () { return null; }));
 }
 function meta(id) { var r = LAB && LAB.rows[ID2I[id]]; return r ? { id: r[0], prob: r[1], kind: r[2] } : null; }
 
@@ -138,12 +137,17 @@ function spawn(mode, dataP) {
     document.head.appendChild(s2); return;
   }
   var w, got = false;
-  var fail = function () { if (got) return; try { w && w.terminate(); } catch (e) {} spawn(mode === 'file' ? 'blob' : 'page', dataP); };
+  var NEXT = { file: 'blob', blob: 'blobc', blobc: 'page' };
+  var fail = function () { if (got) return; got = true; try { w && w.terminate(); } catch (e) {} spawn(NEXT[mode], dataP); };
   var go = function (url) {
-    try { w = new Worker(url, { type: 'module' }); } catch (e) { return fail(); }
+    try { w = new Worker(url, mode === 'blobc' ? undefined : { type: 'module' }); } catch (e) { return fail(); }
     K.w = w;
-    w.onmessage = function (ev) { got = true; konmsg(ev.data); };
-    w.onerror = function (ev) { if (!got) { ev.preventDefault && ev.preventDefault(); fail(); } else fatal('The Python worker stopped: ' + (ev.message || 'unknown error')); };
+    var live = false;
+    w.onmessage = function (ev) {
+      if (ev.data && ev.data.type === 'fatal' && !K.ready && !got) { console.warn('kernel mode ' + mode + ' failed: ' + ev.data.text); live = false; return fail(); }
+      live = true; konmsg(ev.data);
+    };
+    w.onerror = function (ev) { if (!live) { ev.preventDefault && ev.preventDefault(); fail(); } else fatal('The Python worker stopped: ' + (ev.message || 'unknown error')); };
     w.postMessage(init);
     dataP.then(sendData);
   };
@@ -168,7 +172,7 @@ function restartKernel() {
   K.cb = {}; K.queue = Promise.resolve(); K.ready = false; running = null;
   $('#kdot').className = 'kdot'; $('#ktext').textContent = 'Restarting Python…';
   $('#loader').classList.remove('gone'); prog.pyMB = 0; prog.text = 'Restarting Python…'; showProg();
-  spawn(K.mode === 'blob' ? 'blob' : 'file', Promise.resolve());
+  spawn(K.mode, Promise.resolve());
   whenReady().then(replay);
 }
 
@@ -378,8 +382,9 @@ var cur = { ed: null, viz: null };
 function openSub(id) {
   if (!SUB[id]) return;
   if (!openable(id)) { var b = firstBlock(id); id = b; }
-  S.cur = id; save();
+  var same = S.cur === id; S.cur = id; save();
   renderNav(); renderWork(); renderOut();
+  if (!same) { $('#work').scrollTop = 0; $('#out').scrollTop = 0; }
 }
 function renderWork() {
   var id = S.cur, s = SUB[id], st = STEP_OF[id], w = $('#work'), ss = SS(id);
