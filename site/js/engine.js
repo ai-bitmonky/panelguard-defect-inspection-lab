@@ -247,6 +247,14 @@ function kcall(msg, out) {
   return p;
 }
 function kRun(code, probe, out) { return kcall({ cmd: 'run', code: code, probe: probe }, out); }
+/* a Python error from pg.py(...) in plain words (the JS cell built that Python expression from your gaps) */
+function pyPlain(e) {
+  var x = String(e || '');
+  var m = x.match(/^NameError: name '(.+?)' is not defined/); if (m) return 'Python does not know the name “' + m[1] + '”. Check the spelling: it must be a name from the Python steps (Steps 1–2).';
+  if (/^SyntaxError/.test(x)) return 'Python could not read the expression your gap makes. Check the spelling and the brackets.';
+  if ((m = x.match(/^(IndexError|KeyError|TypeError|ValueError|AttributeError): (.*)$/))) return 'Python could not do it: ' + m[2].slice(0, 120) + '. Check the name you typed in the gap.';
+  return 'Python stopped: ' + x.slice(0, 160);
+}
 function kEval(code) { return kcall({ cmd: 'eval', code: code }).then(function (m) { return m.probe; }); }
 function whenReady() { return new Promise(function (res) { if (K.ready) res(); else K.onReady.push(res); }); }
 function restartKernel() {
@@ -312,7 +320,7 @@ function refreshBridge() {
       live: JSR.T.live, trainingWatch: JSR.T.watch, trainState: function () { return JSR.T.state; },
       falseAlarmAt95: J.falseAlarmAt95, twoGates: J.twoGates, gatesFor: window.PG_STEP3_gatesFor, auc: J.auc,
       saveModel: saveModel, review: REVIEW,
-      py: function (expr) { return kEval('_r = (' + expr + ')').then(function (r) { if (r && r.probe_error) throw window.PGJS.CheckError('Python said: ' + r.probe_error); return r; }); },   // one Python expression -> JSON (Step 8 scores the sealed tray with the Step 2 model)
+      py: function (expr) { return kEval('_r = (' + expr + ')').then(function (r) { if (r && r.probe_error) throw window.PGJS.CheckError(pyPlain(r.probe_error)); return r; }); },   // one Python expression -> JSON (Step 8 scores the sealed tray with the Step 2 model)
       mechOf: function (id) { try { var rv = REVIEW && RV.subs[id] && RV.subs[id].mech && Object.keys(RV.subs[id].mech).length ? RV.subs[id] : S.subs[id]; return JSON.parse(JSON.stringify((rv && rv.mech) || {})); } catch (e) { return {}; } }   // read-only copy (Step 6 action_list reads the student's 4f boxes; never creates entries)
     };
     pg.rough = !!(REVIEW && RES['3e'] && RES['3e'].quick === 'review');

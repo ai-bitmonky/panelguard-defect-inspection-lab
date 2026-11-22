@@ -176,7 +176,7 @@ function cardResult(r, host) {
   var g = el('div'); g.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px';
   var a = r.log && r.logType === 'list';
   g.appendChild(el('div', 'tile', '<div class="l">plain field <code>lane</code> — last value wins</div><div class="v" style="font-size:16px">' + esc(r.lane == null ? '—' : r.lane) + '</div>'));
-  g.appendChild(el('div', 'tile ' + (a && r.log.length === 2 ? 'g' : 'r'), '<div class="l">reducer field <code>log</code> — values are combined</div><div class="v" style="font-size:14px;font-family:Space Mono,monospace">' + esc(JSON.stringify(r.log)) + '</div>'));
+  g.appendChild(el('div', 'tile ' + (a && r.log.length === 2 ? 'g' : 'r'), '<div class="l">reducer field <code>log</code> — values are combined</div><div class="v" style="font-size:14px;font-family:Space Mono,monospace">' + esc(r.log == null ? '— nothing: the stations could not add their lines' : a ? JSON.stringify(r.log) : JSON.stringify(r.log) + '  (' + ({ string: 'text', number: 'a number' }[r.logType] || r.logType) + ', not a list)') + '</div>'));
   c.appendChild(g);
   c.appendChild(el('div', 'hint', 'Fields on your card: ' + r.keys.map(function (k) { return '<code>' + k + '</code>'; }).join(' ')));
 }

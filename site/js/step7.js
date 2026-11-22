@@ -397,9 +397,10 @@ var s7c = { id: '7c', name: 'Run the line', kind: 'code', lang: 'js',
   },
   check: function (r) {
     if (r.missing) return { pass: false, msg: 'Missing: ' + r.missing.join(', ') + '. Run the whole cell.' };
-    if (r.err) return { pass: false, msg: 'onResult failed: ' + r.err + '. Count under the lamp\'s key: r.lamp.key.' };
+    if (r.err) return { pass: false, msg: 'onResult stopped with an error while counting a cell. Count under the lamp\'s key: r.lamp.key.' };
     var nan = Object.keys(r.after).filter(function (k) { return typeof r.after[k] !== 'number' || isNaN(r.after[k]); });
-    if (nan.length || r.sum !== r.after.total) return { pass: false, msg: 'After 5 cells the counters are ' + JSON.stringify(r.after) + ': the four lamps add up to ' + r.sum + ', not ' + r.after.total + '. Each cell must go under its lamp\'s counter: type key.' };
+    if (nan.length || r.sum !== r.after.total) { var odd = Object.keys(r.after).filter(function (k) { return ['pass', 'person', 'stop', 'none', 'total', 'byPerson'].indexOf(k) < 0; });
+      return { pass: false, msg: 'After 5 cells the counters show PASS ' + (r.after.pass || 0) + ', CHECK ' + (r.after.person || 0) + ', STOP ' + (r.after.stop || 0) + ', NO VERDICT ' + (r.after.none || 0) + ' — together ' + r.sum + ', but ' + r.after.total + ' cells arrived.' + (odd.length ? ' The cells were counted under names that are not lamp counters (' + odd.map(function (k) { return '“' + k + '”'; }).join(', ') + ').' : '') + ' Each cell must go under its lamp\'s counter: type key.' }; }
     var t = r.tests.filter(function (x) { return x.up !== 1 || x.total !== 1 || x.nan.length; })[0];
     if (t) return { pass: false, msg: 'With ' + t.what + ' the “' + t.key + '” counter went up by ' + t.up + '. Every cell counts once under its own lamp: r.lamp.key.' };
     return { pass: true, msg: '5 real cells counted: ' + ['pass', 'person', 'stop', 'none'].map(function (k) { return k + ' ' + r.after[k]; }).join(', ') + '. A flow error counts as NO VERDICT. Median decision ' + (r.speed ? r.speed.medianMs.toFixed(0) + ' ms' : '?') + '.' };
@@ -583,7 +584,7 @@ var s7d = { id: '7d', name: 'The person\'s queue', kind: 'code', lang: 'js',
   },
   check: function (r) {
     if (r.missing) return { pass: false, msg: 'Missing: ' + r.missing.join(', ') + '. Run the whole cell.' };
-    if (r.err) return { pass: false, msg: 'Answering a queued cell failed: ' + r.err + (/resume|Command|interrupt/i.test(r.err) ? '' : '') + '. The Command option that hands the answer to the paused flow is resume.' };
+    if (r.err) return { pass: false, msg: (/cmd\.update|update/.test(r.err) ? 'Command({ update }) only changes card fields; it cannot carry the person\'s answer into the paused flow.' : /empty Command/i.test(r.err) ? 'The Command was empty: nothing was handed to the paused flow.' : 'Answering a queued cell stopped with an error.') + ' The Command option that hands the answer to the paused flow is resume.' };
     var R = r.res;
     if (!R.queued) return { pass: false, msg: 'Cell ' + r.id + ' paused for a person, but it did not go into the queue.' };
     if (!R.row) return { pass: false, msg: 'The person said stop for cell ' + r.id + ', but the flow did not finish (no logbook row; it waits at ' + JSON.stringify(R.next) + '). Hand the answer to the paused flow: new Command({ resume: said }).' };

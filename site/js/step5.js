@@ -146,8 +146,10 @@ var s5b = { id: '5b', name: 'The traveller card', kind: 'code', lang: 'js',
     if (r.missing) return { pass: false, msg: 'There is no Cell yet. Run the whole cell.' };
     if (r.miss.length) return { pass: false, msg: 'The card is missing: ' + r.miss.join(', ') + '. Put the fields back (Reset this cell if needed).' };
     if (r.err && /push/.test(r.err)) return { pass: false, msg: 'push adds to the old list and gives back its LENGTH (a number), so after the first station the log is a number and the second station breaks. Use the method that gives back a NEW list: concat.' };
-    if (r.err && /null|undefined/.test(r.err)) return { pass: false, msg: 'The first station could not add its line: the log started as nothing (' + r.err + '). Start it as an empty list: [].' };
-    if (r.err) return { pass: false, msg: 'LangGraph stopped: ' + r.err };
+    if (r.err && /null|undefined/.test(r.err)) return { pass: false, msg: 'The first station could not add its line: the log started as nothing (null). Start it as an empty list: [].' };
+    var nf = r.err && r.err.match(/([\w$.]+) is not a function/);
+    if (nf) return { pass: false, msg: '“' + nf[1].split('.').pop() + '” is not something a list can do, so the second line could not be added. The list method that gives back a NEW, longer list is concat.' };
+    if (r.err) return { pass: false, msg: 'LangGraph stopped while the two test stations wrote on the card. Check the reducer line: (old, add) => old.concat(add), starting from [].' };
     if (r.logType === 'string') return { pass: false, msg: 'The log started as text, so the lines were glued into one word: “' + r.log + '”. Start it as an empty list: [].' };
     if (r.logType !== 'list' || r.log.join('|') !== 'a: first line|b: second line') return { pass: false, msg: 'Two test stations each added one line, but the log is ' + JSON.stringify(r.log) + '. It should keep BOTH lines, in order: concat, starting from [].' };
     return { pass: true, msg: 'Card ready: ' + r.keys.length + ' fields. Test with real LangGraph ' + r.ver + ': two stations each added a line → log keeps both; lane kept only the last value (“' + r.lane + '”).' };
