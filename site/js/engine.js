@@ -645,7 +645,7 @@ function renderWork() {
     cur.ed = Editor(box, ss.code || s.code, doRun, function (v) { ss.draft = v; save(); }, s.lang);
     if (ss.draft && ss.draft !== (ss.code || s.code)) cur.ed.set(ss.draft);
     var note = h('span', { class: 'note' });
-    var rvBtns = REVIEW && s.ref ? [h('button', { class: 'btn small rvb', id: 'reffill', text: 'Fill reference answer', onclick: function () { cur.ed.set(fillRef(s.code, s.ref)); } }),
+    var rvBtns = REVIEW && s.ref ? [h('button', { class: 'btn small rvb', id: 'reffill', text: 'Fill reference answer', onclick: function () { cur.ed.set(refCode(s)); } }),
       h('button', { class: 'btn small rvb', id: 'runupto', text: 'Run up to here', onclick: function () { runUpTo(id); } }), h('span', { class: 'note', id: 'rvstat' })] : [];
     box.appendChild(h('div', { class: 'runrow' }, [runB, stopB].concat(rvBtns, [note, h('span', { class: 'note', style: 'margin-left:auto', text: 'Ctrl+Enter runs · Tab indents' })])));
     if (s.twin) { var pair = h('div', { class: 'pair' }, [box, twinPanel(s)]); w.appendChild(pair); } else w.appendChild(box);
@@ -692,8 +692,8 @@ function updateRunBtn() {
   else if (replaying) why = 'Python is rebuilding your earlier cells. Wait a moment.';
   else if (s.lang === 'js' && JSR.err) why = JSR.err;
   else if (s.lang === 'js' && !JSR.ready) why = 'TensorFlow.js is still starting. Wait a moment.';
-  else if (s.lang === 'js' && STEP_OF[S.cur].id === 5 && !window.LangGraph) why = 'LangGraph could not be loaded (js/langgraph.min.js). Reload the page.';
-  else if (s.lang === 'js' && STEP_OF[S.cur].id === 6 && !window.MiniCrew) why = 'The crew runner could not be loaded (js/crew.js). Reload the page.';
+  else if (s.lang === 'js' && STEP_OF[S.cur].id >= 5 && !window.LangGraph) why = 'LangGraph could not be loaded (js/langgraph.min.js). Reload the page.';
+  else if (s.lang === 'js' && STEP_OF[S.cur].id >= 6 && !window.MiniCrew) why = 'The crew runner could not be loaded (js/crew.js). Reload the page.';
   else if (!REVIEW && s.pre && s.pre.need(ss.mech || {})) why = 'First do the hands-on part above: ' + s.pre.need(ss.mech || {}) + '.';
   else if (!REVIEW && s.predict && !(ss.pred && ss.pred.locked)) why = 'Answer the prediction question above first.';
   else if (running) why = 'Code is running.';
@@ -921,6 +921,8 @@ function execCell(id, code) {
 var BLANK = /(?<![A-Za-z])_{2,}(?![A-Za-z])/;
 function blankLine(code) { var L = code.split('\n'); for (var i = 0; i < L.length; i++) { var t = L[i].replace(/(#|\/\/).*$/, ''); if (BLANK.test(t)) return i + 1; } return 0; }
 function fillRef(code, vals) { var i = 0; return code.replace(/____/g, function () { return vals[i++]; }); }
+/* reference code of a cell: gaps filled, then any planted-bug fixes applied (s.fixes = [[from, to]], used by 7g) */
+function refCode(s) { var c = fillRef(s.code, s.ref || []); (s.fixes || []).forEach(function (f) { c = c.split(f[0]).join(f[1]); }); return c; }
 /* Review mode: run every earlier code cell (reference answers) whose result is not here yet, then this one. Real computation, nothing faked. */
 var runningUpTo = false;
 function runUpTo(id) {
@@ -933,8 +935,8 @@ function runUpTo(id) {
     chain = chain.then(function (prev) {
       if (prev && prev.stop) return prev;
       stat('Run up to here: ' + x + ' “' + SUB[x].name + '” (' + (n + 1) + ' of ' + list.length + ')' + (x === '3e' ? ' — review setting: 1 epoch, numbers are rough' : '') + '…');
-      if (x === id && cur.ed) cur.ed.set(fillRef(SUB[x].code, SUB[x].ref));
-      return execCell(x, fillRef(SUB[x].code, SUB[x].ref)).then(function (v) { if (!v || !v.pass) { stat('Run up to here stopped at ' + x + ': ' + (v ? v.msg : 'no result')); return { stop: 1 }; } });
+      if (x === id && cur.ed) cur.ed.set(refCode(SUB[x]));
+      return execCell(x, refCode(SUB[x])).then(function (v) { if (!v || !v.pass) { stat('Run up to here stopped at ' + x + ': ' + (v ? v.msg : 'no result')); return { stop: 1 }; } });
     });
   });
   return chain.then(function (r) {

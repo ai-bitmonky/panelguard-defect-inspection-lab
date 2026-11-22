@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>PanelGuard — Solar Panel Defect Inspection Lab v0.7</title>
+<title>PanelGuard — Solar Panel Defect Inspection Lab v0.8</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root{
@@ -208,7 +208,7 @@ body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
   <header class="top">
     <div class="brand">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#46e3ff"/><stop offset="1" stop-color="#3dffa0"/></linearGradient></defs><path d="M15 2 27 8v8c0 6-5 10-12 12C8 26 3 22 3 16V8z" fill="none" stroke="url(#lg)" stroke-width="2"/><rect x="9" y="9" width="12" height="12" rx="1.5" fill="#0d2233" stroke="#46e3ff"/><path d="M9 13h12M9 17h12" stroke="#46e3ff" stroke-width=".8"/></svg>
-      <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v0.7 preview</span>
+      <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v0.8 preview</span>
     </div>
     <div class="goal" title="The business target for every model in this course"><i>TARGET</i> catch at least&nbsp;<b>95 of every 100</b>&nbsp;defective cells, and count the good cells stopped</div>
     <button class="btn small" id="revbtn" aria-pressed="false" title="For reviewers: open every page without answering anything. Nothing done here is saved as progress.">Review mode: OFF</button>
@@ -230,7 +230,7 @@ body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
     <section class="out" id="out"></section>
     <div class="orail" id="orail"></div>
   </div>
-  <footer class="foot" title="Data licence: CC BY-NC-SA 4.0. Full text in data/LICENSE.md">Data: ELPV dataset (Buerhop-Lutz et al. 2018, EU PVSEC; Deitsch et al. 2019, Solar Energy; Deitsch et al. 2021, Machine Vision and Applications) · licence CC BY-NC-SA 4.0 · photos downscaled to 64×64 · <a id="lic" href="#" onclick="return false" style="color:#8d9bb0">full licence text</a> · Python: Pyodide + scikit-learn · TensorFlow.js · LangGraph JS · MiniCrew (CrewAI-style) — all in your browser · PanelGuard v0.7</footer>
+  <footer class="foot" title="Data licence: CC BY-NC-SA 4.0. Full text in data/LICENSE.md">Data: ELPV dataset (Buerhop-Lutz et al. 2018, EU PVSEC; Deitsch et al. 2019, Solar Energy; Deitsch et al. 2021, Machine Vision and Applications) · licence CC BY-NC-SA 4.0 · photos downscaled to 64×64 · <a id="lic" href="#" onclick="return false" style="color:#8d9bb0">full licence text</a> · Python: Pyodide + scikit-learn · TensorFlow.js · LangGraph JS · MiniCrew (CrewAI-style) — all in your browser · PanelGuard v0.8</footer>
 </div>
 <div class="tip" id="tip"></div>
 <script src="js/tf.min.js"></script>
@@ -240,6 +240,7 @@ body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
 <script src="js/step5.js"></script>
 <script src="js/crew.js"></script>
 <script src="js/step6.js"></script>
+<script src="js/step7.js"></script>
 <script src="js/langgraph.min.js"></script>
 <script src="js/jskernel.js"></script>
 <script src="js/art.js"></script>
@@ -248,6 +249,7 @@ body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
 <script src="js/viz4.js"></script>
 <script src="js/viz5.js"></script>
 <script src="js/viz6.js"></script>
+<script src="js/viz7.js"></script>
 <script src="js/engine.js"></script>
 </body>
 </html>

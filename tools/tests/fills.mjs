@@ -42,3 +42,11 @@ Object.assign(FILLS, {
   '6e': { right: ['sequential', 'push', 'kickoff'], wrong: [['parallel', 'push', 'kickoff'], ['sequential', 'pop', 'kickoff'], ['sequential', 'push', 'run']] },
   '6f': { right: ['0.5', '0', 'guardrail'], wrong: [['1', '0', 'guardrail'], ['0', '0', 'guardrail'], ['0.5', '1', 'guardrail'], ['0.5', '0', 'callback']] },
 });
+// Step 7 (JavaScript cells, the operator console). 7g has no gaps: its fixes are SUBS['7g'].fixes (see refCode in engine.js).
+Object.assign(FILLS, {
+  '7b': { right: ['lane', 'LAMPS.none'], wrong: [['p', 'LAMPS.none'], ['lane', 'LAMPS.pass'], ['lane', 'LAMPS.person']] },
+  '7c': { right: ['key'], wrong: [['word'], ['shape']] },
+  '7d': { right: ['resume', "'stop'"], wrong: [['update', "'stop'"], ['resume', "'pass'"]] },
+  '7e': { right: ['lane', "'pass'"], wrong: [['decision', "'pass'"], ['lane', "'stop'"]] },
+  '7f': { right: ['facts()', 'ok'], wrong: [['facts', 'ok'], ['facts()', 'wrong']] },
+});
