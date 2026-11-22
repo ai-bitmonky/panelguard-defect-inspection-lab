@@ -1,5 +1,5 @@
 /* PanelGuard Python kernel: Pyodide + scikit-learn.
-   Runs as a classic Web Worker, or (fallback) in the page, or under Node for tests.
+   Runs as a module Web Worker, or (fallback) in the page, or under Node for tests.
    Messages in:  {cmd:'init', base} {cmd:'data', buf, labels} {cmd:'run', id, code, probe} {cmd:'eval', id, code}
    Messages out: {type:'progress'|'ready'|'stdout'|'result'|'fatal', ...} */
 (function (G) {
@@ -107,16 +107,16 @@ function Core(post, loadPyodideFn, helpCode) {
 G.PGKernelCore = Core;
 G.PGKernelBoot = BOOT;
 
-/* Running as a dedicated worker? */
+/* Running as a dedicated (module) worker? Pyodide 314 needs a module worker: it refuses classic workers. */
 if (typeof WorkerGlobalScope !== 'undefined' && G instanceof WorkerGlobalScope) {
   var handle = null, queue = [];
   G.onmessage = function (ev) {
     var m = ev.data;
     if (m.cmd === 'init') {
-      try { importScripts(m.base + 'pyodide/pyodide.js'); }
-      catch (e) { postMessage({ type: 'fatal', text: 'Could not load pyodide.js: ' + e.message }); return; }
-      handle = Core(function (x) { postMessage(x); }, G.loadPyodide, m.help);
-      handle(m); queue.forEach(handle); queue = [];
+      import(m.base + 'pyodide/pyodide.mjs').then(function (mod) {
+        handle = Core(function (x) { postMessage(x); }, mod.loadPyodide, m.help);
+        handle(m); queue.forEach(handle); queue = [];
+      }, function (e) { postMessage({ type: 'fatal', text: 'Could not load pyodide.mjs: ' + (e && e.message || e) }); });
     } else if (handle) handle(m); else queue.push(m);
   };
 }

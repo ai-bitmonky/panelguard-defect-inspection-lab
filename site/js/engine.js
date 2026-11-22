@@ -129,16 +129,18 @@ function spawn(mode, dataP) {
   K.mode = mode;
   var init = { cmd: 'init', base: BASE, help: window.PG_PY_HELP };
   if (mode === 'page') {
-    var s1 = h('script', { src: 'pyodide/pyodide.js' }), s2 = h('script', { src: 'js/pyworker.js' });
-    s1.onload = function () { document.head.appendChild(s2); };
-    s2.onload = function () { K.pageHandle = window.PGKernelCore(konmsg, window.loadPyodide, window.PG_PY_HELP); K.pageHandle(init); dataP.then(sendData); };
-    s1.onerror = function () { fatal('pyodide/pyodide.js could not be loaded.'); };
-    document.head.appendChild(s1); return;
+    var s2 = h('script', { src: 'js/pyworker.js' });
+    s2.onload = function () {
+      import(BASE + 'pyodide/pyodide.mjs').then(function (mod) { K.pageHandle = window.PGKernelCore(konmsg, mod.loadPyodide, window.PG_PY_HELP); K.pageHandle(init); dataP.then(sendData); },
+        function (e) { fatal('pyodide/pyodide.mjs could not be loaded: ' + (e && e.message || e)); });
+    };
+    s2.onerror = function () { fatal('js/pyworker.js could not be loaded.'); };
+    document.head.appendChild(s2); return;
   }
   var w, got = false;
   var fail = function () { if (got) return; try { w && w.terminate(); } catch (e) {} spawn(mode === 'file' ? 'blob' : 'page', dataP); };
   var go = function (url) {
-    try { w = new Worker(url); } catch (e) { return fail(); }
+    try { w = new Worker(url, { type: 'module' }); } catch (e) { return fail(); }
     K.w = w;
     w.onmessage = function (ev) { got = true; konmsg(ev.data); };
     w.onerror = function (ev) { if (!got) { ev.preventDefault && ev.preventDefault(); fail(); } else fatal('The Python worker stopped: ' + (ev.message || 'unknown error')); };
@@ -264,8 +266,8 @@ function renderStrip(st, box) {
     if (ok && !done && !cur) inner += '<rect x="' + (cx - 21) + '" y="13" width="42" height="42" rx="8" fill="none" stroke="#ffb547" stroke-width="2" opacity=".8"><animate attributeName="opacity" values=".9;.15;.9" dur="1.6s" repeatCount="indefinite"/></rect>';
     inner += '<rect x="' + (cx - 17) + '" y="17" width="34" height="34" rx="5" fill="' + (done ? '#0d2a1d' : '#0c131d') + '" stroke="' + col + '" stroke-width="2"/>' +
       '<line x1="' + (cx - 17) + '" y1="28" x2="' + (cx + 17) + '" y2="28" stroke="' + col + '" stroke-opacity=".45"/><line x1="' + (cx - 17) + '" y1="40" x2="' + (cx + 17) + '" y2="40" stroke="' + col + '" stroke-opacity=".45"/>' +
-      '<text x="' + cx + '" y="' + 38.5 + '" text-anchor="middle" font-family="Orbitron,Arial" font-size="12" font-weight="700" fill="' + (ok || done ? '#fff' : '#5d6b80') + '">' + (done ? '✓' : (ok ? s.id : '🔒')) + '</text>' +
-      '<text x="' + cx + '" y="74" text-anchor="middle" font-family="Rajdhani,Arial" font-size="15" font-weight="600" fill="' + (cur ? '#46e3ff' : (ok ? '#c6d2e2' : '#5d6b80')) + '">' + esc(s.name) + '</text>';
+      '<text x="' + cx + '" y="' + 38.5 + '" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="12" font-weight="700" fill="' + (ok || done ? '#fff' : '#5d6b80') + '">' + (done ? '✓' : (ok ? s.id : '🔒')) + '</text>' +
+      '<text x="' + cx + '" y="74" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="15" font-weight="600" fill="' + (cur ? '#46e3ff' : (ok ? '#c6d2e2' : '#5d6b80')) + '">' + esc(s.name) + '</text>';
     g.innerHTML = inner;
     g.addEventListener('click', function () { if (ok) location.hash = '#sub-' + s.id; });
     g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ok) location.hash = '#sub-' + s.id; });
@@ -323,7 +325,7 @@ function Editor(box, code, onRun, onChange) {
   });
   return {
     get: function () { return ta.value; },
-    set: function (c) { ta.value = c; errLine = null; paint(); },
+    set: function (c) { ta.value = c; errLine = null; paint(); ed.scrollTop = 0; ed.scrollLeft = 0; },
     mark: function (n) { errLine = n; paint(); },
     focusGap: function () { var i = ta.value.indexOf('____'); if (i >= 0) { ta.focus(); ta.setSelectionRange(i, i + 4); } },
     ta: ta
@@ -384,7 +386,7 @@ function renderWork() {
   w.innerHTML = '';
   var banner = h('div', { class: 'banner' });
   w.appendChild(h('div', { class: 'sthead' }, [h('div', { class: 'stxt' }, [h('h1', { html: '<small>STEP ' + st.id + '</small>' + esc(st.title) }), h('p', { text: st.story })]), banner]));
-  ART.banner(banner, st.id, { cellURL: fullURL, canvas: cellCanvas });
+  if (s.kind === 'scene') banner.style.display = 'none'; else ART.banner(banner, st.id, { cellURL: fullURL, canvas: cellCanvas });
   var strip = h('div', { class: 'strip' }); w.appendChild(strip); renderStrip(st, strip);
   var card = h('div', { class: 'card' }, [h('h2', { html: '<span class="k">' + id + '</span>' + esc(s.name) }), h('p', { class: 'goalline', text: s.goal })]);
   if (s.task) {

@@ -31,7 +31,7 @@ function station(opts) {
   s += '<rect width="800" height="300" fill="url(#' + id + 'bg)"/>';
   s += '<rect y="232" width="800" height="68" fill="url(#' + id + 'grid)" opacity=".7"/>';
   s += '<g opacity=".5">' + [80, 240, 560, 720].map(function (x) { return '<rect x="' + (x - 40) + '" y="6" width="80" height="4" rx="2" fill="#9fe9ff"/><rect x="' + (x - 60) + '" y="10" width="120" height="40" fill="url(#' + id + 'glow)" opacity=".35"/>'; }).join('') + '</g>';
-  s += '<text x="14" y="26" font-family="Orbitron,Arial" font-size="10" fill="#3f6b88" letter-spacing="2">LINE 3 · FINAL EL STATION</text>';
+  s += '<text x="14" y="26" font-family="Orbitron,Arial,sans-serif" font-size="10" fill="#3f6b88" letter-spacing="2">LINE 3 · FINAL EL STATION</text>';
   // legs + belt
   s += '<g fill="#1a222d">' + [40, 200, 600, 700].map(function (x) { return '<rect x="' + x + '" y="226" width="10" height="56"/>'; }).join('') + '</g>';
   s += '<path d="M0 196H730L748 206V226H0Z" fill="url(#' + id + 'belt)"/>';
@@ -57,28 +57,28 @@ function station(opts) {
   // hood shell (cut-away frame)
   s += '<path d="M330 40H470L478 50V200H470V122H330V200H322V50Z" fill="url(#' + id + 'hood)" stroke="#2c3a4c"/>';
   s += '<rect x="330" y="122" width="140" height="80" fill="none" stroke="#46e3ff" stroke-opacity=".5" stroke-dasharray="4 4"/>';
-  s += '<text x="400" y="116" text-anchor="middle" font-family="Rajdhani,Arial" font-size="10" fill="#6c8aa6">cut-away view · inside it is dark</text>';
+  s += '<text x="400" y="116" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="10" fill="#6c8aa6">cut-away view · inside it is dark</text>';
   // camera
   s += '<g data-hot="camera"><rect x="380" y="52" width="40" height="34" rx="4" fill="#0b0f15" stroke="#46e3ff" stroke-opacity=".6"/><rect x="390" y="86" width="20" height="14" fill="#141b25" stroke="#2f4054"/>' +
        '<circle cx="400" cy="101" r="7" fill="#08202a" stroke="#46e3ff"/><circle cx="400" cy="101" r="3" fill="#46e3ff"><animate attributeName="opacity" values="1;.3;1" dur="2s" repeatCount="indefinite"/></circle>' +
        '<path d="M393 106L360 190H440L407 106Z" fill="#46e3ff" opacity=".07"/></g>';
-  s += '<text x="400" y="34" text-anchor="middle" font-family="Orbitron,Arial" font-size="10" font-weight="700" fill="#9fe9ff" letter-spacing="2">EL CAMERA</text>';
+  s += '<text x="400" y="34" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="10" font-weight="700" fill="#9fe9ff" letter-spacing="2">EL CAMERA</text>';
   s += '<circle cx="462" cy="48" r="3" fill="#3dffa0"><animate attributeName="opacity" values="1;.2;1" dur="1.3s" repeatCount="indefinite"/></circle>';
   // monitor
   s += '<g data-hot="monitor"><path d="M520 140V120H560" stroke="#2c3a4c" stroke-width="4" fill="none"/>' +
        '<rect x="540" y="36" width="150" height="88" rx="6" fill="#070b10" stroke="#46e3ff" stroke-opacity=".7"/>' +
        '<image data-cell="' + (opts.monitorCell || 6) + '" x="548" y="44" width="68" height="68" preserveAspectRatio="none"/>' +
        '<rect x="548" y="44" width="68" height="68" fill="none" stroke="#46e3ff" stroke-opacity=".4"/>' +
-       '<text x="624" y="58" font-family="Orbitron,Arial" font-size="8" fill="#6c8aa6">' + (opts.monitorTitle || 'CELL 0006') + '</text>' +
-       '<text x="624" y="80" font-family="Orbitron,Arial" font-size="13" font-weight="700" fill="' + (opts.monitorColor || '#ff4d6a') + '">' + (opts.monitor || 'STOP?') + '</text>' +
-       '<text x="624" y="100" font-family="Rajdhani,Arial" font-size="10" fill="#8d9bb0">' + (opts.monitorSub || 'you decide') + '</text></g>';
+       '<text x="624" y="58" font-family="Orbitron,Arial,sans-serif" font-size="8" fill="#6c8aa6">' + (opts.monitorTitle || 'CELL 0006') + '</text>' +
+       '<text x="624" y="80" font-family="Orbitron,Arial,sans-serif" font-size="13" font-weight="700" fill="' + (opts.monitorColor || '#ff4d6a') + '">' + (opts.monitor || 'STOP?') + '</text>' +
+       '<text x="624" y="100" font-family="Rajdhani,Arial,sans-serif" font-size="10" fill="#8d9bb0">' + (opts.monitorSub || 'you decide') + '</text></g>';
   // sorter
   s += '<g data-hot="sorter"><path d="M730 196L790 196" stroke="#2c6a4a" stroke-width="6"/><path d="M736 206L770 262H796L760 206Z" fill="#2a0e15" stroke="#7a2232"/>' +
        '<rect x="722" y="168" width="8" height="30" fill="#556" /><path d="M730 172L760 196" stroke="#cfd8e3" stroke-width="3"/>' +
        '<circle cx="752" cy="150" r="7" fill="#3dffa0" opacity=".9"/><circle cx="752" cy="150" r="14" fill="#3dffa0" opacity=".25" filter="url(#' + id + 'b)"/>' +
        '<circle cx="776" cy="150" r="7" fill="#ff4d6a" opacity=".9"><animate attributeName="opacity" values=".9;.3;.9" dur="1.1s" repeatCount="indefinite"/></circle>' +
-       '<text x="760" y="188" text-anchor="middle" font-family="Orbitron,Arial" font-size="8" fill="#3dffa0">PASS →</text>' +
-       '<text x="770" y="280" text-anchor="middle" font-family="Orbitron,Arial" font-size="8" fill="#ff4d6a">STOP ↓ RE-CHECK</text></g>';
+       '<text x="760" y="188" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="8" fill="#3dffa0">PASS →</text>' +
+       '<text x="770" y="280" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="8" fill="#ff4d6a">STOP ↓ RE-CHECK</text></g>';
   // hotspots
   if (opts.hot) {
     var HS = [['camera', 400, 70, '1'], ['contacts', 352, 147, '2'], ['monitor', 615, 80, '3'], ['sorter', 760, 170, '4']];
@@ -88,8 +88,8 @@ function station(opts) {
         '<circle cx="' + p[1] + '" cy="' + p[2] + '" r="22" fill="transparent"/>' +
         '<circle cx="' + p[1] + '" cy="' + p[2] + '" r="13" fill="none" stroke="' + (seen ? '#3dffa0' : '#ffb547') + '" stroke-width="2">' + (seen ? '' : '<animate attributeName="r" values="11;17;11" dur="1.6s" repeatCount="indefinite"/>') + '</circle>' +
         '<circle cx="' + (p[1] + 13) + '" cy="' + (p[2] - 13) + '" r="8" fill="' + (seen ? '#3dffa0' : '#ffb547') + '"/>' +
-        '<text x="' + (p[1] + 13) + '" y="' + (p[2] - 9.5) + '" text-anchor="middle" font-family="Orbitron,Arial" font-size="9" font-weight="900" fill="#1a1000">' + (seen ? '✓' : p[3]) + '</text>' +
-        (seen ? '' : '<text x="' + p[1] + '" y="' + (p[2] + 30) + '" text-anchor="middle" font-family="Rajdhani,Arial" font-size="11" font-weight="700" fill="#ffb547">tap</text>') + '</g>';
+        '<text x="' + (p[1] + 13) + '" y="' + (p[2] - 9.5) + '" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="9" font-weight="900" fill="#1a1000">' + (seen ? '✓' : p[3]) + '</text>' +
+        (seen ? '' : '<text x="' + p[1] + '" y="' + (p[2] + 30) + '" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="11" font-weight="700" fill="#ffb547">tap</text>') + '</g>';
     });
   }
   return s + '</svg>';

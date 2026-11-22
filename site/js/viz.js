@@ -46,7 +46,7 @@ function sceneStation(s, stage, out, api) {
     var c = card(out, 'THE STATION', 'Tap the numbered rings on the station. ' + Object.keys(m.visited).length + ' of 4 found.');
     Object.keys(PARTS).forEach(function (k, i) {
       var seen = m.visited[k];
-      c.appendChild(el('div', 'tile', '<div class="l" style="font-family:Orbitron;font-size:11px;color:' + (seen ? '#3dffa0' : '#5d6b80') + '">' + (i + 1) + ' · ' + PARTS[k][0].toUpperCase() + '</div><div style="font-size:15px;margin-top:3px">' + (seen ? PARTS[k][1] : '<span class="hint">Not found yet.</span>') + '</div>')).style.marginBottom = '6px';
+      c.appendChild(el('div', 'tile', '<div class="l" style="font-family:Orbitron,Arial,sans-serif;font-size:11px;color:' + (seen ? '#3dffa0' : '#5d6b80') + '">' + (i + 1) + ' · ' + PARTS[k][0].toUpperCase() + '</div><div style="font-size:15px;margin-top:3px">' + (seen ? PARTS[k][1] : '<span class="hint">Not found yet.</span>') + '</div>')).style.marginBottom = '6px';
     });
   }
   draw(); list();
@@ -64,7 +64,7 @@ function sceneDefects(s, stage, out, api) {
       var im = new Image(); im.style.cssText = 'width:100%;aspect-ratio:1;border-radius:6px;display:block;image-rendering:auto;filter:' + (on ? 'none' : 'brightness(1.05)');
       api.full(cd.id).then(function (u) { if (u) im.src = u; else im.src = api.canvas(cd.id).toDataURL(); });
       f.appendChild(im);
-      f.appendChild(el('div', null, on ? '<div style="font-family:Orbitron;font-size:11px;margin-top:6px;color:' + (/Good/.test(cd.tag) ? '#3dffa0' : '#ff4d6a') + '">' + cd.tag.toUpperCase() + '</div><div style="font-size:14px">' + cd.note + '</div>'
+      f.appendChild(el('div', null, on ? '<div style="font-family:Orbitron,Arial,sans-serif;font-size:11px;margin-top:6px;color:' + (/Good/.test(cd.tag) ? '#3dffa0' : '#ff4d6a') + '">' + cd.tag.toUpperCase() + '</div><div style="font-size:14px">' + cd.note + '</div>'
         : '<div style="margin-top:6px;font-size:15px;color:#ffb547">Good or bad? Tap to flip</div>'));
       f.style.borderColor = on ? (/Good/.test(cd.tag) ? '#1f6b44' : '#6b1f30') : '#263346';
     }
@@ -101,7 +101,7 @@ function sceneMistakes(s, stage, out, api) {
     var top = el('div'); top.style.cssText = 'display:flex;gap:14px;justify-content:center;min-height:86px';
     Object.keys(TOK).forEach(function (k) {
       if (m.place[k]) return;
-      var t = el('div', 'dragtok', '<div style="font-family:Orbitron;font-size:12px;color:#ffb547">' + TOK[k][0] + '</div><div>' + TOK[k][1] + '</div>');
+      var t = el('div', 'dragtok', '<div style="font-family:Orbitron,Arial,sans-serif;font-size:12px;color:#ffb547">' + TOK[k][0] + '</div><div>' + TOK[k][1] + '</div>');
       t.style.cssText = 'cursor:grab;padding:12px 16px;border-radius:12px;background:#1c1606;border:2px solid ' + (sel === k ? '#fff' : '#ffb547') + ';font-size:16px;min-width:200px;text-align:center';
       t.setAttribute('data-k', k);
       t.addEventListener('pointerdown', function (ev) { startDrag(ev, t, k); });
@@ -112,7 +112,7 @@ function sceneMistakes(s, stage, out, api) {
     var bins = el('div'); bins.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:14px';
     Object.keys(BIN).forEach(function (b) {
       var placed = Object.keys(m.place).filter(function (k) { return m.place[k] === b; })[0];
-      var d = el('div', null, '<div style="font-family:Orbitron;font-size:12px;color:' + (b === 'warranty' ? '#ff4d6a' : '#46e3ff') + '">' + BIN[b][0].toUpperCase() + '</div><div style="font-size:15px;margin:4px 0">' + BIN[b][1] + '</div>' +
+      var d = el('div', null, '<div style="font-family:Orbitron,Arial,sans-serif;font-size:12px;color:' + (b === 'warranty' ? '#ff4d6a' : '#46e3ff') + '">' + BIN[b][0].toUpperCase() + '</div><div style="font-size:15px;margin:4px 0">' + BIN[b][1] + '</div>' +
         (placed ? '<div style="margin-top:6px;padding:6px 10px;border-radius:8px;background:#0b2418;border:1px solid #1f6b44">✓ ' + TOK[placed][0] + '</div>' : '<div class="hint" style="margin-top:6px;border:1px dashed #33445a;border-radius:8px;padding:8px;text-align:center">drop a mistake here</div>'));
       d.style.cssText = 'padding:12px;border-radius:12px;background:#0a0f16;border:2px solid #263346;min-height:150px';
       d.setAttribute('data-bin', b);
@@ -166,11 +166,11 @@ function sceneGame(s, stage, out, api) {
       var box = el('div'); box.style.cssText = 'position:relative;width:min(300px,60%);aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid #46e3ff;box-shadow:0 0 30px rgba(70,227,255,.25)';
       var im = new Image(); im.style.cssText = 'width:100%;height:100%;display:block'; api.full(id).then(function (u) { im.src = u || api.canvas(id).toDataURL(); });
       box.appendChild(im);
-      box.appendChild(el('div', null, '<span style="position:absolute;left:8px;top:6px;font-family:Orbitron;font-size:10px;color:#9fe9ff;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px">CELL ' + (i + 1) + ' / 12 · ' + api.meta(id).kind + '</span>'));
+      box.appendChild(el('div', null, '<span style="position:absolute;left:8px;top:6px;font-family:Orbitron,Arial,sans-serif;font-size:10px;color:#9fe9ff;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px">CELL ' + (i + 1) + ' / 12 · ' + api.meta(id).kind + '</span>'));
       wrap.appendChild(box);
       var row = el('div', 'row');
-      var p = el('button', 'btn', '✓ PASS'); p.style.cssText = 'font-family:Orbitron;font-size:14px;padding:10px 26px;background:#0b2418;border-color:#3dffa0;color:#3dffa0';
-      var st = el('button', 'btn', '■ STOP'); st.style.cssText = 'font-family:Orbitron;font-size:14px;padding:10px 26px;background:#2a0e15;border-color:#ff4d6a;color:#ff9aac';
+      var p = el('button', 'btn', '✓ PASS'); p.style.cssText = 'font-family:Orbitron,Arial,sans-serif;font-size:14px;padding:10px 26px;background:#0b2418;border-color:#3dffa0;color:#3dffa0';
+      var st = el('button', 'btn', '■ STOP'); st.style.cssText = 'font-family:Orbitron,Arial,sans-serif;font-size:14px;padding:10px 26px;background:#2a0e15;border-color:#ff4d6a;color:#ff9aac';
       p.onclick = function () { pick(id, 0); }; st.onclick = function () { pick(id, 1); };
       row.appendChild(p); row.appendChild(st); wrap.appendChild(row);
       wrap.appendChild(el('div', 'hint', 'Bright and even = healthy. Dark lines, dark blobs, broken dashes = trouble. Poly cells are spotty by nature.'));
@@ -200,7 +200,7 @@ function sceneGame(s, stage, out, api) {
     ids.forEach(function (id) { var mt = api.meta(id), t = mt.prob >= 0.5, y = !!m.choices[id]; if (t && y) tp++; else if (t) fn++; else if (y) fp++; else tn++; if (mt.prob === 0.33 || mt.prob === 0.67) unsure++; });
     var rec = tp / (tp + fn);
     tiles(c, [[tp + ' / ' + (tp + fn), 'defects caught', 'g'], [fn, 'defects missed', fn ? 'r' : 'g'], [fp + ' / ' + (fp + tn), 'false alarms', fp ? 'a' : 'g']]);
-    var bar = '<rect x="0" y="8" width="400" height="16" rx="8" fill="#162131"/><rect x="0" y="8" width="' + (400 * rec) + '" height="16" rx="8" fill="' + (rec >= .95 ? '#3dffa0' : '#ff4d6a') + '"/><line x1="380" y1="2" x2="380" y2="30" stroke="#fff" stroke-dasharray="3 2"/><text x="380" y="42" text-anchor="middle" font-size="11" fill="#c6d2e2" font-family="Rajdhani">target 95%</text>';
+    var bar = '<rect x="0" y="8" width="400" height="16" rx="8" fill="#162131"/><rect x="0" y="8" width="' + (400 * rec) + '" height="16" rx="8" fill="' + (rec >= .95 ? '#3dffa0' : '#ff4d6a') + '"/><line x1="380" y1="2" x2="380" y2="30" stroke="#fff" stroke-dasharray="3 2"/><text x="380" y="42" text-anchor="middle" font-size="11" fill="#c6d2e2" font-family="Rajdhani,Arial,sans-serif">target 95%</text>';
     c.appendChild(svg(420, 46, bar));
     c.appendChild(el('p', null, 'Your recall: <b>' + pct(rec, 0) + '</b> (' + tp + ' of ' + (tp + fn) + ' defects stopped). ' + (rec >= .95 ? 'You hit the target.' : 'Below the 95% target.') + ' You stopped <b>' + fp + '</b> of ' + (fp + tn) + ' good cells.'));
     c.appendChild(el('p', null, '<b>' + unsure + '</b> of these 12 cells were ones where the experts were not sure (0.33 or 0.67). If you found those hard, so will a model.'));
@@ -232,7 +232,7 @@ function wall(r, host, api) {
 function unitChart(r, host, api) {
   var per = 20, c = card(host, 'WHAT IS IN THE PACK', 'Each little cell = ' + per + ' real cells. Counted by your code.');
   function row(y, n, col, label, mark) {
-    var k = Math.round(n / per), s = '<text x="0" y="' + (y + 12) + '" font-family="Rajdhani" font-size="14" fill="#c6d2e2">' + label + '</text>';
+    var k = Math.round(n / per), s = '<text x="0" y="' + (y + 12) + '" font-family="Rajdhani,Arial,sans-serif" font-size="14" fill="#c6d2e2">' + label + '</text>';
     for (var i = 0; i < k; i++) { var x = 120 + (i % 30) * 10, yy = y + Math.floor(i / 30) * 10; s += '<rect x="' + x + '" y="' + yy + '" width="8" height="8" rx="1.5" fill="' + col + '"/>' + (mark ? '<text x="' + (x + 4) + '" y="' + (yy + 7) + '" font-size="7" text-anchor="middle" fill="#111" font-family="Arial" font-weight="700">?</text>' : ''); }
     return { s: s, h: Math.ceil(k / 30) * 10 + 8 };
   }
@@ -260,12 +260,12 @@ function binLine(r, host, api) {
     r.bins.forEach(function (n, i) {
       var hgt = 150 * n / maxN, def = i >= slot;
       o += '<rect x="' + (xs[i] - 34) + '" y="' + (170 - hgt) + '" width="68" height="' + hgt + '" rx="4" fill="' + (def ? '#ff4d6a' : '#3dffa0') + '" opacity="' + (i === 1 || i === 2 ? .65 : .9) + '"/>' +
-        '<text x="' + xs[i] + '" y="' + (164 - hgt) + '" text-anchor="middle" font-family="Orbitron" font-size="12" fill="#fff">' + n + '</text>' +
-        '<text x="' + xs[i] + '" y="190" text-anchor="middle" font-family="Space Mono" font-size="13" fill="#c6d2e2">' + P[i] + '</text>' +
-        (i === 1 || i === 2 ? '<text x="' + xs[i] + '" y="206" text-anchor="middle" font-family="Rajdhani" font-size="12" fill="#d6e05a">experts unsure</text>' : '');
+        '<text x="' + xs[i] + '" y="' + (164 - hgt) + '" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="12" fill="#fff">' + n + '</text>' +
+        '<text x="' + xs[i] + '" y="190" text-anchor="middle" font-family="Space Mono,monospace" font-size="13" fill="#c6d2e2">' + P[i] + '</text>' +
+        (i === 1 || i === 2 ? '<text x="' + xs[i] + '" y="206" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#d6e05a">experts unsure</text>' : '');
     });
-    o += '<text x="220" y="224" text-anchor="middle" font-family="Rajdhani" font-size="12" fill="#8d9bb0">expert defect score</text>';
-    o += '<line x1="220" y1="6" x2="220" y2="176" stroke="#8d9bb0" stroke-dasharray="2 4"/><text x="224" y="14" font-family="Rajdhani" font-size="11" fill="#8d9bb0">our rule</text>';
+    o += '<text x="220" y="224" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#8d9bb0">expert defect score</text>';
+    o += '<line x1="220" y1="6" x2="220" y2="176" stroke="#8d9bb0" stroke-dasharray="2 4"/><text x="224" y="14" font-family="Rajdhani,Arial,sans-serif" font-size="11" fill="#8d9bb0">our rule</text>';
     var lx = SX[slot];
     o += '<g style="cursor:ew-resize"><rect x="' + (lx - 14) + '" y="0" width="28" height="180" fill="transparent"/><line x1="' + lx + '" y1="0" x2="' + lx + '" y2="180" stroke="#ffb547" stroke-width="4"/><rect x="' + (lx - 12) + '" y="74" width="24" height="30" rx="5" fill="#ffb547"/><text x="' + lx + '" y="94" text-anchor="middle" font-size="14" fill="#1a1000">⇔</text></g>';
     s.innerHTML = o;
@@ -291,12 +291,12 @@ function trays(r, host, api) {
     o += '<g><path d="M' + x + ' 120h130l-10 40h-110z" fill="#111a27" stroke="' + col[i] + '"/>';
     var k = Math.round(n / 25);
     for (var j = 0; j < k; j++) { var cx = x + 12 + (j % 11) * 10, cy = 110 - Math.floor(j / 11) * 9; o += '<rect x="' + cx + '" y="' + cy + '" width="8" height="7" rx="1" fill="' + (j < Math.round(k * sh) ? '#ff4d6a' : '#2a4a6a') + '"/>'; }
-    o += '<text x="' + (x + 65) + '" y="182" text-anchor="middle" font-family="Orbitron" font-size="11" fill="' + col[i] + '">' + N[i] + '</text>' +
-      '<text x="' + (x + 65) + '" y="200" text-anchor="middle" font-family="Rajdhani" font-size="15" fill="#fff">' + n + ' cells</text>' +
-      '<text x="' + (x + 65) + '" y="216" text-anchor="middle" font-family="Rajdhani" font-size="14" fill="#ff8a9c">' + r.defects[i] + ' defects · ' + pct(sh) + '</text></g>';
+    o += '<text x="' + (x + 65) + '" y="182" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="11" fill="' + col[i] + '">' + N[i] + '</text>' +
+      '<text x="' + (x + 65) + '" y="200" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="15" fill="#fff">' + n + ' cells</text>' +
+      '<text x="' + (x + 65) + '" y="216" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="14" fill="#ff8a9c">' + r.defects[i] + ' defects · ' + pct(sh) + '</text></g>';
   });
-  o += '<g transform="translate(300 58) rotate(-12)"><rect x="-6" y="0" width="150" height="30" rx="4" fill="#5a1220" stroke="#ff4d6a" stroke-width="2"/><text x="69" y="13" text-anchor="middle" font-family="Orbitron" font-size="10" font-weight="900" fill="#ffd1d9">SEALED</text><text x="69" y="25" text-anchor="middle" font-family="Rajdhani" font-size="10" fill="#ffd1d9">opened once, at the end (Step 8)</text></g>';
-  o += '<text x="10" y="236" font-family="Rajdhani" font-size="12" fill="#8d9bb0">each little block ≈ 25 cells · red = defect</text>';
+  o += '<g transform="translate(300 58) rotate(-12)"><rect x="-6" y="0" width="150" height="30" rx="4" fill="#5a1220" stroke="#ff4d6a" stroke-width="2"/><text x="69" y="13" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="10" font-weight="900" fill="#ffd1d9">SEALED</text><text x="69" y="25" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="10" fill="#ffd1d9">opened once, at the end (Step 8)</text></g>';
+  o += '<text x="10" y="236" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#8d9bb0">each little block ≈ 25 cells · red = defect</text>';
   c.appendChild(svg(445, 242, o));
   var c2 = card(host, 'WHY STRATIFY? ROLL THE DICE', 'Each roll splits the cells again WITHOUT stratify, with a new random seed. Python does the real split.');
   var m = api.mech; m.dice = m.dice || [];
@@ -306,14 +306,14 @@ function trays(r, host, api) {
   function draw() {
     var lo = 0.24, hi = 0.39, X = function (v) { return 110 + 310 * (v - lo) / (hi - lo); }, o2 = '';
     var strat = r.defects[0] / r.sizes[0];
-    [0.25, 0.3, 0.35].forEach(function (t) { o2 += '<line x1="' + X(t) + '" y1="10" x2="' + X(t) + '" y2="120" stroke="#1b2533"/><text x="' + X(t) + '" y="136" text-anchor="middle" font-size="11" fill="#8d9bb0" font-family="Space Mono">' + pct(t, 0) + '</text>'; });
+    [0.25, 0.3, 0.35].forEach(function (t) { o2 += '<line x1="' + X(t) + '" y1="10" x2="' + X(t) + '" y2="120" stroke="#1b2533"/><text x="' + X(t) + '" y="136" text-anchor="middle" font-size="11" fill="#8d9bb0" font-family="Space Mono,monospace">' + pct(t, 0) + '</text>'; });
     N.forEach(function (nm, i) {
       var y = 30 + i * 36;
-      o2 += '<text x="0" y="' + (y + 4) + '" font-family="Orbitron" font-size="10" fill="' + col[i] + '">' + nm + '</text>';
+      o2 += '<text x="0" y="' + (y + 4) + '" font-family="Orbitron,Arial,sans-serif" font-size="10" fill="' + col[i] + '">' + nm + '</text>';
       o2 += '<line x1="' + X(r.defects[i] / r.sizes[i]) + '" y1="' + (y - 12) + '" x2="' + X(r.defects[i] / r.sizes[i]) + '" y2="' + (y + 12) + '" stroke="#46e3ff" stroke-width="3"/>';
       m.dice.forEach(function (d) { o2 += '<circle cx="' + X(Math.max(lo, Math.min(hi, d.share[i]))) + '" cy="' + y + '" r="5" fill="#ffb547" opacity=".8"/>'; });
     });
-    o2 += '<text x="110" y="148" font-family="Rajdhani" font-size="11" fill="#46e3ff">▍ your stratified split</text><text x="300" y="148" font-family="Rajdhani" font-size="11" fill="#ffb547">● random splits</text>';
+    o2 += '<text x="110" y="148" font-family="Rajdhani,Arial,sans-serif" font-size="11" fill="#46e3ff">▍ your stratified split</text><text x="300" y="148" font-family="Rajdhani,Arial,sans-serif" font-size="11" fill="#ffb547">● random splits</text>';
     s2.innerHTML = o2;
     if (m.dice.length) {
       var spread = [0, 1, 2].map(function (i) { var v = m.dice.map(function (d) { return d.share[i]; }); return Math.max.apply(null, v) - Math.min.apply(null, v); });
@@ -371,7 +371,7 @@ function chips(r, host, api) {
   function drawChips() {
     row.innerHTML = '';
     Object.keys(CHIP).forEach(function (k) {
-      var b = el('button', null, '<div style="font-family:Orbitron;font-size:11px;color:' + (on[k] ? '#001018' : '#46e3ff') + '">' + k + ' · ' + CHIP[k][0].toUpperCase() + '</div><div style="font-size:13px">' + CHIP[k][1] + ' · ' + CHIP[k][2] + '</div>');
+      var b = el('button', null, '<div style="font-family:Orbitron,Arial,sans-serif;font-size:11px;color:' + (on[k] ? '#001018' : '#46e3ff') + '">' + k + ' · ' + CHIP[k][0].toUpperCase() + '</div><div style="font-size:13px">' + CHIP[k][1] + ' · ' + CHIP[k][2] + '</div>');
       b.style.cssText = 'text-align:left;border-radius:10px;padding:8px 10px;border:1px solid ' + (on[k] ? '#46e3ff' : '#263346') + ';background:' + (on[k] ? 'linear-gradient(180deg,#46e3ff,#1aa6c9)' : '#0a1019') + ';color:' + (on[k] ? '#001018' : '#e6eef8');
       b.setAttribute('aria-pressed', on[k] ? 'true' : 'false');
       b.onclick = function () { on[k] = on[k] ? 0 : 1; api.setMech({ on: on }); drawChips(); };
@@ -385,7 +385,7 @@ function chips(r, host, api) {
     var lo = 0.75, hi = 0.9;
     m.results.slice().sort(function (a, b) { return b.auc - a.auc; }).forEach(function (x) {
       var w = Math.max(2, 100 * (x.auc - lo) / (hi - lo)), kept = m.kept && m.kept.join() === x.keys.join();
-      var d = el('div', null, '<div style="display:flex;justify-content:space-between;font-size:14px"><span><b>' + x.keys.join(' + ') + '</b> <span class="hint">' + x.dims + ' numbers · ' + x.sec + ' s</span></span><span style="font-family:Orbitron;font-size:13px;color:' + (x === best ? '#3dffa0' : '#c6d2e2') + '">' + x.auc.toFixed(3) + (x === best ? ' ★' : '') + '</span></div>' +
+      var d = el('div', null, '<div style="display:flex;justify-content:space-between;font-size:14px"><span><b>' + x.keys.join(' + ') + '</b> <span class="hint">' + x.dims + ' numbers · ' + x.sec + ' s</span></span><span style="font-family:Orbitron,Arial,sans-serif;font-size:13px;color:' + (x === best ? '#3dffa0' : '#c6d2e2') + '">' + x.auc.toFixed(3) + (x === best ? ' ★' : '') + '</span></div>' +
         '<div style="height:8px;background:#162131;border-radius:4px;margin:3px 0"><div style="height:100%;width:' + w + '%;background:' + (x === best ? '#3dffa0' : '#46e3ff') + ';border-radius:4px"></div></div>');
       var u = el('button', 'btn small', kept ? '✓ In use as F' : 'Use this mix'); u.disabled = !!kept;
       u.onclick = function () {
@@ -414,19 +414,19 @@ function chips(r, host, api) {
 function race(r, host, api) {
   var c = card(host, 'THREE INSPECTORS, FIVE FOLDS', '5-fold cross-validation on the train tray. Each dot = one fold. Real scores from your run.');
   var lo = 0.7, hi = 0.95, X = function (v) { return 150 + 280 * (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo); }, o = '';
-  [0.7, 0.75, 0.8, 0.85, 0.9, 0.95].forEach(function (t) { o += '<line x1="' + X(t) + '" y1="4" x2="' + X(t) + '" y2="' + (r.models.length * 56 + 4) + '" stroke="#1b2533"/><text x="' + X(t) + '" y="' + (r.models.length * 56 + 20) + '" text-anchor="middle" font-family="Space Mono" font-size="10" fill="#8d9bb0">' + t.toFixed(2) + '</text>'; });
+  [0.7, 0.75, 0.8, 0.85, 0.9, 0.95].forEach(function (t) { o += '<line x1="' + X(t) + '" y1="4" x2="' + X(t) + '" y2="' + (r.models.length * 56 + 4) + '" stroke="#1b2533"/><text x="' + X(t) + '" y="' + (r.models.length * 56 + 20) + '" text-anchor="middle" font-family="Space Mono,monospace" font-size="10" fill="#8d9bb0">' + t.toFixed(2) + '</text>'; });
   r.models.forEach(function (x, i) {
     var y = 30 + i * 56, win = x.name === r.best;
-    o += '<text x="0" y="' + (y - 6) + '" font-family="Rajdhani" font-weight="700" font-size="15" fill="' + (win ? '#3dffa0' : '#e6eef8') + '">' + (win ? '★ ' : '') + x.name + '</text>' +
-      '<text x="0" y="' + (y + 12) + '" font-family="Space Mono" font-size="11" fill="#8d9bb0">' + x.sec + ' s</text>';
+    o += '<text x="0" y="' + (y - 6) + '" font-family="Rajdhani,Arial,sans-serif" font-weight="700" font-size="15" fill="' + (win ? '#3dffa0' : '#e6eef8') + '">' + (win ? '★ ' : '') + x.name + '</text>' +
+      '<text x="0" y="' + (y + 12) + '" font-family="Space Mono,monospace" font-size="11" fill="#8d9bb0">' + x.sec + ' s</text>';
     x.folds.forEach(function (f) { o += '<circle cx="' + X(f) + '" cy="' + y + '" r="5" fill="' + (win ? '#3dffa0' : '#46e3ff') + '" opacity=".75"/>'; });
-    o += '<line x1="' + X(x.mean) + '" y1="' + (y - 14) + '" x2="' + X(x.mean) + '" y2="' + (y + 14) + '" stroke="#fff" stroke-width="2.5"/><text x="' + (X(x.mean) + 6) + '" y="' + (y - 8) + '" font-family="Orbitron" font-size="11" fill="#fff">' + x.mean.toFixed(3) + '</text>';
+    o += '<line x1="' + X(x.mean) + '" y1="' + (y - 14) + '" x2="' + X(x.mean) + '" y2="' + (y + 14) + '" stroke="#fff" stroke-width="2.5"/><text x="' + (X(x.mean) + 6) + '" y="' + (y - 8) + '" font-family="Orbitron,Arial,sans-serif" font-size="11" fill="#fff">' + x.mean.toFixed(3) + '</text>';
   });
   c.appendChild(svg(440, r.models.length * 56 + 26, o));
   c.appendChild(el('p', null, 'White line = mean ranking score. Tight dots = steady model. The winner, <b>' + r.best + '</b>, is now trained once on the whole train tray as <code>best</code>.'));
 }
 var SQ = function (v) { return Math.sqrt(Math.max(0, v)); };
-function scoreAxis(o, X, y) { [0, 0.02, 0.05, 0.1, 0.2, 0.4, 0.6, 0.8, 1].forEach(function (t) { o.push('<line x1="' + X(t) + '" y1="' + (y - 3) + '" x2="' + X(t) + '" y2="' + (y + 3) + '" stroke="#5d6b80"/><text x="' + X(t) + '" y="' + (y + 14) + '" text-anchor="middle" font-family="Space Mono" font-size="9" fill="#8d9bb0">' + t + '</text>'); }); }
+function scoreAxis(o, X, y) { [0, 0.02, 0.05, 0.1, 0.2, 0.4, 0.6, 0.8, 1].forEach(function (t) { o.push('<line x1="' + X(t) + '" y1="' + (y - 3) + '" x2="' + X(t) + '" y2="' + (y + 3) + '" stroke="#5d6b80"/><text x="' + X(t) + '" y="' + (y + 14) + '" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="#8d9bb0">' + t + '</text>'); }); }
 function gate(r, host, api) {
   var c = card(host, 'THE CUTOFF GATE', r.cells.length + ' real validation cells, placed by their defect score. Red = real defect (above the line), green = good (below). Drag the gate.');
   var m = api.mech, cells = r.cells.slice().sort(function (a, b) { return a[1] - b[1]; });
@@ -476,15 +476,15 @@ function gate(r, host, api) {
 function curveSvg(curve, opt) {
   var W = 440, H = 220, L = 34, R = W - 10, T = 10, B = H - 34, X = function (v) { return L + (R - L) * SQ(v); }, Y = function (v) { return B - (B - T) * v; }, o = [];
   o.push('<rect x="' + L + '" y="' + T + '" width="' + (R - L) + '" height="' + (B - T) + '" fill="#070b11" stroke="#1b2533"/>');
-  [0, 0.25, 0.5, 0.75, 1].forEach(function (v) { o.push('<text x="' + (L - 4) + '" y="' + (Y(v) + 3) + '" text-anchor="end" font-family="Space Mono" font-size="9" fill="#8d9bb0">' + v + '</text>'); });
+  [0, 0.25, 0.5, 0.75, 1].forEach(function (v) { o.push('<text x="' + (L - 4) + '" y="' + (Y(v) + 3) + '" text-anchor="end" font-family="Space Mono,monospace" font-size="9" fill="#8d9bb0">' + v + '</text>'); });
   scoreAxis(o, X, B + 6);
-  o.push('<text x="' + ((L + R) / 2) + '" y="' + (H - 2) + '" text-anchor="middle" font-family="Rajdhani" font-size="12" fill="#8d9bb0">cutoff (defect score needed to STOP)</text>');
-  o.push('<line x1="' + L + '" y1="' + Y(0.95) + '" x2="' + R + '" y2="' + Y(0.95) + '" stroke="#3dffa0" stroke-dasharray="5 4"/><text x="' + (R - 4) + '" y="' + (Y(0.95) - 4) + '" text-anchor="end" font-family="Rajdhani" font-size="12" fill="#3dffa0">target recall 0.95</text>');
+  o.push('<text x="' + ((L + R) / 2) + '" y="' + (H - 2) + '" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#8d9bb0">cutoff (defect score needed to STOP)</text>');
+  o.push('<line x1="' + L + '" y1="' + Y(0.95) + '" x2="' + R + '" y2="' + Y(0.95) + '" stroke="#3dffa0" stroke-dasharray="5 4"/><text x="' + (R - 4) + '" y="' + (Y(0.95) - 4) + '" text-anchor="end" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#3dffa0">target recall 0.95</text>');
   var pts = curve.map(function (p) { return X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(' ');
   o.push('<polyline points="' + pts + '" fill="none" stroke="#46e3ff" stroke-width="2.5"/>');
-  if (opt && opt.prec) o.push('<polyline points="' + curve.map(function (p) { return X(p[0]).toFixed(1) + ',' + Y(p[2]).toFixed(1); }).join(' ') + '" fill="none" stroke="#a98bff" stroke-width="1.5" stroke-dasharray="3 3"/><text x="' + (L + 6) + '" y="' + (T + 14) + '" font-family="Rajdhani" font-size="12" fill="#46e3ff">— recall</text><text x="' + (L + 60) + '" y="' + (T + 14) + '" font-family="Rajdhani" font-size="12" fill="#a98bff">- - precision</text>');
-  if (opt && opt.guess != null) o.push('<line x1="' + X(opt.guess) + '" y1="' + T + '" x2="' + X(opt.guess) + '" y2="' + B + '" stroke="#a98bff" stroke-width="2"/><text x="' + X(opt.guess) + '" y="' + (T + 28) + '" text-anchor="middle" font-family="Orbitron" font-size="10" fill="#a98bff" paint-order="stroke" stroke="#070b11" stroke-width="3">your guess ' + opt.guess.toFixed(2) + '</text>');
-  if (opt && opt.cut != null) o.push('<line x1="' + X(opt.cut) + '" y1="' + T + '" x2="' + X(opt.cut) + '" y2="' + B + '" stroke="#ffb547" stroke-width="2.5"/><circle cx="' + X(opt.cut) + '" cy="' + Y(opt.rec) + '" r="5" fill="#ffb547"/><text x="' + X(opt.cut) + '" y="' + (T + 44) + '" text-anchor="middle" font-family="Orbitron" font-size="10" fill="#ffb547" paint-order="stroke" stroke="#070b11" stroke-width="3">answer ' + opt.cut.toFixed(3) + '</text>');
+  if (opt && opt.prec) o.push('<polyline points="' + curve.map(function (p) { return X(p[0]).toFixed(1) + ',' + Y(p[2]).toFixed(1); }).join(' ') + '" fill="none" stroke="#a98bff" stroke-width="1.5" stroke-dasharray="3 3"/><text x="' + (L + 6) + '" y="' + (T + 14) + '" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#46e3ff">— recall</text><text x="' + (L + 60) + '" y="' + (T + 14) + '" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#a98bff">- - precision</text>');
+  if (opt && opt.guess != null) o.push('<line x1="' + X(opt.guess) + '" y1="' + T + '" x2="' + X(opt.guess) + '" y2="' + B + '" stroke="#a98bff" stroke-width="2"/><text x="' + X(opt.guess) + '" y="' + (T + 28) + '" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="10" fill="#a98bff" paint-order="stroke" stroke="#070b11" stroke-width="3">your guess ' + opt.guess.toFixed(2) + '</text>');
+  if (opt && opt.cut != null) o.push('<line x1="' + X(opt.cut) + '" y1="' + T + '" x2="' + X(opt.cut) + '" y2="' + B + '" stroke="#ffb547" stroke-width="2.5"/><circle cx="' + X(opt.cut) + '" cy="' + Y(opt.rec) + '" r="5" fill="#ffb547"/><text x="' + X(opt.cut) + '" y="' + (T + 44) + '" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="10" fill="#ffb547" paint-order="stroke" stroke="#070b11" stroke-width="3">answer ' + opt.cut.toFixed(3) + '</text>');
   return { s: svg(W, H, o.join('')), X: X, L: L, R: R, W: W };
 }
 function guessChart(holder, pre, pr, onPick, result) {
@@ -512,18 +512,18 @@ function report(r, host, api) {
   var k = 1000 / r.n;
   var c = card(host, 'REPORT CARD — VALIDATION TRAY', 'Cutoff ' + r.cut.toFixed(3) + '. Every tile is a real cell. Test tray: still sealed.');
   var grid = el('div'); grid.style.cssText = 'display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;align-items:stretch';
-  grid.appendChild(el('div')); grid.appendChild(el('div', null, '<div style="text-align:center;font-family:Orbitron;font-size:11px;color:#ff4d6a">MODEL SAYS STOP</div>')); grid.appendChild(el('div', null, '<div style="text-align:center;font-family:Orbitron;font-size:11px;color:#3dffa0">MODEL SAYS PASS</div>'));
+  grid.appendChild(el('div')); grid.appendChild(el('div', null, '<div style="text-align:center;font-family:Orbitron,Arial,sans-serif;font-size:11px;color:#ff4d6a">MODEL SAYS STOP</div>')); grid.appendChild(el('div', null, '<div style="text-align:center;font-family:Orbitron,Arial,sans-serif;font-size:11px;color:#3dffa0">MODEL SAYS PASS</div>'));
   function box(list, n, title, col, bg) {
     var b = el('div'); b.style.cssText = 'border:1px solid ' + col + ';background:' + bg + ';border-radius:10px;padding:6px;min-height:90px;position:relative';
-    b.appendChild(el('div', null, '<span style="font-family:Orbitron;font-size:20px;font-weight:700;color:' + col + '">' + n + '</span> <span style="font-size:13px;color:#c6d2e2">' + title + '</span>'));
+    b.appendChild(el('div', null, '<span style="font-family:Orbitron,Arial,sans-serif;font-size:20px;font-weight:700;color:' + col + '">' + n + '</span> <span style="font-size:13px;color:#c6d2e2">' + title + '</span>'));
     var t = el('div'); t.style.cssText = 'display:flex;flex-wrap:wrap;gap:2px;margin-top:4px';
     list.slice(0, 24).forEach(function (cl) { var th = thumb(api, cl[0], 22); th.title = 'cell ' + cl[0] + ' · score ' + cl[3] + ' · expert ' + cl[1] + ' · ' + cl[2]; th.style.cursor = 'pointer'; th.onclick = function () { zoomIn(c, api, cl[0], null, ' · model score ' + cl[3]); }; t.appendChild(th); });
     if (list.length > 24) t.appendChild(el('span', 'hint', '+' + (list.length - 24)));
     b.appendChild(t); return b;
   }
-  grid.appendChild(el('div', null, '<div style="font-family:Orbitron;font-size:10px;color:#ff8a9c;padding-top:30px">REAL DEFECT</div>'));
+  grid.appendChild(el('div', null, '<div style="font-family:Orbitron,Arial,sans-serif;font-size:10px;color:#ff8a9c;padding-top:30px">REAL DEFECT</div>'));
   grid.appendChild(box(r.TP, r.tp, 'caught', '#3dffa0', '#0b2418')); grid.appendChild(box(r.FN, r.fn, 'MISSED — ships!', '#ff4d6a', '#2a0e16'));
-  grid.appendChild(el('div', null, '<div style="font-family:Orbitron;font-size:10px;color:#3dffa0;padding-top:30px">REALLY GOOD</div>'));
+  grid.appendChild(el('div', null, '<div style="font-family:Orbitron,Arial,sans-serif;font-size:10px;color:#3dffa0;padding-top:30px">REALLY GOOD</div>'));
   grid.appendChild(box(r.FP, r.fp, 'false alarms', '#ffb547', '#1c1606')); grid.appendChild(box(r.TN, r.tn, 'passed, fine', '#2f8a5f', '#08140e'));
   c.appendChild(grid);
   tiles(c, [[pct(r.rec), 'recall', r.rec >= .95 ? 'g' : 'r'], [pct(r.far), 'false-alarm rate', 'a'], [pct(r.tp / (r.tp + r.fp)), 'precision', 'c']]);
@@ -553,7 +553,11 @@ function sorter(r, host, api) {
       function mv(e) { if (!moved && Math.abs(e.clientX - ev.clientX) + Math.abs(e.clientY - ev.clientY) > 4) { moved = true; document.body.appendChild(gh); } gh.style.left = (e.clientX - 26) + 'px'; gh.style.top = (e.clientY - 26) + 'px'; }
       function up(e) {
         document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); gh.remove();
-        if (!moved) { if (sel === cl[0]) { zoomIn(c, api, cl[0], null, ' · model score ' + cl[3]); } sel = cl[0]; draw(); return; }
+        if (!moved) {
+          var inBin = m.sort[cl[0]];
+          if (sel != null && sel !== cl[0] && inBin) { m.sort[sel] = inBin; sel = null; api.setMech({ sort: m.sort }); draw(); return; }
+          if (sel === cl[0]) { zoomIn(c, api, cl[0], null, ' · model score ' + cl[3]); } sel = cl[0]; draw(); return;
+        }
         var b = document.elementFromPoint(e.clientX, e.clientY); b = b && b.closest && b.closest('[data-reason]');
         if (b) { m.sort[cl[0]] = b.getAttribute('data-reason'); sel = null; api.setMech({ sort: m.sort }); draw(); }
       }
@@ -566,7 +570,7 @@ function sorter(r, host, api) {
     r.FN.forEach(function (cl) { if (!m.sort[cl[0]]) pool.appendChild(tile(cl)); });
     if (!pool.children.length) pool.appendChild(el('span', 'hint', 'All sorted.'));
     Object.keys(REASONS).forEach(function (k) {
-      var b = el('div', null, '<div style="font-family:Orbitron;font-size:10px;color:' + REASONS[k][1] + '">' + REASONS[k][0].toUpperCase() + '</div>');
+      var b = el('div', null, '<div style="font-family:Orbitron,Arial,sans-serif;font-size:10px;color:' + REASONS[k][1] + '">' + REASONS[k][0].toUpperCase() + '</div>');
       b.setAttribute('data-reason', k); b.style.cssText = 'min-height:90px;border:1px solid ' + REASONS[k][1] + '55;border-radius:10px;padding:6px;background:#0a0f16';
       var t = el('div'); t.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-top:4px';
       r.FN.forEach(function (cl) { if (m.sort[cl[0]] === k) t.appendChild(tile(cl)); }); b.appendChild(t);

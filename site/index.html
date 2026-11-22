@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
 <title>PanelGuard — Solar Panel Defect Inspection Lab v0.1</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -20,15 +21,17 @@ button{font-family:var(--fb);font-size:15px;font-weight:600;cursor:pointer}
 code,pre,.mono{font-family:var(--fm)}
 code{background:#0f1a26;border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:.86em;color:#bfe9ff}
 h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
-.app{position:absolute;inset:0;display:grid;grid-template-rows:54px auto 1fr 22px;}
+.app{position:absolute;inset:0;display:grid;grid-template-rows:54px auto minmax(0,1fr) 22px;}
+.top{grid-row:1}.loader{grid-row:2}.main{grid-row:3}.foot{grid-row:4}
 /* top bar */
 .top{display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0b111a,#070a10)}
 .brand{display:flex;align-items:center;gap:10px}
 .brand b{font-family:var(--fh);font-weight:900;font-size:19px;letter-spacing:.14em;background:linear-gradient(90deg,#fff,var(--cy));-webkit-background-clip:text;background-clip:text;color:transparent}
-.brand span{font-size:13px;color:var(--dim);letter-spacing:.08em}
-.goal{margin-left:auto;display:flex;align-items:center;gap:8px;padding:5px 12px;border:1px solid #2a3b2f;border-radius:20px;background:#0b1510;font-size:14px}
+.brand span{font-size:13px;color:var(--dim);letter-spacing:.08em;white-space:nowrap}
+@media (max-width:1500px){.brand span{display:none}}
+.goal{margin-left:auto;display:flex;align-items:center;gap:8px;white-space:nowrap;padding:5px 12px;border:1px solid #2a3b2f;border-radius:20px;background:#0b1510;font-size:14px}
 .goal i{font-style:normal;font-family:var(--fh);font-size:12px;color:var(--gr)}
-.kstat{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--dim);min-width:150px;justify-content:flex-end}
+.kstat{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--dim);min-width:150px;justify-content:flex-end;white-space:nowrap}
 .kdot{width:9px;height:9px;border-radius:50%;background:var(--am);box-shadow:0 0 8px var(--am)}
 .kdot.ok{background:var(--gr);box-shadow:0 0 8px var(--gr)}.kdot.busy{background:var(--cy);box-shadow:0 0 10px var(--cy);animation:pulse 1s infinite}.kdot.bad{background:var(--rd);box-shadow:0 0 8px var(--rd)}
 @keyframes pulse{50%{opacity:.35}}
@@ -177,7 +180,7 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#46e3ff"/><stop offset="1" stop-color="#3dffa0"/></linearGradient></defs><path d="M15 2 27 8v8c0 6-5 10-12 12C8 26 3 22 3 16V8z" fill="none" stroke="url(#lg)" stroke-width="2"/><rect x="9" y="9" width="12" height="12" rx="1.5" fill="#0d2233" stroke="#46e3ff"/><path d="M9 13h12M9 17h12" stroke="#46e3ff" stroke-width=".8"/></svg>
       <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v0.1 preview</span>
     </div>
-    <div class="goal" title="The business target for every model in this course"><i>TARGET</i> catch at least <b>95 of every 100</b> defective cells — and count the good cells stopped</div>
+    <div class="goal" title="The business target for every model in this course"><i>TARGET</i> catch at least&nbsp;<b>95 of every 100</b>&nbsp;defective cells, and count the good cells stopped</div>
     <div class="kstat"><span class="kdot" id="kdot"></span><span id="ktext">Python loading…</span></div>
   </header>
   <div class="loader" id="loader">
@@ -193,7 +196,7 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
     <div class="rz" id="rz2" title="Drag to resize"></div>
     <section class="out" id="out"></section>
   </div>
-  <footer class="foot">Data: ELPV dataset — Buerhop-Lutz et al. 2018 (EU PVSEC); Deitsch et al. 2019 (Solar Energy 185); Deitsch et al. 2021 (Machine Vision and Applications 32). Licence CC BY-NC-SA 4.0 (photos downscaled to 64×64 for this lab; full text in data/LICENSE.md). Python: Pyodide + scikit-learn, running in your browser.</footer>
+  <footer class="foot" title="Data licence: CC BY-NC-SA 4.0. Full text in data/LICENSE.md">Data: ELPV dataset (Buerhop-Lutz et al. 2018, EU PVSEC; Deitsch et al. 2019, Solar Energy; Deitsch et al. 2021, Machine Vision and Applications) · licence CC BY-NC-SA 4.0 · photos downscaled to 64×64 · full licence text: data/LICENSE.md · Python: Pyodide + scikit-learn in your browser</footer>
 </div>
 <div class="tip" id="tip"></div>
 <script src="js/steps.js"></script>

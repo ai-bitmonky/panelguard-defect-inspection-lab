@@ -54,7 +54,7 @@ await page.waitForTimeout(400); await shot('0d'); await expectPass('0d');
 await page.waitForFunction(() => window.PG && window.PG.ready(), null, { timeout: 240000 });
 log('python ready after', ((Date.now() - t0) / 1000).toFixed(1), 's', await page.locator('#ktext').innerText());
 
-const setCode = async (code) => { await page.locator('.edw textarea').fill(code); };
+const setCode = async (code) => { await page.locator('.edw textarea').fill(code); await page.locator('.ed').evaluate((e) => { e.scrollTop = 0; e.scrollLeft = 0; }); };
 const run = async (id, timeout = 180000) => {
   const t = Date.now();
   await page.locator('#runbtn').click();
@@ -93,7 +93,7 @@ await codeStep('2a', null, async () => {
   log('2a mixes', JSON.stringify(((await mech('2a')).results || []).map((x) => [x.keys.join('+'), x.auc, x.sec])));
   // keep the best measured mix
   const res = (await mech('2a')).results; const best = res.reduce((a, b) => (b.auc > a.auc ? b : a));
-  const rows = page.locator('#vizbox .vc div[style*="margin-bottom:8px"]'); await rows.first().locator('button', { hasText: 'Use this mix' }).click();
+  await page.locator('#vizbox button', { hasText: 'Use this mix' }).first().click();
   await page.waitForFunction(() => !!(window.PG.S.subs['2a'].mech || {}).kept, null, { timeout: 60000 });
   log('2a kept', JSON.stringify((await mech('2a')).kept), 'best was', best.keys.join('+'));
 });
