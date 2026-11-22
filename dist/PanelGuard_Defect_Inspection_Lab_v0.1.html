@@ -1690,7 +1690,7 @@ function h(tag, attrs, kids) {
   return e;
 }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-var BASE = new URL('./', location.href).href;
+var BASE; try { BASE = new URL('./', location.href).href; } catch (e) { BASE = ''; }
 /* Own files: fetched normally, or taken from window.PG_EMBED when the single-file build is used (tools/build_single.py). */
 var EMB = window.PG_EMBED || null;
 function b64bytes(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
