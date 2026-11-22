@@ -35,7 +35,7 @@ const open = async (id) => { await ev((i) => { location.hash = '#sub-' + i; }, i
 const mech = (id) => ev((i) => (window.PG.S.subs[i] || {}).mech || {}, id);
 const pend = (id) => ev((i) => window.PG.pendingOf(i), id);
 const setCode = async (c) => { await F.locator('.edw textarea').first().fill(c); await F.locator('.ed').first().evaluate((e) => { e.scrollTop = 0; e.scrollLeft = 0; }); };
-const run = async (id, timeout = 600000) => { const t = Date.now(); await F.locator('#runbtn').click(); await F.waitForFunction((i) => window.PG.VERD[i] != null && window.PG.running() == null, id, { timeout }); const v = await ev((i) => window.PG.VERD[i], id); log(id, 'run', ((Date.now() - t) / 1000).toFixed(1) + 's', v.pass ? 'PASS' : 'fail', '|', v.msg.slice(0, 220)); return v; };
+const run = async (id, timeout = 600000) => { const t = Date.now(); await F.locator('#runbtn').click({ noWaitAfter: true }); await F.waitForFunction((i) => window.PG.VERD[i] != null && window.PG.running() == null, id, { timeout }); const v = await ev((i) => window.PG.VERD[i], id); log(id, 'run', ((Date.now() - t) / 1000).toFixed(1) + 's', v.pass ? 'PASS' : 'fail', '|', v.msg.slice(0, 220)); return v; };
 const codeStep = async (id, wrongs) => { for (const w of (QUICK ? wrongs.slice(0, 1) : wrongs)) { await setCode(fill(SUBS[id].code, w)); const v = await run(id); expect(!v.pass, id + ' wrong answer ' + JSON.stringify(w) + ' fails with a plain message'); } await setCode(fill(SUBS[id].code, SUBS[id].ref)); const v = await run(id); expect(v.pass, id + ' right answer passes'); return v; };
 const top = async () => { await F.locator('#out').evaluate((e) => { e.scrollTop = 0; }); };
 const outText = () => F.locator('#out').innerText();

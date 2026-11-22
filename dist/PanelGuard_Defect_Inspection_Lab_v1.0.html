@@ -4795,7 +4795,9 @@ var s8b = { id: '8b', name: 'The line trial', kind: 'code', lang: 'js',
 "// 1. Step 2 score: your scikit-learn inspector, run in Python on the test cells",
 "const pSvcTest = await pg.py('best.predict_proba(F[____])[:, 1]');",
 "// 2. Step 3 score: your CNN looks at the test photos",
-"const pCnnTest = tf.tidy(() => Array.from(model.predict(tf.gather(X, tray.idx_test)).dataSync()));",
+"const cnnOut = tf.tidy(() => model.predict(tf.gather(X, tray.idx_test)));",
+"const pCnnTest = Array.from(await cnnOut.data());          // await: the page stays responsive while the GPU works",
+"cnnOut.dispose();",
 "// 3. the frozen 3f blend",
 "const pTest = pCnnTest.map((c, i) => ____ * c + (1 - bestW) * pSvcTest[i]);",
 "",
@@ -5008,13 +5010,17 @@ var s8d = { id: '8d', name: 'Watch for drift', kind: 'code', lang: 'js',
 "const ALARM = ____;",
 "",
 "// 3. the reference: the validation tray = how the line looked when you set the gates",
-"function cnnScores(cells) {                              // the CNN part of the score: it looks at the photo live",
-"  return tf.tidy(() => Array.from(model.predict(tf.tensor(cells.map((c) => c.photo).flat(), [cells.length, 64, 64, 1], 'float32').div(255)).dataSync()));",
+"async function cnnScores(cells) {                        // the CNN part of the score: it looks at the photo live",
+"  const out = tf.tidy(() => model.predict(tf.tensor(cells.map((c) => c.photo).flat(), [cells.length, 64, 64, 1], 'float32').div(255)));",
+"  const s = Array.from(await out.data());",
+"  out.dispose();",
+"  return s;",
 "}",
 "const refCells = pg.cell_val.map((id) => pg.card(id));",
 "const refLooks = refCells.map((c) => looks(c.photo));",
 "const REFD = { score: pCnn, bright: refLooks.map((x) => x.bright), contrast: refLooks.map((x) => x.contrast), sharp: refLooks.map((x) => x.sharp) };   // pCnn: your CNN on validation (3f)",
-"function drift(cells, scores = cnnScores(cells)) {",
+"async function drift(cells, scores) {",
+"  if (!scores) scores = await cnnScores(cells);",
 "  const lk = cells.map((c) => looks(c.photo)), out = { score: psi(REFD.score, scores) };",
 "  for (const k of ['bright', 'contrast', 'sharp']) out[k] = psi(REFD[k], lk.map((x) => x[k]));",
 "  out.ring = Object.keys(out).filter((k) => out[k] > ALARM);",
@@ -5022,11 +5028,11 @@ var s8d = { id: '8d', name: 'Watch for drift', kind: 'code', lang: 'js',
 "}",
 "",
 "// 4. today = the test tray (cells the model never saw, same factory; CNN scores from 8b)",
-"const today = drift(tray.cell_test.map((id) => pg.card(id)), pCnnTest);",
+"const today = await drift(tray.cell_test.map((id) => pg.card(id)), pCnnTest);",
 "// 4 SIMULATED changes, built from 260 real test photos",
 "const sims = pg.driftScenarios(tray, 260);",
 "const alarms = {};",
-"for (const k in sims) alarms[k] = drift(sims[k].cells);",
+"for (const k in sims) alarms[k] = await drift(sims[k].cells);",
 "console.log('today:', JSON.stringify(today));"
   ]),
   twin: L([
@@ -5179,7 +5185,7 @@ var REF8 = { '8b': ['idx_test', 'bestW', 'routePoly'], '8c': ['1.96', 'kPassed',
 step8.substeps.forEach(function (s) { if (REF8[s.id]) s.ref = REF8[s.id]; if (s.kind === 'code' && s.lang === 'js') { s.twinTitle = 'Same thing in Python'; s.twinNote = 'read-only · scikit-learn + Keras + LangGraph'; s.edLabel = 'JavaScript · TensorFlow.js · LangGraph'; } });
 s8c.twinNote = 'read-only · statsmodels 0.15 + numpy'; s8d.twinNote = 'read-only · numpy + Keras';
 
-G.PG_NAME_FROM = Object.assign(G.PG_NAME_FROM || {}, { tray: '8b', pSvcTest: '8b', pCnnTest: '8b', pTest: '8b', testAt: '8b', trialScore: '8b', trialLog: '8b', trialRecord: '8b', trialLine: '8b', expert: '8b', trial: '8b',
+G.PG_NAME_FROM = Object.assign(G.PG_NAME_FROM || {}, { tray: '8b', pSvcTest: '8b', pCnnTest: '8b', cnnOut: '8b', pTest: '8b', testAt: '8b', trialScore: '8b', trialLog: '8b', trialRecord: '8b', trialLine: '8b', expert: '8b', trial: '8b',
   kPassed: '8c', nDefects: '8c', z: '8c', wilson: '8c', interval: '8c', boot: '8c', bootInterval: '8c', underTarget: '8c', drawRows: '8c',
   looks: '8d', psi: '8d', ALARM: '8d', cnnScores: '8d', refCells: '8d', refLooks: '8d', REFD: '8d', drift: '8d', today: '8d', sims: '8d', alarms: '8d' });
 G.PG_STEP8 = step8;
@@ -9006,7 +9012,7 @@ function U() { return window.PG_STEP8_UTIL; }
 function f0(x) { return x == null || isNaN(x) ? '?' : Math.round(x).toLocaleString('en-US'); }
 function f1(x) { return x == null || isNaN(x) ? '?' : (Math.round(10 * x) / 10).toFixed(1); }
 function f3(x) { return x == null || isNaN(x) ? '?' : (+x).toFixed(3); }
-function noData(host, api, what) { host.appendChild(el('div', 'verdict', api.review ? 'Review mode: press “Run up to here” (below the code) to load real data for this page.' : what)); }
+function noData(host, api, what, rv) { host.appendChild(el('div', 'verdict', api.review ? (rv || 'Review mode: press “Run up to here” (below the code) to load real data for this page.') : what)); }
 function shake(e) { if (e && e.animate) e.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 260 }); }
 var C = { cy: '#46e3ff', am: '#ffb547', gr: '#3dffa0', rd: '#ff4d6a', vi: '#a98bff', dim: '#8d9bb0', ink: '#e6eef8' };
 function why(e, title) {
@@ -9021,7 +9027,7 @@ function why(e, title) {
 function flag(host, h) {
   if (!h) return;
   if (h.frozen && h.ok === false) {
-    var d = el('div', 'verdict bad', '<b style="font-size:17px">⚠ NOT AN HONEST TEST ANY MORE.</b> After the seal broke, these frozen values changed: <b>' + esc(h.changed.join(', ')) + '</b>. The test tray now helped to choose the settings, so its numbers are too hopeful. An honest test needs a NEW sealed tray.');
+    var d = el('div', 'verdict bad', '<b style="font-size:17px">⚠ NOT AN HONEST TEST ANY MORE.</b> After the seal broke, these frozen values changed: <b>' + esc(h.changed.join(', ')) + '</b>. You changed the system after seeing the test tray, so its numbers no longer describe the system you have — and anything chosen after seeing them is tuned on the test. An honest test needs a NEW sealed tray.');
     d.setAttribute('data-flag8', 'dishonest'); host.appendChild(d);
   } else if (h.frozen && h.ok) { var g = el('div', 'hint', '🔒 Frozen since the seal broke' + (h.at ? ' (' + esc(h.at) + ')' : '') + ': model, blend, gates and flow unchanged.'); g.setAttribute('data-flag8', 'honest'); host.appendChild(g); }
   else if (!h.frozen) host.appendChild(el('div', 'hint', 'No freeze sheet recorded here' + (window.PG && window.PG.review && window.PG.review() ? ' (review mode)' : '') + '.'));
@@ -9058,7 +9064,7 @@ function sceneFreeze(s, stage, out, api) {
   var F = null, val = null, key = (api.getMech('3e') || {}).modelKey;
   function load() { return api.jsEval(function (NS, pg) { var f = U().freezeOf(NS); if (!f || !NS.auditLog || !pg.shiftReport) return null; return { f: f, val: U().valReport(NS, pg), h: U().honesty(NS, pg) }; }); }
   stage.innerHTML = '<div class="hint" style="padding:12px">Reading your frozen settings…</div>';
-  load().then(function (x) { if (!x) { stage.innerHTML = ''; noData(stage, api, 'Finish Steps 3–7 first: the freeze sheet reads your model, gates and flow.'); side(); return; } F = x.f; val = x.val; draw(); side(x.h); });
+  load().then(function (x) { if (!x) { stage.innerHTML = ''; noData(stage, api, 'Finish Steps 3–7 first: the freeze sheet reads your model, gates and flow.', 'Review mode: this page reads your model, gates and flow. Open 8b, press “Run up to here”, then come back.'); side(); return; } F = x.f; val = x.val; draw(); side(x.h); });
   function allLocked() { return LINES.every(function (l) { return m.locks[l[0]]; }); }
   function draw() {
     stage.innerHTML = '';
@@ -9463,7 +9469,7 @@ function sceneAcceptance(s, stage, out, api, hLive) {
   var F = acceptFacts(api);
   if (F && hLive) { F.honest = hLive; F.dishonest = !!(hLive.frozen && hLive.ok === false); }
   stage.innerHTML = ''; out.innerHTML = '';
-  if (!F) { X8().noData(stage, api, 'Finish 8b and 8c first: the sheet is filled from the trial and its interval.'); return {}; }
+  if (!F) { X8().noData(stage, api, 'Finish 8b and 8c first: the sheet is filled from the trial and its interval.', 'Review mode: open 8c, press “Run up to here”, then come back: the sheet is filled from the trial and its interval.'); return {}; }
   var w = el('div'); w.style.cssText = 'padding:10px 12px'; stage.appendChild(w);
   var sh = el('div'); sh.id = 'sheet8'; sh.style.cssText = 'position:relative;background:#f2efe6;color:#1b2230;border-radius:8px;padding:12px 16px;box-shadow:0 4px 18px #0008;font-family:Rajdhani,Arial;font-size:15px';
   var light = function (ok) { return '<span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:' + (ok === true ? '#1f9d55' : ok === false ? '#d23a4a' : '#d9a21b') + ';margin-right:6px;vertical-align:-1px"></span>'; };

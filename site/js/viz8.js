@@ -12,7 +12,7 @@ function U() { return window.PG_STEP8_UTIL; }
 function f0(x) { return x == null || isNaN(x) ? '?' : Math.round(x).toLocaleString('en-US'); }
 function f1(x) { return x == null || isNaN(x) ? '?' : (Math.round(10 * x) / 10).toFixed(1); }
 function f3(x) { return x == null || isNaN(x) ? '?' : (+x).toFixed(3); }
-function noData(host, api, what) { host.appendChild(el('div', 'verdict', api.review ? 'Review mode: press “Run up to here” (below the code) to load real data for this page.' : what)); }
+function noData(host, api, what, rv) { host.appendChild(el('div', 'verdict', api.review ? (rv || 'Review mode: press “Run up to here” (below the code) to load real data for this page.') : what)); }
 function shake(e) { if (e && e.animate) e.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 260 }); }
 var C = { cy: '#46e3ff', am: '#ffb547', gr: '#3dffa0', rd: '#ff4d6a', vi: '#a98bff', dim: '#8d9bb0', ink: '#e6eef8' };
 function why(e, title) {
@@ -27,7 +27,7 @@ function why(e, title) {
 function flag(host, h) {
   if (!h) return;
   if (h.frozen && h.ok === false) {
-    var d = el('div', 'verdict bad', '<b style="font-size:17px">⚠ NOT AN HONEST TEST ANY MORE.</b> After the seal broke, these frozen values changed: <b>' + esc(h.changed.join(', ')) + '</b>. The test tray now helped to choose the settings, so its numbers are too hopeful. An honest test needs a NEW sealed tray.');
+    var d = el('div', 'verdict bad', '<b style="font-size:17px">⚠ NOT AN HONEST TEST ANY MORE.</b> After the seal broke, these frozen values changed: <b>' + esc(h.changed.join(', ')) + '</b>. You changed the system after seeing the test tray, so its numbers no longer describe the system you have — and anything chosen after seeing them is tuned on the test. An honest test needs a NEW sealed tray.');
     d.setAttribute('data-flag8', 'dishonest'); host.appendChild(d);
   } else if (h.frozen && h.ok) { var g = el('div', 'hint', '🔒 Frozen since the seal broke' + (h.at ? ' (' + esc(h.at) + ')' : '') + ': model, blend, gates and flow unchanged.'); g.setAttribute('data-flag8', 'honest'); host.appendChild(g); }
   else if (!h.frozen) host.appendChild(el('div', 'hint', 'No freeze sheet recorded here' + (window.PG && window.PG.review && window.PG.review() ? ' (review mode)' : '') + '.'));
@@ -64,7 +64,7 @@ function sceneFreeze(s, stage, out, api) {
   var F = null, val = null, key = (api.getMech('3e') || {}).modelKey;
   function load() { return api.jsEval(function (NS, pg) { var f = U().freezeOf(NS); if (!f || !NS.auditLog || !pg.shiftReport) return null; return { f: f, val: U().valReport(NS, pg), h: U().honesty(NS, pg) }; }); }
   stage.innerHTML = '<div class="hint" style="padding:12px">Reading your frozen settings…</div>';
-  load().then(function (x) { if (!x) { stage.innerHTML = ''; noData(stage, api, 'Finish Steps 3–7 first: the freeze sheet reads your model, gates and flow.'); side(); return; } F = x.f; val = x.val; draw(); side(x.h); });
+  load().then(function (x) { if (!x) { stage.innerHTML = ''; noData(stage, api, 'Finish Steps 3–7 first: the freeze sheet reads your model, gates and flow.', 'Review mode: this page reads your model, gates and flow. Open 8b, press “Run up to here”, then come back.'); side(); return; } F = x.f; val = x.val; draw(); side(x.h); });
   function allLocked() { return LINES.every(function (l) { return m.locks[l[0]]; }); }
   function draw() {
     stage.innerHTML = '';

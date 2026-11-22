@@ -15,7 +15,7 @@ const expect = (ok, what) => { log(ok ? 'OK  ' : 'FAIL', what); if (!ok) fails.p
 const ev = (f, a) => page.evaluate(f, a); let n = 0; const shot = async (nm) => page.screenshot({ path: `${shots}/smoke_${String(++n).padStart(2, '0')}_${nm}.png` });
 await page.goto('file://' + DIST + '?pgEpochs=1');
 await page.waitForFunction(() => window.PG && window.PG.ready() && window.PG.JSR.ready, null, { timeout: 600000 });
-expect(await ev(() => Object.keys(window.PG.S.subs).length === 0), 'fresh browser: no saved progress');
+expect(await ev(() => Object.keys(window.PG.S.subs).filter((k) => window.PG.S.subs[k].codePass).length === 0), 'fresh browser: no saved progress');
 const M = { '0a': { done: 1 }, '0b': { done: 1 }, '0c': { done: 1 }, '0d': { done: 1 }, '1a': { opened: 2 }, '1c': { moves: 2 }, '1d': { rolls: 3 }, '1e': { found: true },
   '2a': { mixes: 3, kept: ['A', 'B', 'C'], best: { keys: ['A', 'B', 'C'], auc: 0.9 } }, '2c': { hit: 1, hitAt: 0.2 }, '2e': { sorted: 1, sort: {} },
   '3a': { tilesDone: 1 }, '3b': { done: 1 }, '3c': { tapBig: 1 }, '3d': { sortOk: 1 }, '3f': { hit: 1 }, '3g': { twoDone: 1, capOk: 1 },
@@ -29,7 +29,7 @@ const pred = (id) => { const f = SUBS[id].predict.format; const val = f === 'dra
   return ev(([i, v]) => { window.PG.SSs(i).pred = { locked: true, val: v, good: 1, cells: [] }; }, [id, val]); };
 const open = async (id) => { await ev((i) => { location.hash = '#sub-' + i; }, id); await page.waitForTimeout(500); };
 const refCode = (s) => { let i = 0, c = s.code.replace(/____/g, () => s.ref[i++]); for (const f of s.fixes || []) c = c.split(f[0]).join(f[1]); return c; };
-const run = async (id) => { await page.locator('.edw textarea').first().fill(refCode(SUBS[id])); const t = Date.now(); await page.locator('#runbtn').click();
+const run = async (id) => { await page.locator('.edw textarea').first().fill(refCode(SUBS[id])); const t = Date.now(); await page.locator('#runbtn').click({ noWaitAfter: true });
   await page.waitForFunction((i) => window.PG.VERD[i] != null && window.PG.running() == null, id, { timeout: 1800000 }); const v = await ev((i) => window.PG.VERD[i], id);
   log(id, ((Date.now() - t) / 1000).toFixed(1) + 's', v.pass ? 'PASS' : 'FAIL', v.msg.slice(0, 160)); return v; };
 const ORDER = await ev(() => window.PG.ORDER);

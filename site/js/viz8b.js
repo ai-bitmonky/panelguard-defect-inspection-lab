@@ -171,7 +171,7 @@ function sceneAcceptance(s, stage, out, api, hLive) {
   var F = acceptFacts(api);
   if (F && hLive) { F.honest = hLive; F.dishonest = !!(hLive.frozen && hLive.ok === false); }
   stage.innerHTML = ''; out.innerHTML = '';
-  if (!F) { X8().noData(stage, api, 'Finish 8b and 8c first: the sheet is filled from the trial and its interval.'); return {}; }
+  if (!F) { X8().noData(stage, api, 'Finish 8b and 8c first: the sheet is filled from the trial and its interval.', 'Review mode: open 8c, press “Run up to here”, then come back: the sheet is filled from the trial and its interval.'); return {}; }
   var w = el('div'); w.style.cssText = 'padding:10px 12px'; stage.appendChild(w);
   var sh = el('div'); sh.id = 'sheet8'; sh.style.cssText = 'position:relative;background:#f2efe6;color:#1b2230;border-radius:8px;padding:12px 16px;box-shadow:0 4px 18px #0008;font-family:Rajdhani,Arial;font-size:15px';
   var light = function (ok) { return '<span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:' + (ok === true ? '#1f9d55' : ok === false ? '#d23a4a' : '#d9a21b') + ';margin-right:6px;vertical-align:-1px"></span>'; };
