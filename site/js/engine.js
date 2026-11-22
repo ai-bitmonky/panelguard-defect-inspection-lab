@@ -216,7 +216,7 @@ var JSR = { k: null, T: null, ready: false, err: null, backend: null, gpu: null,
 var EPOCHS = { quick: 10, full: 30 };
 /* Test setting only (shown plainly in the app): ?pgEpochs=N in the address, or window.PG_TEST_EPOCHS for srcdoc frames that have no address. */
 var TEST_EPOCHS = (function () { try { if (window.PG_TEST_EPOCHS) return Math.max(1, +window.PG_TEST_EPOCHS); var m = location.search.match(/[?&]pgEpochs=(\d+)/); return m ? Math.max(1, +m[1]) : null; } catch (e) { return null; } })();
-function epochsMode() { return TEST_EPOCHS ? 'test' : (S.epochsMode === 'full' ? 'full' : 'quick'); }
+function epochsMode() { return TEST_EPOCHS ? 'test' : (S.epochsMode === 'quick' ? 'quick' : 'full'); }
 function epochsNow() { return TEST_EPOCHS || EPOCHS[epochsMode()]; }
 function gpuInfo() {
   try {

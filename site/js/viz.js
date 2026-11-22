@@ -509,9 +509,10 @@ function target(r, host, api) {
   tiles(c, [[r.cut.toFixed(3), 'cutoff', 'a'], [pct(r.rec), 'recall', r.rec >= .95 ? 'g' : 'r'], [pct(r.prec), 'precision', 'c']]);
   c.appendChild(el('p', null, 'Any cell with a defect score of <b>' + r.cut.toFixed(3) + '</b> or more gets STOP. Precision ' + pct(r.prec, 0) + ' means: of all stopped cells, only ' + pct(r.prec, 0) + ' are real defects.'));
 }
-function report(r, host, api) {
+function report(r, host, api, opt) {
+  opt = opt || {};
   var k = 1000 / r.n;
-  var c = card(host, 'REPORT CARD — VALIDATION TRAY', 'Cutoff ' + r.cut.toFixed(3) + '. Every tile is a real cell. Test tray: still sealed.');
+  var c = card(host, opt.title || 'REPORT CARD — VALIDATION TRAY', 'Cutoff ' + r.cut.toFixed(3) + '. Every tile is a real cell. Test tray: still sealed.');
   var grid = el('div'); grid.style.cssText = 'display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;align-items:stretch';
   grid.appendChild(el('div')); grid.appendChild(el('div', null, '<div style="text-align:center;font-family:Orbitron,Arial,sans-serif;font-size:11px;color:#ff4d6a">MODEL SAYS STOP</div>')); grid.appendChild(el('div', null, '<div style="text-align:center;font-family:Orbitron,Arial,sans-serif;font-size:11px;color:#3dffa0">MODEL SAYS PASS</div>'));
   function box(list, n, title, col, bg) {
@@ -534,8 +535,8 @@ function report(r, host, api) {
   blocks(a, '#3dffa0'); blocks(b, '#ff4d6a'); blocks(f, '#ffb547'); blocks(1000 - a - b - f, '#1d2a3a');
   c2.appendChild(svg(440, Math.ceil(1000 / 50) * 8.8, o));
   c2.appendChild(el('p', null, '<b style="color:#3dffa0">' + a + '</b> defects caught · <b style="color:#ff4d6a">' + b + '</b> missed · <b style="color:#ffb547">' + f + '</b> good cells stopped · ' + (1000 - a - b - f) + ' good cells passed.'));
-  c2.appendChild(el('div', 'verdict bad', '<b>Honest verdict:</b> the target is met, but ' + pct(r.far, 0) + ' of good cells get stopped. On a real line that means ' + f + ' extra manual checks per 1,000 cells — far too many. This baseline is not good enough. Step 3 must cut false alarms at the same 95% recall.'));
-  sorter(r, host, api);
+  c2.appendChild(el('div', 'verdict bad', opt.verdict ? opt.verdict(f) : '<b>Honest verdict:</b> the target is met, but ' + pct(r.far, 0) + ' of good cells get stopped. On a real line that means ' + f + ' extra manual checks per 1,000 cells — far too many. This baseline is not good enough. Step 3 must cut false alarms at the same 95% recall.'));
+  if (!opt.noSorter) sorter(r, host, api);
 }
 var REASONS = { faint: ['Faint crack / small mark', '#46e3ff'], unsure: ['Unsure label', '#d6e05a'], poly: ['Poly texture hides it', '#a98bff'] };
 function sorter(r, host, api) {

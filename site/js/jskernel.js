@@ -63,7 +63,7 @@ function friendly(e) {
   if ((x = m.match(/Cannot read propert(?:y|ies) of (undefined|null) \(reading '(.+?)'\)/))) return 'Something is ' + x[1] + ' just before “.' + x[2] + '”. Usually a name is misspelled, or a list index is past the end.';
   if ((x = m.match(/^(.+?) is not a function/))) return '“' + x[1] + '” is not a function here. Check the spelling.';
   if ((x = m.match(/index value (-?\d+) is not in \[0, (\d+)\]/))) return 'There is no position ' + x[1] + ' there: that axis has only ' + (+x[2] + 1) + ' entries. Check the order of the numbers in the shape: the photo count comes first.';
-  if ((x = m.match(/Unknown loss (\S+)/))) return 'TensorFlow.js has no loss called “' + x[1] + '”. Check the spelling (names are written likeThis).';
+  if ((x = m.match(/Unknown loss (\S+)/))) return 'TensorFlow.js has no loss called “' + x[1] + '”. Check the spelling letter by letter: capital letters count.';
   if ((x = m.match(/Axis must be|axis.*out of range|Invalid axis/i))) return 'That axis does not exist here: ' + m;
   return t + ': ' + m;
 }

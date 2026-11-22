@@ -13,7 +13,8 @@ if (MODE === 'site') { srv = spawn('node', [path.resolve(here, '../serve.mjs'), 
 else if (MODE === 'srcdoc') { srv = spawn('node', [path.resolve(here, '../serve.mjs'), site, '8767'], { stdio: 'pipe' }); await new Promise((r) => srv.stdout.once('data', r)); URL0 = 'http://localhost:8767/index.html'; }
 else URL0 = 'file://' + path.resolve(here, '../../dist/' + fs.readdirSync(path.resolve(here, '../../dist')).filter((f) => /v0\.3\.html$/.test(f))[0]);
 process.on('exit', () => { try { srv && srv.kill(); } catch (e) {} });
-const URL1 = URL0 + '?pgEpochs=' + EPOCHS;
+// QUICK=1: no test setting at all — the app's own "Quick" training length (10 epochs), as a student would pick it.
+const URL1 = process.env.QUICK === '1' ? URL0 : URL0 + '?pgEpochs=' + EPOCHS;
 // PROFILE=/dir keeps browser storage between runs (dev: FROM=3f continues from a model saved in an earlier run).
 const FROM = process.env.FROM || '3a', at = (id) => id >= FROM;
 const ctxB = process.env.PROFILE ? await chromium.launchPersistentContext(process.env.PROFILE, { executablePath: '/usr/bin/google-chrome', headless: true, viewport: { width: W, height: H } })
@@ -56,8 +57,8 @@ const loadApp = async () => {
   await page.waitForTimeout(1500); F = page.frames().find((f) => f.url() === 'about:srcdoc') || page.frames()[1];
 };
 log('target', MODE === 'srcdoc' ? 'srcdoc frame of ' + DIST : URL1);
-await page.goto(URL1);
-if (process.env.SEED !== '0' && FROM === '3a') await page.evaluate(([k, v]) => localStorage.setItem(k, v), [KEY, seedState(SUBS)]);
+await page.goto(MODE === 'srcdoc' ? URL0.replace('index.html', 'data/labels.json') : URL1);   // srcdoc: a plain same-origin parent (not the app itself)
+if (process.env.SEED !== '0' && FROM === '3a') await page.evaluate(([k, v]) => localStorage.setItem(k, v), [KEY, seedState(SUBS, process.env.QUICK === '1' ? { epochsMode: 'quick' } : {})]);
 await loadApp();
 await F.waitForFunction(() => window.PG && window.PG.ready() && window.PG.RES['2e'] && window.PG.JSR.ready, null, { timeout: 600000 });
 log('ready (Python replayed Steps 1-2) after', ((Date.now() - t0) / 1000).toFixed(0), 's | backend', await ev(() => window.PG.JSR.backend + ' | ' + window.PG.JSR.gpu.name));

@@ -87,8 +87,8 @@ var s3a = { id: '3a', name: 'Shape the photos', kind: 'code', lang: 'js',
     if (!r.train || r.train[0] !== r.nTrain || !r.val || r.val[0] !== r.nVal) return { pass: false, msg: 'xTrain / xVal do not hold the Step 1 trays. Keep the tf.gather lines as they are.' };
     return { pass: true, msg: 'X is [' + s.join(', ') + '], values 0 to 1. Train tray ' + r.nTrain + ' photos, validation ' + r.nVal + '.' };
   },
-  example: '<p>A camera shoots <b>10 colour photos</b> of <b>32 × 48</b> pixels (rows × columns), 3 colour channels, bytes 0..255:</p>' +
-    '<pre>const P = tf.tensor(bytes, [10, 32, 48, 3], \'float32\').div(255);\n// 10 × 32 × 48 × 3 = 46,080 values</pre><p>The 4 numbers multiply to the length of the byte list. Dividing by the largest possible byte puts every value on 0..1.</p>',
+  example: '<p>A thermal camera shoots <b>10 colour photos</b> of <b>32 × 48</b> pixels (rows × columns), 3 colour channels, and stores each value as a 16-bit number from 0 to 65,535:</p>' +
+    '<pre>const P = tf.tensor(values, [10, 32, 48, 3], \'float32\').div(65535);\n// 10 × 32 × 48 × 3 = 46,080 values</pre><p>The 4 numbers multiply to the length of the list. Dividing by the largest possible value puts every value on 0..1.</p>',
   render: function (r, el, api) { V().stack(r, el, api); },
   explain: function (r) { return {
     asked: 'Build one 4-D tensor of all photos with values 0..1, then pick the Step 1 trays.',
@@ -279,7 +279,7 @@ var s3e = { id: '3e', name: 'Train it', kind: 'code', lang: 'js', long: true,
       trap: 'Thinking “more epochs = always better”. The train loss always improves; only the validation tray tells the truth.',
       remember: 'Keep the best epoch on validation, not the last one.' } },
   task: [
-    'Gap 1: type the name of the loss for a yes/no answer with one sigmoid output, in quotes style already given: two words joined, written likeThis (binary + cross-entropy).',
+    'Gap 1: type the TensorFlow.js loss for yes/no answers. Its name joins the words “binary” and “crossentropy” into one word, with a capital C.',
     'Gap 2: the weight for defects = all train cells ÷ (2 × number of defects). Type the name of the variable that holds the number of defects.',
     'Then press RUN and watch the curves. Pick “Quick” or “Full” training length above the code.'
   ],
@@ -338,7 +338,7 @@ var s3e = { id: '3e', name: 'Train it', kind: 'code', lang: 'js', long: true,
     if (r.restored == null) return { pass: false, msg: 'Training ran, but the best epoch was not put back. Keep the line keeper.restoreBest().' };
     return { pass: true, msg: 'Trained ' + r.epochs + (r.epochs === 1 ? ' epoch' : ' epochs') + ' in ' + (r.sec / 60).toFixed(1) + ' min on ' + r.backend.toUpperCase() + '. Best epoch ' + r.best.epoch + ': validation ranking score ' + f3(r.best.valAuc) + ' (kept).' };
   },
-  example: '<p>A smoke detector model with <b>900 normal</b> and <b>100 smoke</b> readings, one sigmoid output:</p><pre>m.compile({ optimizer: tf.train.adam(0.01), loss: \'binaryCrossentropy\' });\nconst w = { 0: 1000 / (2 * 900), 1: 1000 / (2 * 100) };   // 0.56 and 5.0</pre><p>The rare class gets the big weight, so missing one costs as much as missing many of the common class.</p>',
+  example: '<p>A fruit sorter has <b>3 kinds</b> (softmax output, so its loss is <code>categoricalCrossentropy</code>). It saw <b>600 apples</b>, <b>300 pears</b> and <b>100 plums</b>:</p><pre>m.compile({ optimizer: tf.train.adam(0.01), loss: \'categoricalCrossentropy\' });\nconst w = { 0: 1000 / (3 * 600), 1: 1000 / (3 * 300), 2: 1000 / (3 * 100) };   // 0.56, 1.11, 3.33</pre><p>Weight = all items ÷ (number of kinds × items of that kind). The rare kind gets the big weight. A yes/no task has 2 kinds.</p>',
   render: function (r, el, api) { V().curves(r, el, api); },
   live: function (el, api) { V().curvesLive(el, api); },
   restore: true,
@@ -411,8 +411,10 @@ var s3f = { id: '3f', name: 'Score it and blend it', kind: 'code', lang: 'js',
     var pb = ref.map(function (c, i) { return bw * c + (1 - bw) * ps[i]; });
     var blendOk = NS.pBlend.length === pb.length && NS.pBlend.every(function (v, i) { return Math.abs(v - pb[i]) < 1e-9; });
     function row(name, s) { var r = P.rates(y, s, P.cutAt(y, s, 0.95)); r.name = name; r.auc = P.auc(y, s); return r; }
+    var bl = row('Blend', pb), pick = function (t, p) { var o = []; for (var i = 0; i < y.length; i++) if (y[i] === t && (pb[i] >= bl.cut ? 1 : 0) === p) o.push([pg.cell_val[i], pg.prob_val[i], pg.kind_val[i], Math.round(pb[i] * 1000) / 1000]); return o; };
+    var card = { tp: bl.tp, fn: bl.fn, fp: bl.fp, tn: bl.tn, rec: bl.rec, far: bl.far, cut: bl.cut, n: y.length, TP: pick(1, 1), FN: pick(1, 0), FP: pick(0, 1), TN: pick(0, 0) };
     return { blendScores: pb, y: y.slice(), cnnOk: cnnOk, blendOk: blendOk, wOk: Math.abs(NS.bestW - bw) < 1e-9, bestW: NS.bestW, refW: bw, refFar: bf, ws: ws, n: y.length, nTrain: pg.idx_train.length,
-      base: row(pg.baseline, ps), cnn: row('CNN', ref), blend: row('Blend', pb), baseline: pg.baseline,
+      base: row(pg.baseline, ps), cnn: row('CNN', ref), blend: bl, card: card, baseline: pg.baseline,
       cells: pg.cell_val.map(function (id, i) { return [id, Math.round(ref[i] * 1e4) / 1e4, y[i], pg.prob_val[i], pg.kind_val[i]]; }) };
   },
   check: function (r) {
@@ -421,7 +423,7 @@ var s3f = { id: '3f', name: 'Score it and blend it', kind: 'code', lang: 'js',
     if (!r.wOk || !r.blendOk) return { pass: false, msg: 'Your loop kept CNN weight ' + r.bestW + ', but the fewest false alarms come at weight ' + r.refW + ' (' + pc(r.refFar) + '). Mix each CNN score with the Step 2 score of the same cell, and keep a weight only when it beats the best so far.' };
     return { pass: true, msg: 'Blend found: CNN weight ' + r.bestW + '. False-alarm rate at 95% recall: Step 2 ' + pc(r.base.far) + ', CNN ' + pc(r.cnn.far) + ', blend ' + pc(r.blend.far) + '.' };
   },
-  example: '<p>Two thermometers, A and B, read the same 4 rooms. Mix them 30% / 70%:</p><pre>const mix = a.map((t, i) => 0.3 * t + 0.7 * b[i]);</pre><p>The index <code>i</code> makes sure both readings come from the same room.</p>',
+  example: '<p>Two thermometers, A and B, read the same 4 rooms. Mix them 30% / 70%, and keep the lowest error seen so far:</p><pre>const mix = a.map((t, room) => 0.3 * t + 0.7 * b[room]);\nif (err < lowestErr) { lowestErr = err; bestMix = 0.3; }</pre><p>The second argument of map is the position, so both readings come from the same room.</p>',
   render: function (r, el, api) { V().blend(r, el, api); },
   mechNeed: function (m) { return m && m.hit ? null : 'drag the gate on the CNN scores until recall reaches 95% or more'; },
   explain: function (r) { return {
