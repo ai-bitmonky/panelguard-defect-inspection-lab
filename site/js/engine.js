@@ -301,7 +301,8 @@ function refreshBridge() {
       get epochs() { return epochsNow(); }, epochsMode: epochsMode(), gpu: JSR.gpu,
       live: JSR.T.live, trainingWatch: JSR.T.watch, trainState: function () { return JSR.T.state; },
       falseAlarmAt95: J.falseAlarmAt95, twoGates: J.twoGates, gatesFor: window.PG_STEP3_gatesFor, auc: J.auc,
-      saveModel: saveModel
+      saveModel: saveModel,
+      mechOf: function (id) { try { return JSON.parse(JSON.stringify(SS(id).mech || {})); } catch (e) { return {}; } }   // read-only copy (Step 6 action_list reads the 4f boxes)
     };
     pg.rough = !!(REVIEW && RES['3e'] && RES['3e'].quick === 'review');
     if (window.PG_PG_EXTRA) Object.assign(pg, window.PG_PG_EXTRA(pg));
@@ -692,6 +693,7 @@ function updateRunBtn() {
   else if (s.lang === 'js' && JSR.err) why = JSR.err;
   else if (s.lang === 'js' && !JSR.ready) why = 'TensorFlow.js is still starting. Wait a moment.';
   else if (s.lang === 'js' && STEP_OF[S.cur].id === 5 && !window.LangGraph) why = 'LangGraph could not be loaded (js/langgraph.min.js). Reload the page.';
+  else if (s.lang === 'js' && STEP_OF[S.cur].id === 6 && !window.MiniCrew) why = 'The crew runner could not be loaded (js/crew.js). Reload the page.';
   else if (!REVIEW && s.pre && s.pre.need(ss.mech || {})) why = 'First do the hands-on part above: ' + s.pre.need(ss.mech || {}) + '.';
   else if (!REVIEW && s.predict && !(ss.pred && ss.pred.locked)) why = 'Answer the prediction question above first.';
   else if (running) why = 'Code is running.';

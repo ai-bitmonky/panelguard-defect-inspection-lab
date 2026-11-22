@@ -1,4 +1,4 @@
-# PanelGuard — builder handover (state at v0.6, Steps 0–5 built)
+# PanelGuard — builder handover (state at v0.7, Steps 0–6 built)
 
 Browser-only course app. No server code. `site/` is the app; `dist/PanelGuard_Defect_Inspection_Lab_vX.Y.html` is the same app as one file.
 Repo: `/home/claude/panelguard` (git, no remote). Commit after every milestone.
@@ -12,8 +12,9 @@ Repo: `/home/claude/panelguard` (git, no remote). Commit after every milestone.
 | `site/js/jskernel.js` | JS cell kernel (`window.PGJS`): notebook scope, `friendly()` errors (incl. `lgFriendly` for LangGraph), TF.js training helpers, metrics (`auc`, `cutAt`, `twoGates`…). |
 | `site/js/pyworker.js` | Pyodide kernel core (worker or page thread). |
 | `site/js/steps.js` | Steps 0–2 content + `PG_STEPS` (Steps 3–8 as `{locked:true}` placeholders) + `PG_PY_HELP`. |
-| `site/js/stepN.js` | Step N content (3, 4, 5). Each replaces its placeholder in `PG_STEPS` and chains `PG_PG_EXTRA`. |
-| `site/js/viz.js` / `viz3.js` / `viz4.js` / `viz5.js` | visuals + hands-on mechanics per step (`window.PGViz`, `PGViz3`…). `viz.js` `scene()` dispatches scene names to `PGViz3/4/5` — add `PGViz6` there. |
+| `site/js/stepN.js` | Step N content (3, 4, 5, 6). Each replaces its placeholder in `PG_STEPS` and chains `PG_PG_EXTRA`. |
+| `site/js/crew.js` | **MiniCrew** (`window.MiniCrew`): the CrewAI-style runner used by Step 6 (section 5b). Reusable, no PanelGuard code inside. |
+| `site/js/viz.js` / `viz3.js` … `viz6.js` | visuals + hands-on mechanics per step (`window.PGViz`, `PGViz3`…). `viz.js` `scene()` dispatches scene names to `PGViz3/4/5/6` — add `PGViz7` there. |
 | `site/js/art.js` | banner art; per-step monitor text in `MON` (add an entry for each new step). |
 | `site/js/tf.min.js` | TensorFlow.js 4.22.0 (self-hosted). |
 | `site/js/langgraph.min.js` | @langchain/langgraph 1.7.5, browser entry, esbuild IIFE → `window.LangGraph` (1.4 MB, 355 KB gz). Built by `tools/lg/build.sh`. |
@@ -21,7 +22,7 @@ Repo: `/home/claude/panelguard` (git, no remote). Commit after every milestone.
 | `tools/build_single.py` | single-file build. |
 | `tools/tests/` | tests (section 9). `tools/research/` Python twins + logs. |
 
-Script order in index.html: `tf.min.js, steps.js, step3.js, step4.js, step5.js, langgraph.min.js, jskernel.js, art.js, viz.js, viz3.js, viz4.js, viz5.js, engine.js`. New `stepN.js` goes after the previous step file; `vizN.js` after `viz5.js`; `engine.js` last.
+Script order in index.html: `tf.min.js, steps.js, step3.js, step4.js, step5.js, crew.js, step6.js, langgraph.min.js, jskernel.js, art.js, viz.js, viz3.js, viz4.js, viz5.js, viz6.js, engine.js`. New `stepN.js` goes after `step6.js`; `vizN.js` after `viz6.js`; `engine.js` last.
 
 ## 2. Adding a step (copy step5.js / viz5.js)
 
@@ -59,7 +60,8 @@ Replacing the placeholder unlocks the step in the nav; later placeholders stay l
 
 ### Mechanics helpers (reuse, but every substep needs a DIFFERENT mechanic)
 `PGViz._h`: `el, card(parent,title,sub), tiles(parent,[[value,label,'g'|'r'|'a'|'c']]), pct, zoomIn, probCol`. `PGViz3._dragTok(el, onDrop(dropName), onTap)` (targets carry `data-drop`). `PGViz4.heatCanvas(api, cellId, grid16x16, 16, size)`. `PGViz5.lineSVG(nodes, edges, opts)` (draws a LangGraph graph from `getGraph()`; positions table `POS`).
-Mechanics already used (do not repeat): tap-to-open wall, drag patch, paint, tile ordering, chip-into-table (4e, 5b), sorting into boxes (4f), hold-to-peek, two-gate drag (3g), arrow wiring (5a), token stepping (5c), cells into lanes (5d), run-broken-then-fix (5e), be-the-checker buttons (5f), logbook hunt (5g).
+Mechanics already used (do not repeat): tap-to-open wall, drag patch, paint, tile ordering, chip-into-table (4e, 5b), sorting into boxes (4f), hold-to-peek, two-gate drag (3g), arrow wiring (5a), token stepping (5c), cells into lanes (5d), run-broken-then-fix (5e, 6d), be-the-checker buttons (5f), logbook hunt (5g), cards onto workers in a room (6a), call panel (6b), ID badge → prompt (6c), tap-through speech-bubble trace (6e), proof-read planted numbers (6f), key slot (6g).
+`PGViz6`: `roomSVG(opts)` (control room: 3 workers, tool wall, wall screen, report tray; `active`, `tap`, `tool`, `report`), `reportSheet(text, {mark})` (paper report; “not known” lines red).
 
 ## 3. Kernels and the bridge
 - **Python** (Pyodide 314.0.8 from the ONE constant `PYODIDE_BASE` in engine.js = jsdelivr; never change it). Python cells share one global namespace; passed cells are replayed on load (`replay()`).
@@ -68,7 +70,7 @@ Mechanics already used (do not repeat): tap-to-open wall, drag patch, paint, til
 - JS replay: all passed JS cells re-run in ORDER on load (`replayJS`); 3e restores the saved model from IndexedDB instead of training. Long cells (5g: 3 shifts ≈ 10 s) make reload slower — keep later steps' replay cheap.
 
 ## 4. Prediction formats (one check, then lock + answer + collapsed `reveal`)
-Used: `number` (1b), `bet` (2b), `chart` (2d), `draw` (3e), `tokens` (4d), `lanes` (5d). A new format needs no engine change: give `predict.render = function (body, api, pr, lock, whyBox) {…}`; store choices in `pr`, call `lock(value)` once (set `pr.good` first); when `pr.locked` draw the verdict + `whyBox(predict.reveal)`. `reveal` = `{asked, steps, trap, remember}`.
+Used: `number` (1b), `bet` (2b), `chart` (2d), `draw` (3e), `tokens` (4d), `lanes` (5d), `blanks` (6d: tap each report line FILLED / MISSING). A new format needs no engine change: give `predict.render = function (body, api, pr, lock, whyBox) {…}`; store choices in `pr`, call `lock(value)` once (set `pr.good` first); when `pr.locked` draw the verdict + `whyBox(predict.reveal)`. `reveal` = `{asked, steps, trap, remember}`.
 
 ## 5. State each step leaves (validation tray only; test tray `idx_test` is SEALED until Step 8)
 - **Python** (Steps 1–2): `X` (2624,64,64) uint8, `y` (prob ≥ 0.5), `prob`, `kind`, `cell_id`, `idx_train` (1574) / `idx_val` (525) / `idx_test` (sealed), `Xs`/features, `models`, `best_name`, `p_val` (Step 2 val scores), `cut` (Step 2 95%-recall cutoff).
@@ -78,6 +80,23 @@ Used: `number` (1b), `bet` (2b), `chart` (2d), `draw` (3e), `tokens` (4d), `lane
   - **Audit log** `auditLog`: array of `{ id, kind, p, lane:'pass'|'person'|'stop', decision:'pass'|'stop', tries }`, one row per cell; holds the LAST shift run (shift3 = poly gate). `pg.shiftReport(rows)` → `{ n, lanes, per1000, reshoots, all/mono/poly: {n,def,defPassed,good,goodStopped,person,personWrong}, escapes:[ids], rows:[[id,lane,decision,y,kind,tries,p]] }`. `PG.RES['5g'].s1/s2/s3` hold perfect / right-9-in-10 / poly-gate reports with rows. Step 6's crew should read `RES['5g'].s1.rows` (or rerun `runShift`).
   - pg helpers: `card(id)`, `shoot(id)`, `faultCards()` (F1–F3: spoiled copies of cells 2567, 2187, 1620), `photoStats`, `labelOf(id)`, `sample(n)`, `unsureCells(s,lo,hi,k)`, `rightNineInTen(base, seed)`, `laneOf`.
   - Live numbers (fixture model): shift1 199/240/86 pass/person/stop, defects passed 8/165, good stopped 4/360; 9-in-10 checker: 16 passed, 26 good stopped; poly gate 0.1358: poly defects passed 6→4 of 84, person 240→284. Python twin matches.
+  - pg (engine bridge): `mechOf(id)` → read-only copy of a substep's saved mech (respects review mode). Step 6's action_list reads `mechOf('4f').actions`.
+- **JS Step 6** (MiniCrew): tools `shiftStats` (reads `auditLog` = the LAST 5g shift: poly-gate line, perfect checker), `sliceTable` (4e slices), `worstCases` (`pg.worstCases(auditLog, 3)`), `actionList` (`pg.actionFacts()`); `brain` (ScriptedLLM); agents `inspector`, `analyst`, `writer`; tasks `inspectShift`, `findCauses` (context [inspectShift]), `writeReport` (context [inspectShift, findCauses]); `orderCrew`/`orderResult` (6d); `qualityCrew`, `trace` (step_callback events), **`shiftResult`** (6e kickoff: `.raw` = the report, `.tasks_output[i].raw`, `.trace`); `facts()` (all 4 tool results now), `factNumbers`, **`checkReport(text, facts)`** → `{ok, wrong:[tokens]}`, `planted`, `onPlanted`, `onReal`, `sloppyWriter`, `checkedReport` (guardrail task), `guarded` (6f).
+  - pg helpers: `sliceFacts(groups)`, `worstCases(log, k)`, `actionFacts()`, `plantedCopy(text, facts)` → `{text, planted:[{was,now,at}], tokens}`, `numberTokens(text)`. `PG_STEP6_UTIL`: `fieldsOf(report)` (which report lines are filled), `FIELDS`, `factList`, `slimTrace`, `outsOf`.
+  - **What a UI step needs**: the report = `NS.shiftResult.raw`; the facts = `NS.facts()`; the trace = `PG.RES['6e'].trace` (`{n,type: task_start|thought|tool_call|tool_result|answer|guardrail|sent_back|note, agent, task, text, tool?, result?, ok?}`); a check = `NS.checkReport(text, NS.facts())`. Always re-run `checkReport` on any report you show an operator.
+  - Live numbers (fixture model): shift_stats 525 cells, per 1,000: 341 / 541 / 118 pass / person / stop, defects passed 6 of 165 = 3.6 per 100 (target ≤ 5 → MET), good stopped 12 of 360? (see the tool card), person checks 284, reshoots 0; slices poly 6 of 84 (7.1 per 100) vs mono 2 of 81; unsure 2 of 17. Scripted trace: 21 steps, 4 tool calls. Python twin matches.
+
+### 5b. MiniCrew (site/js/crew.js) — the runner
+Real CrewAI is Python and cannot run in a browser; MiniCrew keeps CrewAI's names and prompt text (copied from crewai 1.15 `translations/en.json`).
+- `tool({ name, description, run, args? })` → tool (`.run(args)`, `.formatted` = CrewAI's “Tool Name / Tool Arguments / Tool Description” block).
+- `new Agent({ role, goal, backstory, tools, llm?, max_iter? })`; `agent.systemPrompt(native)` = the exact system message (ReAct tool block unless `native`).
+- `new Task({ description, expected_output, agent, context?, guardrail?, guardrail_max_retries? (default 3), name? })`. `context` undefined = all earlier outputs (CrewAI NOT_SPECIFIED); `[]` = none.
+- `new Crew({ agents, tasks, process: Process.sequential, step_callback?, task_callback? })` — refuses a context task that runs later (same message as CrewAI's `validate_context_no_future_tasks`). `await crew.kickoff()` → `{ raw, tasks_output:[{agent, description, raw, attempts}], trace, ms }`.
+- Agent loop: `llm.call(messages, tools, {agent, task})` → `{thought, toolCalls:[{id,name,args}]}` or `{thought, final}`; tool results go back as `{role:'tool'}` + CrewAI's post-tool line; max_iter then one no-tool call.
+- Guardrail: `(output) => [true, result] | [false, 'why']`; on fail the agent is re-run with CrewAI's validation text as its ONLY context (error + previous result); after `guardrail_max_retries` it throws `Task failed guardrail validation after N retries. Last error: …`.
+- Brains: `new ScriptedLLM({ slips })` (rules: call each tool once, then the sentence pattern registered for the role with `ScriptedLLM.register(/role/i, fn({facts, context, role}))`; `slips: n` changes n numbers in a first draft on purpose; after a send-back it removes the numbers the error names). `new AnthropicLLM({ apiKey, model, baseURL? })` (Messages API, `anthropic-version: 2026-10-21` from @anthropic-ai/sdk 1.12.0, `anthropic-dangerous-direct-browser-access: true`), `new OpenAILLM({ apiKey, model, baseURL })` (chat completions + tools). The key lives in a closure only; provider errors are redacted. `MiniCrew.fetch` can be set to a stand-in fetch. `withLLM(crew, llm, lastTaskOverride?)` → a copy of the crew with another brain.
+- Errors are `CrewError` (plain text); `PGJS.friendly` maps them (`crewFriendly`).
+- Differences from CrewAI worth knowing: Python ignores unknown Agent options silently (MiniCrew refuses them); CrewAI sets a crew's `step_callback` only on agents that have none yet (reusing agents across crews keeps the first callback — the twin uses fresh agents); hierarchical process is not built; Python's step_callback gets AgentAction/ToolResult objects, MiniCrew gets plain event objects (more types).
 
 ## 6. Review mode (generic)
 Top-bar button / `#review` / `?review=1`. All pages open; work goes to `RV` (memory), never to the student's progress. Code cells with `ref` get “Fill reference answer” and “Run up to here” (runs every earlier code cell with `ref` that has no passing result, then this one; 3e trains 1 epoch, numbers marked rough via `pg.rough`). Renderers must show the plain “press Run up to here” text when data is missing (`api.review`). Every code cell MUST have `ref`, or Run up to here skips it and later cells fail.
@@ -86,7 +105,7 @@ Top-bar button / `#review` / `?review=1`. All pages open; work goes to `RV` (mem
 Only own files, fetched through `pgFetch` (reads `window.PG_EMBED` in the single file). Allowed extensions only (.html .css .js .mjs .wasm .json .csv .txt .md .png .jpg .webp .svg .woff2). No alert/confirm/prompt, downloads, window.open. Storage only inside try/catch (srcdoc `allow-scripts` frames block localStorage). Must work on the site, via file://, and in about:srcdoc frames.
 
 ## 8. Build + version bump
-1. Bump `vX.Y` in `site/index.html` (title, brand span, footer). 2. `python3 tools/build_single.py` → `dist/PanelGuard_Defect_Inspection_Lab_vX.Y.html` (name from the title; inlines every `js/*.js`, embeds data). 3. Update the `DIST` path / version regex in the tests you run (`s5_e2e.mjs` uses v0.6, `srcdoc_test.mjs` matches `/v0.6.html$/`). 4. Commit site + dist.
+1. Bump `vX.Y` in `site/index.html` (title, brand span, footer). 2. `python3 tools/build_single.py` → `dist/PanelGuard_Defect_Inspection_Lab_vX.Y.html` (name from the title; inlines every `js/*.js`, embeds data). 3. Update the `DIST` path / version regex in the tests you run (`s6_e2e.mjs` uses v0.7, `srcdoc_test.mjs` matches `/v0.7.html$/`; older `s5_e2e.mjs` still says v0.6). 4. Commit site + dist.
 LangGraph bundle: `cd tools/lg && npm ci && sh build.sh`. `entry.mjs` exports only the names used (Annotation, StateGraph, START, END, MemorySaver, interrupt, Command, GraphRecursionError, INTERRUPT, isInterrupted) — add exports there if needed and rebuild.
 
 ## 9. Tests (Chrome at `/usr/bin/google-chrome`; run only what your change touches)
@@ -96,6 +115,7 @@ LangGraph bundle: `cd tools/lg && npm ci && sh build.sh`. `entry.mjs` exports on
 - `node tests/wasm_block.mjs` — site + single file served with a CSP that blocks WebAssembly (`CSP` env of `serve.mjs`): plain message, no Pyodide request, Step 0 / no-Python pages work, zero uncaught errors.
 - `node srcdoc_test.mjs` — single file in 3 sandbox variants: Python + TF.js ready, LangGraph pause/resume + recursion limit, zero console errors.
 - Python twin: `python3 tools/research/step5_twin.py [inputs.json]` (needs `pip install langgraph`); must print `TWIN MATCHES`.
+- Step 6: `node tests/js_cells6.test.mjs [6d,6f]` (writes `tools/research/step6_inputs.json`), then the CrewAI twin `python -I tools/research/step6_twin.py` in a venv with `pip install crewai` (verified 1.15.44; run it from outside the crewai folder: crewai has a `types` package) → `TWIN MATCHES`. Browser: `TARGET=site|file|srcdoc node tests/s6_e2e.mjs` (port 8773; the real-model path uses Playwright routes as mocked providers — no real provider is ever called; srcdoc mode tests the honest skip).
 - **CDN mirror**: jsdelivr is NOT reachable here. `tests/cdn.mjs` `mirrorCDN(ctx)` answers the exact `PYODIDE_BASE` URL from `tools/cdn-mirror` with CORS headers. Keep it; never change the constant. Chrome's own background calls to google.com show as proxy refusals in the Bash output — harmless.
 - Local server for site mode: `node tools/serve.mjs <site dir> <port>` (each test uses its own port: s4 8769, s5 8771, fresh review 8772).
 
@@ -112,4 +132,5 @@ LangGraph bundle: `cd tools/lg && npm ci && sh build.sh`. `entry.mjs` exports on
 - Scores at a gate: `low` IS a defect's score; `p < low` passes, so that defect goes to a person. Show 4 decimals when that matters.
 - `pg.pixels` is the whole pack (train+val+test). Use `pg.cell_val` / `idx_val` only; the test tray stays sealed until Step 8.
 - 4d's seeded prediction value in tests is a placeholder (`val: 1`); opening 4d in a seeded test shows a broken token row — harmless.
+- Step 6 keys: never put a key in code (code and drafts are saved to localStorage). The 6g key slot keeps it in a viz6 closure variable (`KEY6`) only. The published page blocks outside network calls (CSP); a real model works only in the downloaded single file (file://) in Chrome. 6g detects `securitypolicyviolation` / network failure and says so.
 - Software WebGL here: replay of Steps 3–4 on load takes ~3.5–6 min in tests; set generous timeouts.
