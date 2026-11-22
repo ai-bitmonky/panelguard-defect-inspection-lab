@@ -57,6 +57,7 @@ function friendly(e) {
   var m = e.msg || '', t = e.type, x;
   if (t === 'Stopped') return m || 'You stopped the run.';
   if (t === 'Check') return m;
+  if (t === 'CrewError') return crewFriendly(m);
   if (t === 'SyntaxError') return 'JavaScript could not read this code (' + m + '). Check brackets ( ) [ ] { }, quotes and commas.';
   if (t === 'ReferenceError' && (x = m.match(/^(.+?) is not defined/)) && G.PG_NAME_FROM && G.PG_NAME_FROM[x[1]]) return 'This cell uses “' + x[1] + '”, which is made in ' + G.PG_NAME_FROM[x[1]] + '. Run ' + G.PG_NAME_FROM[x[1]] + ' first (in review mode: press “Run up to here”).';
   if (t === 'ReferenceError' && (x = m.match(/^(.+?) is not defined/))) return 'JavaScript does not know the name “' + x[1] + '”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again.';
@@ -68,6 +69,13 @@ function friendly(e) {
   if ((x = m.match(/Axis must be|axis.*out of range|Invalid axis/i))) return 'That axis does not exist here: ' + m;
   if ((x = lgFriendly(m))) return x;
   return t + ': ' + m;
+}
+/* MiniCrew (Step 6) errors are already plain; the CrewAI rule about future tasks gets a plainer line first */
+function crewFriendly(m) {
+  var x = String(m).match(/^Task '(.+?)' has a context dependency on a future task '(.+?)', which is not allowed\./);
+  if (x) return 'A job reads a job that runs LATER: “' + x[1].slice(0, 50) + '” reads “' + x[2].slice(0, 50) + '”, which has not run yet. CrewAI refuses this before anything runs. Put the job later in the tasks list, or give it no context: [].';
+  if ((x = String(m).match(/^Task failed guardrail validation after (\d+) retries\. Last error: ([\s\S]*)$/))) return /: ?$/.test(x[2]) ? 'The report job failed its guardrail every time, but the list of wrong numbers was EMPTY. The check must say ok when the wrong list is empty: length 0.' : 'The report job was sent back ' + x[1] + ' time(s) and still failed the guardrail (last reason: ' + x[2] + ').';
+  return m;
 }
 /* LangGraph errors in plain words (Step 5). Returns null for other messages. */
 function lgFriendly(m) {

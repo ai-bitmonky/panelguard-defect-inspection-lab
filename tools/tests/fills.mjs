@@ -36,4 +36,9 @@ Object.assign(FILLS, {
   '5e': { right: ['2', "'human_check'"], wrong: [['Infinity', "'human_check'"], ['2', "'reshoot'"], ['2', "'record'"], ['3', "'human_check'"]] },
   '5f': { right: ['memory', 'resume'], wrong: [['undefined', 'resume'], ['memory', 'goto'], ['memory', 'update']] },
   '5g': { right: ['0.05', "'poly'"], wrong: [['5', "'poly'"], ['0.05', "'mono'"], ['0.5', "'poly'"]] },
+  '6b': { right: ["'shift_stats'", 'auditLog', 'defPassed'], wrong: [["'shiftStats'", 'auditLog', 'defPassed'], ["'shift_stats'", 'shift1', 'defPassed'], ["'shift_stats'", 'auditLog', 'def']] },
+  '6c': { right: ["'Root-cause Analyst'", 'worstCases', 'tools'], wrong: [["'Analyst'", 'worstCases', 'tools'], ["'Root-cause Analyst'", 'actionList', 'tools'], ["'Root-cause Analyst'", 'worstCases', 'tool']] },
+  '6d': { right: ['[inspectShift, findCauses]', 'inspectShift, findCauses, writeReport'], wrong: [['[]', 'writeReport, inspectShift, findCauses'], ['[inspectShift, findCauses]', 'writeReport, inspectShift, findCauses'], ['[]', 'inspectShift, findCauses, writeReport'], ['[inspectShift]', 'inspectShift, findCauses, writeReport']] },
+  '6e': { right: ['sequential', 'push', 'kickoff'], wrong: [['parallel', 'push', 'kickoff'], ['sequential', 'pop', 'kickoff'], ['sequential', 'push', 'run']] },
+  '6f': { right: ['0.5', '0', 'guardrail'], wrong: [['1', '0', 'guardrail'], ['0', '0', 'guardrail'], ['0.5', '1', 'guardrail'], ['0.5', '0', 'callback']] },
 });
