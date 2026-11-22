@@ -7,12 +7,12 @@ const st = JSON.parse(seedState(SUBS)); st.subs['2a'].codePass = false; for (con
 await p.goto('file:///tmp/blank.html'); await p.evaluate(([k, v]) => localStorage.setItem(k, v), [KEY, JSON.stringify(st)]);
 await p.goto('file://' + DIST + '#sub-2b'); await p.waitForFunction(() => window.PG && window.PG.ready(), null, { timeout: 600000 }); await p.waitForTimeout(800);
 const a = await p.evaluate(() => ({ cur: window.PG.S.cur, hash: location.hash })); console.log('deep link to locked 2b ->', JSON.stringify(a));
-await p.locator('.edw textarea').first().fill(fill(SUBS['2a'].code, SUBS['2a'].ref)); await p.locator('#runbtn').click(); await p.waitForFunction(() => window.PG.VERD['2a'] && window.PG.running() == null, null, { timeout: 300000 });
-// 2a also needs its hands-on (keep a mix): write it as the student would have it after measuring
+// 2a also needs its hands-on (keep a mix): written as the student would have it after measuring
 await p.evaluate(() => { const s = window.PG.S.subs['2a']; s.mech = Object.assign(s.mech || {}, { mixes: 3, kept: ['A', 'B', 'C'], best: { keys: ['A', 'B', 'C'], auc: 0.9 } }); });
-await p.evaluate(() => { location.hash = '#sub-1e'; }); await p.waitForTimeout(500); await p.evaluate(() => { location.hash = '#sub-2a'; }); await p.waitForTimeout(500);
+await p.locator('.edw textarea').first().fill(fill(SUBS['2a'].code, SUBS['2a'].ref)); await p.locator('#runbtn').click(); await p.waitForFunction(() => window.PG.VERD['2a'] && window.PG.running() == null, null, { timeout: 300000 });
+await p.evaluate(() => { const s = window.PG.S.subs['2a']; s.mech = Object.assign(s.mech || {}, { kept: ['A', 'B', 'C'], keptCmd: 'x' }); window.PG.openSub('2a'); }); await p.waitForTimeout(800);
 console.log('2a passed:', await p.evaluate(() => window.PG.passed('2a')), '| pending', await p.evaluate(() => window.PG.pendingOf('2a')));
-await p.evaluate(() => { location.hash = '#sub-2a'; }); await p.waitForTimeout(300);
+console.log('hash before the tap:', await p.evaluate(() => location.hash));
 await p.locator('.strip .snode').nth(1).click(); await p.waitForTimeout(800);
 const c = await p.evaluate(() => ({ cur: window.PG.S.cur, hash: location.hash })); console.log('tap 2b in the strip ->', JSON.stringify(c));
 console.log(a.cur === '2a' && a.hash === '#sub-2a' && c.cur === '2b' ? 'DEEPLINK OK' : 'DEEPLINK PROBLEM', '| errors', JSON.stringify(errs));
