@@ -3542,7 +3542,7 @@ function heatCanvas(api, id, grid, n, size, opt) {
   if (grid && !opt.plain) {
     var mx = 0; for (var i = 0; i < grid.length; i++) if (grid[i] > mx) mx = grid[i];
     var g = document.createElement('canvas'); g.width = g.height = n; var gx = g.getContext('2d'), im = gx.createImageData(n, n);
-    for (i = 0; i < n * n; i++) { var v = mx > 0 ? Math.max(0, grid[i]) / mx : 0; im.data[4 * i] = 255; im.data[4 * i + 1] = Math.round(60 + 180 * v); im.data[4 * i + 2] = Math.round(40 * (1 - v)); im.data[4 * i + 3] = Math.round(200 * Math.pow(v, 0.8)); }
+    for (i = 0; i < n * n; i++) { var v = mx > 0 ? Math.max(0, grid[i]) / mx : 0; im.data[4 * i] = 255; im.data[4 * i + 1] = Math.round(60 + 180 * v); im.data[4 * i + 2] = Math.round(40 * (1 - v)); im.data[4 * i + 3] = v < 0.25 ? 0 : Math.round(215 * Math.pow((v - 0.25) / 0.75, 0.8)); }
     gx.putImageData(im, 0, 0);
     var a = opt.area || [0, 64]; x.imageSmoothingEnabled = true;
     x.drawImage(g, a[0] / 64 * size, a[0] / 64 * size, (a[1] - a[0]) / 64 * size, (a[1] - a[0]) / 64 * size);
@@ -3559,6 +3559,7 @@ function noData(host, api, what) {
 
 /* ================= 4a: paint over the defect ================= */
 function scenePaint(s, stage, out, api) {
+  if (!api.canvas(s.cells[0])) { stage.innerHTML = '<p class="hint" style="padding:14px">Loading the photos…</p>'; setTimeout(function () { if (document.contains(stage)) scenePaint(s, stage, out, api); }, 500); return; }
   var m = api.mech; m.paint = m.paint || {};
   stage.innerHTML = '';
   var wrap = el('div'); wrap.style.cssText = 'display:flex;gap:12px;padding:12px;flex-wrap:wrap;justify-content:center'; stage.appendChild(wrap);
@@ -3693,8 +3694,8 @@ function deletion(r, host, api) {
   var c = card(host, 'DELETION TEST — ' + r.n + ' REAL DEFECTS', 'Average drop of the defect score after graying out 10% of the pixels.' + (r.rough ? ' Review setting — rough.' : ''));
   var mx = Math.max(r.dropHot, r.dropRand, 0.01) * 1.2, W = 420, o = '';
   [['hottest 10% (Grad-CAM)', r.dropHot, '#ff8a5c'], ['random 10%', r.dropRand, '#8d9bb0']].forEach(function (b, j) {
-    var y = 10 + j * 40, w = Math.max(2, (W - 170) * Math.max(0, b[1]) / mx);
-    o += '<text x="0" y="' + (y + 16) + '" font-family="Rajdhani,Arial,sans-serif" font-size="14" fill="#c6d2e2">' + b[0] + '</text><rect x="150" y="' + y + '" width="' + w + '" height="24" rx="4" fill="' + b[2] + '"/><text x="' + (156 + w) + '" y="' + (y + 17) + '" font-family="Space Mono,monospace" font-size="13" fill="#fff">' + f3(b[1]) + '</text>';
+    var y = 10 + j * 40, w = Math.max(2, (W - 230) * Math.max(0, b[1]) / mx);
+    o += '<text x="0" y="' + (y + 16) + '" font-family="Rajdhani,Arial,sans-serif" font-size="14" fill="#c6d2e2">' + b[0] + '</text><rect x="175" y="' + y + '" width="' + w + '" height="24" rx="4" fill="' + b[2] + '"/><text x="' + (181 + w) + '" y="' + (y + 17) + '" font-family="Space Mono,monospace" font-size="13" fill="#fff">' + f3(b[1]) + '</text>';
   });
   c.appendChild(H().svg(W, 92, o));
   tiles(c, [[r.wins + ' of ' + r.n, 'defects where the hot area hurt more', 'c'], [f3(r.s0), 'average score before', 'c'], [(r.dropRand > 0 ? (r.dropHot / r.dropRand).toFixed(1) + '×' : '—'), 'hot drop ÷ random drop', r.dropHot > 1.5 * r.dropRand ? 'g' : 'a']]);
@@ -3770,6 +3771,7 @@ function sliceTable(r, host, api) {
 /* ================= 4f: sort mistakes into action boxes ================= */
 var BOXES = [['more', 'Need more photos like this', '#46e3ff'], ['label', 'Ask the expert to re-check the label', '#d6e05a'], ['sharp', 'Needs a sharper photo', '#a98bff'], ['wrong', 'Model looked at the wrong place', '#ff8a5c']];
 function sceneTodo(s, stage, out, api) {
+  if (!api.canvas(s.cells ? s.cells[0] : 6)) { stage.innerHTML = '<p class="hint" style="padding:14px">Loading the photos…</p>'; setTimeout(function () { if (document.contains(stage)) sceneTodo(s, stage, out, api); }, 500); return; }
   var m = api.mech; m.box = m.box || {}; var sel = null;
   stage.innerHTML = '<p class="hint" style="padding:14px">Loading the real mistakes and their heat maps…</p>';
   api.jsEval(async function (NS, pg, tf) {
@@ -3804,7 +3806,7 @@ function sceneTodo(s, stage, out, api) {
     function draw() {
       pool.innerHTML = ''; bins.innerHTML = '';
       D.list.forEach(function (d) { if (!m.box[d.id]) pool.appendChild(tile(d)); });
-      if (!pool.children.length) pool.appendChild(el('span', 'hint', m.done ? '' : 'All sorted.'));
+      pool.style.display = m.done && !pool.children.length ? 'none' : 'flex'; if (!pool.children.length) pool.appendChild(el('span', 'hint', 'All sorted.'));
       BOXES.forEach(function (b) {
         var d = el('div', null, '<div style="font-family:Orbitron,Arial,sans-serif;font-size:10px;color:' + b[2] + '">' + b[1].toUpperCase() + '</div>');
         d.setAttribute('data-drop', b[0]); d.style.cssText = 'min-height:100px;border:1px solid ' + b[2] + '66;border-radius:10px;padding:6px;background:#0a0f16';
@@ -3840,7 +3842,7 @@ function endCard(api) {
   var d = r4 ? (r4.dropHot > 1.5 * r4.dropRand && r4.dropHot - r4.dropRand > 0.03 ? 'removing the hottest 10% hurt the score ' + (r4.dropHot / Math.max(1e-6, r4.dropRand)).toFixed(1) + '× more than random (' + f3(r4.dropHot) + ' vs ' + f3(r4.dropRand) + ')' : 'the deletion test was weak (' + f3(r4.dropHot) + ' vs ' + f3(r4.dropRand) + ')') : 'run 4d to measure it';
   var R = r5 && r5.R, rt = function (g) { return g.def ? Math.round(100 * g.defPass / g.def) + '%' : '—'; };
   return el('div', 'endc', '<h3 class="fh">STEP 4 DONE — WHAT WE TRUST, WHAT WE DO NOT</h3>' +
-    '<ul><li><b>Trust a little:</b> on clear defects the heat usually sits on the defect, and ' + d + '.</li>' +
+    '<ul><li><b>Trust a little:</b> ' + d + '. The cover-up test and Grad-CAM let us check any single photo.</li>' +
     '<li><b>Do not trust blindly:</b> the Grad-CAM map is coarse (16 × 16) and wins on only part of the cells.</li>' +
     (R ? '<li><b>Weak spots:</b> defects passed with no check — mono ' + rt(R.mono) + ', poly ' + rt(R.poly) + '; experts unsure ' + rt(R.unsure) + ' vs sure ' + rt(R.sure) + '.</li>' : '') +
     '<li>Your action list is saved for Step 8.</li></ul>' +
