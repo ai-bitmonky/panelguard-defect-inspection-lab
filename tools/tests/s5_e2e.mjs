@@ -81,7 +81,7 @@ await F.locator('#out').evaluate((e) => { e.scrollTop = 0; }); await shot('5c');
 await open('5d'); await F.locator('[data-cell5d]').first().waitFor({ timeout: 120000 });
 const cells5d = await ev(() => window.PG.S.subs['5d'].pred.cells);
 log('5d cells to predict:', JSON.stringify(cells5d.map((c) => [c.id, +c.p.toFixed(3), c.lane, c.y])));
-for (const c of cells5d) { await F.locator(`[data-cell5d="${c.id}"]`).click(); await F.locator(`#predbox [data-drop="${c.lane}"]`).click(); await page.waitForTimeout(100); }
+for (const c of cells5d) { await F.locator(`[data-cell5d="${c.id}"]`).click(); await F.locator(`#predbox [data-drop="${c.lane}"]`).click({ position: { x: 12, y: 10 } }); await page.waitForTimeout(100); }
 await shot('5d_predict');
 await F.locator('#lanecheck').click(); await page.waitForTimeout(300);
 expect(/All 4 right/.test(await F.locator('#predbox .verdict').innerText()) && await ev(() => window.PG.S.subs['5d'].pred.locked), '5d lanes prediction checked once and locked');

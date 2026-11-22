@@ -6,6 +6,7 @@ function el(t, c, h) { return H().el(t, c, h); }
 function card(p, t, s) { return H().card(p, t, s); }
 function tiles(p, l) { return H().tiles(p, l); }
 function f3(x) { return x == null || isNaN(x) ? '—' : (+x).toFixed(3); }
+function f4(x) { return x == null || isNaN(x) ? '—' : (+x).toFixed(4); }
 function pc(x, d) { return (100 * x).toFixed(d == null ? 0 : d) + '%'; }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 function drag(tok, onDrop, onTap) { window.PGViz3._dragTok(tok, onDrop, onTap); }
@@ -24,8 +25,8 @@ function photoCanvas(api, id, px, size) {
 }
 
 /* ---------- the line drawing: positions per station; edges come from the compiled graph (getGraph) ---------- */
-var POS = { __start__: [45, 140], check_photo: [180, 140], reshoot: [180, 250], score: [330, 140], route: [470, 140], human_check: [620, 48], record: [762, 140], __end__: [862, 140] };
-function shape(n) { return n === '__start__' || n === '__end__' ? { k: 'c', r: 25 } : n === 'route' ? { k: 'd', w: 46, h: 30 } : { k: 'r', w: 62, h: 21 }; }
+var POS = { __start__: [36, 140], check_photo: [168, 140], reshoot: [168, 250], score: [322, 140], route: [470, 140], human_check: [610, 48], record: [752, 140], __end__: [866, 140] };
+function shape(n) { return n === '__start__' || n === '__end__' ? { k: 'c', r: 28 } : n === 'route' ? { k: 'd', w: 50, h: 32 } : { k: 'r', w: 64, h: 24 }; }
 function posOf(n, extra) { if (POS[n]) return POS[n]; var i = extra.indexOf(n); if (i < 0) { extra.push(n); i = extra.length - 1; } return [330 + 140 * i, 250]; }
 function border(n, p, q) {            // point where the line from p (centre of n) towards q leaves the shape
   var s = shape(n), dx = q[0] - p[0], dy = q[1] - p[1], L = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -40,7 +41,7 @@ function nodeSVG(n, o) {
   if (s.k === 'c') g += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + s.r + '" fill="' + fill + '" stroke="' + col + '" stroke-width="2"/>';
   else if (s.k === 'd') g += '<path d="M' + (p[0] - s.w) + ' ' + p[1] + 'L' + p[0] + ' ' + (p[1] - s.h) + 'L' + (p[0] + s.w) + ' ' + p[1] + 'L' + p[0] + ' ' + (p[1] + s.h) + 'Z" fill="' + fill + '" stroke="' + col + '" stroke-width="2"/>';
   else g += '<rect x="' + (p[0] - s.w) + '" y="' + (p[1] - s.h) + '" width="' + 2 * s.w + '" height="' + 2 * s.h + '" rx="8" fill="' + fill + '" stroke="' + col + '" stroke-width="2"/>';
-  g += '<text x="' + p[0] + '" y="' + (p[1] + 5) + '" text-anchor="middle" font-family="Space Mono,Consolas,monospace" font-size="' + (s.k === 'c' ? 11 : 13) + '" fill="' + (n[0] === '_' ? '#8d9bb0' : '#e6eef8') + '">' + lab + '</text></g>';
+  g += '<text x="' + p[0] + '" y="' + (p[1] + 6) + '" text-anchor="middle" font-family="Space Mono,Consolas,monospace" font-size="' + (s.k === 'c' ? 13 : 16.5) + '" font-weight="700" fill="' + (n[0] === '_' ? '#8d9bb0' : '#e6eef8') + '">' + lab + '</text></g>';
   return g;
 }
 function edgesSVG(edges, o) {          // edges: [{s,t,c,d,col}]
@@ -53,17 +54,17 @@ function edgesSVG(edges, o) {          // edges: [{s,t,c,d,col}]
     var col = e.col || (e.c ? '#ffb547' : '#46e3ff');
     out += '<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="' + col + '" stroke-width="2.2"' + (e.c ? ' stroke-dasharray="6 4"' : '') + ' marker-end="url(#ah' + (e.c ? 'c' : '') + ')"/>';
     var lab = e.d.filter(function (x) { return x; }).join(' · ');
-    if (lab) { var mx = (a[0] + b[0]) / 2 + nx * 1.6, my = (a[1] + b[1]) / 2 + ny * 1.6 - 6; out += '<text x="' + mx + '" y="' + my + '" text-anchor="middle" font-family="Rajdhani,Arial" font-size="13" font-weight="700" fill="#ffcf6b" stroke="#05070b" stroke-width="3" paint-order="stroke">' + esc(lab) + '</text>'; }
+    if (lab) { var mx = (a[0] + b[0]) / 2 + nx * 1.6, my = (a[1] + b[1]) / 2 + ny * 1.6 - 6; out += '<text x="' + mx + '" y="' + my + '" text-anchor="middle" font-family="Rajdhani,Arial" font-size="17" font-weight="700" fill="#ffcf6b" stroke="#05070b" stroke-width="3" paint-order="stroke">' + esc(lab) + '</text>'; }
   });
   return out;
 }
 function lineSVG(nodes, edges, o) {
   o = o || {}; var extra = []; o.pos = function (n) { return posOf(n, extra); };
   var hasRe = nodes.indexOf('reshoot') >= 0 || nodes.some(function (n) { return !POS[n]; });
-  var s = '<svg viewBox="0 0 900 ' + (hasRe ? 290 : 190) + '" style="width:100%;height:auto;display:block;touch-action:none" xmlns="http://www.w3.org/2000/svg"><defs>' +
+  var s = '<svg viewBox="0 0 900 ' + (hasRe ? 296 : 168) + '" style="width:100%;height:auto;display:block;touch-action:none" xmlns="http://www.w3.org/2000/svg"><defs>' +
     '<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#46e3ff"/></marker>' +
     '<marker id="ahc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ffb547"/></marker></defs>' +
-    '<g transform="translate(0,' + (hasRe ? 0 : -45) + ')">';
+    '<g transform="translate(0,' + (hasRe ? 4 : -14) + ')">';
   s += edgesSVG(edges, o);
   nodes.forEach(function (n) { s += nodeSVG(n, o); });
   if (o.token) { var tp = POS[o.token] || o.pos(o.token); s += '<g id="tok5" style="transition:transform .45s ease;transform:translate(' + tp[0] + 'px,' + (tp[1] - 34) + 'px)"><circle r="11" fill="#a98bff" stroke="#fff" stroke-width="2"/><text y="4" text-anchor="middle" font-size="10" font-family="Orbitron,Arial" font-weight="900" fill="#fff">' + esc(o.tokLabel || '') + '</text></g>'; }
@@ -102,7 +103,7 @@ function sceneWire(s, stage, out, api) {
       var from = g.getAttribute('data-node'), pt = svg.createSVGPoint();
       var ln = document.createElementNS('http://www.w3.org/2000/svg', 'line'), p = POS[from]; ln.setAttribute('x1', p[0]); ln.setAttribute('y1', p[1]); ln.setAttribute('x2', p[0]); ln.setAttribute('y2', p[1]);
       ln.setAttribute('stroke', '#ffb547'); ln.setAttribute('stroke-width', '2'); ln.setAttribute('stroke-dasharray', '4 4'); svg.firstElementChild.nextElementSibling.appendChild(ln); rub = ln;
-      function mv(e) { pt.x = e.clientX; pt.y = e.clientY; var q = pt.matrixTransform(svg.getScreenCTM().inverse()); ln.setAttribute('x2', q.x); ln.setAttribute('y2', q.y + 45); }
+      function mv(e) { pt.x = e.clientX; pt.y = e.clientY; var q = pt.matrixTransform(svg.getScreenCTM().inverse()); ln.setAttribute('x2', q.x); ln.setAttribute('y2', q.y + 14); }
       function up(e) {
         document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); if (rub) rub.remove(); rub = null;
         var t = document.elementFromPoint(e.clientX, e.clientY), tg = t && t.closest && t.closest('[data-node]'), to = tg && tg.getAttribute('data-node');
@@ -243,20 +244,20 @@ function lanesPredict(body, api, pr, lock, whyBox, P) {
     pr.cells = pr.cells || D.cells; pr.place = pr.place || {}; var sel = null;
     function draw() {
       holder.innerHTML = '';
-      holder.appendChild(el('div', 'hint', 'Gates: low = <b>' + f3(D.low) + '</b>, high = <b>' + f3(D.high) + '</b>.'));
+      holder.appendChild(el('div', 'hint', 'Gates: low = <b>' + f4(D.low) + '</b>, high = <b>' + f4(D.high) + '</b>. Below low → pass. At or above high → stop.'));
       var pool = el('div'); pool.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;min-height:30px;margin:6px 0';
       var lanes = el('div'); lanes.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px';
       function tok(cx) {
         var w = el('div'); w.setAttribute('data-cell5d', cx.id); w.style.cssText = 'text-align:center;font-size:12px;padding:3px;border-radius:8px;background:#0a0816;border:2px solid ' + (sel === cx.id ? '#fff' : '#5b48a0') + ';cursor:' + (pr.locked ? 'default' : 'grab');
-        w.appendChild(photoCanvas(api, cx.id, null, 54)); w.appendChild(el('div', null, 'score <b>' + f3(cx.p) + '</b>'));
+        w.appendChild(photoCanvas(api, cx.id, null, 54)); w.appendChild(el('div', null, 'score <b>' + f4(cx.p) + '</b>'));
         if (pr.locked) { var ok = (pr.val.place[cx.id] === cx.lane); w.appendChild(el('div', null, ok ? '<b style="color:#3dffa0">✓</b>' : '<b style="color:#ff4d6a">✗ → ' + LANE[cx.lane][0].toLowerCase() + '</b>')); }
-        else drag(w, function (d) { put(cx.id, d); }, function () { sel = sel === cx.id ? null : cx.id; draw(); });
+        else drag(w, function (d) { put(cx.id, d); }, function () { if (sel && sel !== cx.id && pr.place[cx.id]) { put(sel, pr.place[cx.id]); return; } sel = sel === cx.id ? null : cx.id; draw(); });
         return w;
       }
       pr.cells.forEach(function (cx) { var pl = pr.locked ? pr.val.place[cx.id] : pr.place[cx.id]; if (!pl) pool.appendChild(tok(cx)); });
       ['pass', 'person', 'stop'].forEach(function (L) {
         var d = el('div'); d.setAttribute('data-drop', L); d.style.cssText = 'min-height:110px;border:1px solid ' + LANE[L][1] + '88;border-radius:10px;padding:6px;background:#0a0f16';
-        d.appendChild(el('div', null, '<div style="font-family:Orbitron,Arial;font-size:10px;color:' + LANE[L][1] + '">' + LANE[L][0] + '</div><div class="hint" style="font-size:12px">' + (L === 'pass' ? 'score below ' + f3(D.low) : L === 'stop' ? 'score ' + f3(D.high) + ' or more' : 'in between') + '</div>'));
+        d.appendChild(el('div', null, '<div style="font-family:Orbitron,Arial;font-size:10px;color:' + LANE[L][1] + '">' + LANE[L][0] + '</div><div class="hint" style="font-size:12px">' + (L === 'pass' ? 'score below ' + f4(D.low) : L === 'stop' ? 'score ' + f4(D.high) + ' or more' : 'from ' + f4(D.low) + ' up to ' + f4(D.high)) + '</div>'));
         var t = el('div'); t.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-top:4px';
         pr.cells.forEach(function (cx) { var pl = pr.locked ? pr.val.place[cx.id] : pr.place[cx.id]; if (pl === L) t.appendChild(tok(cx)); });
         d.appendChild(t); d.addEventListener('click', function (e) { if (sel && !pr.locked && !e.target.closest('[data-cell5d]')) put(sel, L); });
@@ -313,12 +314,12 @@ function loopView(r, host, api) {
     if (r.recursion && !api.mech.sawLoop) api.setMech({ sawLoop: 1 });
     var c = card(host, r.recursion ? 'ENDLESS LOOP — STOPPED BY LANGGRAPH' : 'LANGGRAPH STOPPED', r.recursion ? 'The first camera fault copy never got a good photo, so it went round and round.' : 'The run stopped with an error.');
     if (r.recursion) {
-      var sv = '<svg viewBox="0 0 420 150" style="width:100%;height:auto"><defs><marker id="ahl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff4d6a"/></marker></defs>' +
-        '<rect x="30" y="20" width="130" height="40" rx="8" fill="#0c131d" stroke="#2f8fb0" stroke-width="2"/><text x="95" y="45" text-anchor="middle" fill="#e6eef8" font-family="Space Mono,monospace" font-size="13">check_photo</text>' +
-        '<rect x="30" y="96" width="130" height="40" rx="8" fill="#0c131d" stroke="#2f8fb0" stroke-width="2"/><text x="95" y="121" text-anchor="middle" fill="#e6eef8" font-family="Space Mono,monospace" font-size="13">reshoot</text>' +
-        '<path id="lp5" d="M160 40 C215 40 215 116 160 116 M30 116 C-25 116 -25 40 30 40" fill="none" stroke="#ff4d6a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahl)"/>' +
-        '<circle r="8" fill="#a98bff" stroke="#fff" stroke-width="2"><animateMotion dur="1.4s" repeatCount="indefinite" path="M160 40 C215 40 215 116 160 116 L30 116 C-25 116 -25 40 30 40 Z"/></circle>' +
-        '<text x="250" y="52" fill="#ff8a9c" font-family="Orbitron,Arial" font-size="15" font-weight="700">25 STEPS</text><text x="250" y="76" fill="#c6d2e2" font-family="Rajdhani,Arial" font-size="15">no END in sight →</text><text x="250" y="98" fill="#c6d2e2" font-family="Rajdhani,Arial" font-size="15">LangGraph stops the run:</text><text x="250" y="120" fill="#ffb547" font-family="Space Mono,monospace" font-size="13">GraphRecursionError</text></svg>';
+      var sv = '<svg viewBox="0 0 460 150" style="width:100%;height:auto"><defs><marker id="ahl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff4d6a"/></marker></defs>' +
+        '<rect x="60" y="20" width="130" height="40" rx="8" fill="#0c131d" stroke="#2f8fb0" stroke-width="2"/><text x="125" y="45" text-anchor="middle" fill="#e6eef8" font-family="Space Mono,monospace" font-size="13">check_photo</text>' +
+        '<rect x="60" y="96" width="130" height="40" rx="8" fill="#0c131d" stroke="#2f8fb0" stroke-width="2"/><text x="125" y="121" text-anchor="middle" fill="#e6eef8" font-family="Space Mono,monospace" font-size="13">reshoot</text>' +
+        '<path id="lp5" d="M190 40 C245 40 245 116 190 116 M60 116 C5 116 5 40 60 40" fill="none" stroke="#ff4d6a" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahl)"/>' +
+        '<circle r="8" fill="#a98bff" stroke="#fff" stroke-width="2"><animateMotion dur="1.4s" repeatCount="indefinite" path="M190 40 C245 40 245 116 190 116 L60 116 C5 116 5 40 60 40 Z"/></circle>' +
+        '<text x="280" y="52" fill="#ff8a9c" font-family="Orbitron,Arial" font-size="15" font-weight="700">25 STEPS</text><text x="280" y="76" fill="#c6d2e2" font-family="Rajdhani,Arial" font-size="15">no END in sight →</text><text x="280" y="98" fill="#c6d2e2" font-family="Rajdhani,Arial" font-size="15">LangGraph stops the run:</text><text x="280" y="120" fill="#ffb547" font-family="Space Mono,monospace" font-size="13">GraphRecursionError</text></svg>';
       c.appendChild(el('div', null, sv));
       c.appendChild(el('p', null, 'In plain words: every photo of this copy is bad, every bad photo goes to reshoot, and reshoot goes back to check_photo. Nothing ever reaches END. After 25 steps (LangGraph\'s <b>recursion limit</b>) the run is stopped and <b>nothing is recorded</b> for that cell.'));
     } else c.appendChild(el('p', null, esc(window.PGJS.lgFriendly(r.raw) || r.raw.split('\n')[0])));
@@ -365,11 +366,11 @@ function humanDesk(r, host, api) {
     r.cells.forEach(function (cx, k) {
       var s = S[k], paused = s && s.next.indexOf('human_check') >= 0, d = m.dec[cx.id];
       var w = el('div'); w.style.cssText = 'display:flex;gap:10px;align-items:center;padding:6px;border-bottom:1px solid #1b2533';
-      w.appendChild(photoCanvas(api, cx.id, null, 74));
-      if (cx.cam && window.PGViz4) { var hc = window.PGViz4.heatCanvas(api, cx.id, cx.cam, 16, 74); w.appendChild(hc); }
-      var info = el('div', null, '<div style="font-size:14px"><b>cell ' + cx.id + '</b> · ' + esc(cx.kind) + ' · score <b>' + f3(cx.p) + '</b></div><div class="hint" style="font-size:12.5px">thread <code>' + esc(cx.thread) + '</code> · ' + (paused ? '<b style="color:#ffb547">paused at human_check</b>' : 'finished: ' + esc(s && s.decision)) + '</div>');
+      w.appendChild(photoCanvas(api, cx.id, null, 62));
+      if (cx.cam && window.PGViz4) { var hc = window.PGViz4.heatCanvas(api, cx.id, cx.cam, 16, 62); w.appendChild(hc); }
+      var info = el('div', null, '<div style="font-size:14px"><b>cell ' + cx.id + '</b> · ' + esc(cx.kind) + ' · score <b>' + f3(cx.p) + '</b></div><div class="hint" style="font-size:12.5px"><code>' + esc(cx.thread) + '</code> ' + (paused ? '<b style="color:#ffb547">paused</b>' : 'done') + '</div>');
       info.style.flex = '1'; w.appendChild(info);
-      if (paused) ['pass', 'stop'].forEach(function (a) { var b = el('button', 'btn small', a === 'pass' ? '✓ Pass' : '■ Stop'); b.setAttribute('data-dec', cx.id + ':' + a); b.style.borderColor = LANE[a][1]; b.onclick = function () { decide(k, cx, a); }; w.appendChild(b); });
+      if (paused) ['pass', 'stop'].forEach(function (a) { var b = el('button', 'btn small', a === 'pass' ? 'Pass' : 'Stop'); b.style.padding = '4px 8px'; b.setAttribute('data-dec', cx.id + ':' + a); b.style.borderColor = LANE[a][1]; b.onclick = function () { decide(k, cx, a); }; w.appendChild(b); });
       else w.appendChild(el('span', 'tagpill', 'you said: <b>' + esc(d || (s && s.decision)) + '</b>'));
       desk.appendChild(w);
       var row = el('div', null, '<code>' + esc(cx.thread) + '</code> ' + (paused ? '<span style="color:#ffb547">⏸ waiting</span>' : '<span style="color:#3dffa0">✓ done → record → END</span>')); row.style.cssText = 'font-size:13.5px;padding:2px 0' + (paused ? '' : ';opacity:.55'); tl.appendChild(row);
@@ -407,7 +408,7 @@ function shiftBoard(r, host, api) {
     return '<td style="padding:6px;vertical-align:top;border-left:1px solid #1b2533"><div style="font-family:Orbitron,Arial;font-size:10px;letter-spacing:.12em;color:#46e3ff">' + title + '</div><div class="hint" style="font-size:12px">' + note + '</div></td>';
   }
   function row(lab, f, fmt) { return '<tr><td style="padding:4px 6px;color:#8d9bb0">' + lab + '</td>' + [A, B, C].map(function (R) { return '<td style="padding:4px 6px;border-left:1px solid #1b2533;font-family:Space Mono,monospace">' + (fmt ? fmt(f(R)) : f(R)) + '</td>'; }).join('') + '</tr>'; }
-  var t = '<table style="width:100%;border-collapse:collapse;font-size:14px"><tr><td></td>' + col(A, 'PERFECT CHECKER', 'the label answers') + col(B, 'RIGHT 9 IN 10', 'seeded what-if') + col(C, 'POLY GATE', 'perfect checker') + '</tr>' +
+  var t = '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr><td></td>' + col(A, 'PERFECT CHECKER', 'the label answers') + col(B, 'RIGHT 9 IN 10', 'seeded what-if') + col(C, 'POLY GATE', 'perfect checker') + '</tr>' +
     row('per 1,000: pass / person / stop', function (R) { return [R.per1000.pass, R.per1000.person, R.per1000.stop].map(Math.round).join(' / '); }) +
     row('defects passed', function (R) { return R.all.defPassed + ' of ' + R.all.def; }) +
     row('good cells stopped', function (R) { return R.all.goodStopped + ' of ' + R.all.good; }) +
