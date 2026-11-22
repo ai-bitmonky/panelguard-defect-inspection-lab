@@ -50,7 +50,9 @@ function pendingOf(id) {
   var s = SUB[id], st = SS(id);
   if (s.kind === 'scene') return st.mech && st.mech.done ? null : s.needText;
   if (s.predict && !(st.pred && st.pred.locked)) return 'answer the prediction question';
-  if (!st.codePass) return 'run the code until the check passes';
+  if (s.pre) { var pn = s.pre.need(st.mech || {}); if (pn) return pn; }
+  if (!st.codePass) return st.mech && st.mech.lost === 'restore' ? 'press RUN to train again: the trained model could not be restored in this browser'
+    : st.mech && (st.mech.lost === 'model' || st.mech.stale) ? 'press RUN again: the model it uses changed' : 'run the code until the check passes';
   if (s.mechNeed) return s.mechNeed(st.mech || {});
   return null;
 }
@@ -209,11 +211,125 @@ function restartKernel() {
   whenReady().then(replay);
 }
 
+/* ---------- JavaScript kernel (cell language 'js': TensorFlow.js in this page) ---------- */
+var JSR = { k: null, T: null, ready: false, err: null, backend: null, gpu: null, live: null, liveId: null, pending: [] };
+var EPOCHS = { quick: 10, full: 30 };
+var TEST_EPOCHS = (function () { try { var m = location.search.match(/[?&]pgEpochs=(\d+)/); return m ? Math.max(1, +m[1]) : null; } catch (e) { return null; } })();
+function epochsMode() { return TEST_EPOCHS ? 'test' : (S.epochsMode === 'full' ? 'full' : 'quick'); }
+function epochsNow() { return TEST_EPOCHS || EPOCHS[epochsMode()]; }
+function gpuInfo() {
+  try {
+    var c = document.createElement('canvas'), gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return { name: 'none', soft: true };
+    var d = gl.getExtension('WEBGL_debug_renderer_info'), n = String(d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    return { name: n, soft: /swiftshader|llvmpipe|software|basic render/i.test(n) };
+  } catch (e) { return { name: 'unknown', soft: false }; }
+}
+function initJS() {
+  if (!window.tf || !window.PGJS) { JSR.err = 'TensorFlow.js could not be loaded (js/tf.min.js).'; showJSStat(); return; }
+  var tf = window.tf;
+  return tf.setBackend('webgl').then(function (ok) { return ok ? 'webgl' : tf.setBackend('cpu').then(function () { return 'cpu'; }); }, function () { return tf.setBackend('cpu').then(function () { return 'cpu'; }); })
+    .then(function (be) { return tf.ready().then(function () { return be; }); })
+    .then(function (be) {
+      JSR.backend = tf.getBackend(); JSR.gpu = JSR.backend === 'webgl' ? gpuInfo() : null;
+      JSR.k = window.PGJS.create({ tf: tf, global: window });
+      JSR.T = window.PGJS.trainer(JSR.k, tf, { tick: function (s) { if (JSR.live && S.cur === JSR.liveId && !JSR.liveQ) { JSR.liveQ = 1; requestAnimationFrame(function () { JSR.liveQ = 0; if (JSR.live) JSR.live.update(s); }); } } });
+      JSR.ready = true; showJSStat();
+      var p = JSR.pending; JSR.pending = []; p.forEach(function (f) { f(); });
+    }).catch(function (e) { JSR.err = 'TensorFlow.js could not start: ' + (e && e.message || e); showJSStat(); });
+}
+function jsReady() { return new Promise(function (res) { if (JSR.ready) res(); else JSR.pending.push(res); }); }
+function showJSStat() {
+  var t = $('#tstat'); if (!t) return;
+  if (JSR.err) { t.innerHTML = '<span class="kdot bad"></span>' + esc(JSR.err); return; }
+  if (!JSR.ready) { t.innerHTML = '<span class="kdot"></span>TensorFlow.js loading…'; return; }
+  var be = JSR.backend === 'webgl' ? 'WebGL' + (JSR.gpu && JSR.gpu.soft ? ' (software)' : '') : 'CPU — slow';
+  t.innerHTML = '<span class="kdot ' + (JSR.backend === 'webgl' && !(JSR.gpu && JSR.gpu.soft) ? 'ok' : 'bad') + '"></span>TensorFlow.js ' + esc(window.tf.version.tfjs) + ' · ' + be;
+  t.title = JSR.backend === 'webgl' ? 'Graphics: ' + (JSR.gpu && JSR.gpu.name) : 'No WebGL here: TensorFlow.js runs on the CPU. Training will be very slow.';
+}
+/* pg: the data bridge. Pixels from this page; split, labels and Step 2 scores from the Python kernel (one source of truth). */
+var BR = null;
+function refreshBridge() {
+  return kEval(window.PG_STEP3_BRIDGE).then(function (b) {
+    if (!b || b.missing || b.probe_error) throw new Error('Python does not have ' + (b && b.missing ? b.missing.join(', ') : 'the Step 1–2 results') + ' yet. Finish Steps 1 and 2 first.');
+    BR = b;
+    var J = window.PGJS, i2 = {};
+    LAB.rows.forEach(function (r, i) { i2[r[0]] = i; });
+    var pg = {
+      pixels: PACK, n: b.n, idx_train: b.idx_train, idx_val: b.idx_val, y_train: b.y_train, y_val: b.y_val, p_val: b.p_val,
+      cell_val: b.cell_val, prob_val: b.prob_val, kind_val: b.kind_val, baseline: b.baseline,
+      cellIndex: function (id) { return i2[id]; },
+      get epochs() { return epochsNow(); }, epochsMode: epochsMode(), gpu: JSR.gpu,
+      live: JSR.T.live, trainingWatch: JSR.T.watch, trainState: function () { return JSR.T.state; },
+      falseAlarmAt95: J.falseAlarmAt95, twoGates: J.twoGates, gatesFor: window.PG_STEP3_gatesFor, auc: J.auc,
+      saveModel: saveModel
+    };
+    JSR.k.setPg(pg); return pg;
+  });
+}
+function saveModel(model) {
+  var ss = SS('3e'), key = window.PG_STEP3_MODEL_KEY + Date.now().toString(36);
+  try {
+    if (typeof indexedDB === 'undefined' || !indexedDB) return Promise.resolve(false);
+    return model.save(key).then(function () {
+      var old = ss.mech.modelKey; ss.mech.modelKey = key; ss.mech.savedAt = new Date().toLocaleString(); save();
+      if (old && old !== key) window.tf.io.removeModel(old).catch(function () {});
+      return true;
+    }).catch(function () { return false; });
+  } catch (e) { return Promise.resolve(false); }
+}
+function restoreModel() {
+  var ss = SS('3e'), key = ss.mech && ss.mech.modelKey;
+  if (!key || !ss.mech.lastRes) return Promise.resolve(false);
+  try {
+    return window.tf.loadLayersModel(key).then(function (m) {
+      JSR.k.NS.model = m;      // same name the cells use
+      var r = Object.assign({}, ss.mech.lastRes, { restoredFrom: ss.mech.savedAt || 'an earlier visit', saved: true });
+      RES['3e'] = r; VERD['3e'] = SUB['3e'].check(r); return true;
+    }).catch(function () { return false; });
+  } catch (e) { return Promise.resolve(false); }
+}
+function jsRun(code, probe, out) {
+  return jsReady().then(refreshBridge).then(function () {
+    var lg = console.log; console.log = function () { if (out) out(Array.prototype.map.call(arguments, function (a) { return window.PGJS.fmt(a); }).join(' ')); };
+    return JSR.k.run(code, probe, function (t, e) { if (out) out(t, e); }).then(function (r) { console.log = lg; return r; }, function (e) { console.log = lg; throw e; });
+  }).catch(function (e) { return { error: { type: 'Setup', msg: e.message || String(e), line: null, tb: '' } }; });
+}
+function jsEval(fn) { return jsReady().then(function () { return JSR.k.eval(fn); }).catch(function (e) { console.warn(e); return null; }); }
+function lose(id, why) { var ss = SS(id); ss.codePass = false; ss.mech.lost = why || 1; delete RES[id]; VERD[id] = null; save(); }
+function invalidateAfter(id) {
+  var later = { '3c': ['3e', '3f', '3g'], '3e': ['3f', '3g'], '3f': ['3g'] }[id] || [];
+  later.forEach(function (x) { if (SS(x).codePass) { SS(x).codePass = false; delete RES[x]; VERD[x] = null; SS(x).mech.stale = id; } });
+  if (later.length) save();
+}
+function replayJS() {
+  var ids = ORDER.filter(function (id) { return SUB[id].lang === 'js' && SS(id).codePass && SS(id).code; });
+  if (!ids.length) return Promise.resolve();
+  replaying = true;
+  var chain = jsReady().then(refreshBridge), modelLost = false;
+  ids.forEach(function (id, n) {
+    chain = chain.then(function () {
+      $('#ktext').textContent = 'Rebuilding your work: ' + id + ' (' + (n + 1) + ' of ' + ids.length + ')…'; $('#kdot').className = 'kdot busy';
+      if (modelLost && (id === '3f' || id === '3g')) { lose(id, 'model'); return; }
+      if (SUB[id].restore) return restoreModel().then(function (ok) { if (!ok) { modelLost = true; lose(id, 'restore'); } });
+      return JSR.k.run(SS(id).code, SUB[id].probe, null).then(function (m) {
+        if (!m.error && m.probe && !m.probe.probe_error) { RES[id] = m.probe; VERD[id] = SUB[id].check(m.probe); if (!VERD[id].pass) lose(id); }
+        else lose(id);
+      });
+    });
+  });
+  return chain.catch(function (e) { console.warn('JS replay stopped: ' + (e && e.message)); }).then(function () {
+    replaying = false; $('#kdot').className = 'kdot ok';
+    if (K.versions) $('#ktext').textContent = 'Python ' + K.versions.python + ' · scikit-learn ' + K.versions.sklearn;
+    if (S.cur && SUB[S.cur]) { renderWork(); renderOut(); }
+  });
+}
+function liveHook(id) { var s = SUB[id]; if (!s || !s.live) return; var vb = $('#vizbox'); if (!vb) return; vb.innerHTML = ''; JSR.live = window.PGViz3.curvesLive(vb, makeApi(id)); JSR.liveId = id; if (JSR.T && JSR.T.state && running === id) JSR.live.update(JSR.T.state); }
+
 /* replay passed code so the notebook state comes back (after reload or Stop) */
 var replaying = false;
 function replay() {
-  var ids = ORDER.filter(function (id) { return SUB[id].kind === 'code' && SS(id).codePass && SS(id).code; });
-  if (!ids.length) return Promise.resolve();
+  var ids = ORDER.filter(function (id) { return SUB[id].kind === 'code' && SUB[id].lang !== 'js' && SS(id).codePass && SS(id).code; });
+  if (!ids.length) return replayJS();
   replaying = true;
   var chain = Promise.resolve();
   ids.forEach(function (id, n) {
@@ -231,7 +347,7 @@ function replay() {
     replaying = false; $('#kdot').className = 'kdot ok';
     $('#ktext').textContent = 'Python ' + K.versions.python + ' · scikit-learn ' + K.versions.sklearn;
     if (S.cur && SUB[S.cur].kind === 'code') renderOut();
-  });
+  }).then(replayJS);
 }
 
 /* ---------- friendly errors ---------- */
@@ -266,7 +382,7 @@ function renderNav() {
   var nav = $('#nav'); nav.innerHTML = '';
   nav.appendChild(h('div', { class: 'navhead' }, [h('h3', { text: 'COURSE' }), h('button', { class: 'ib', title: S.navC ? 'Open the step list' : 'Fold the step list', html: S.navC ? '»' : '«', onclick: function () { S.navC = !S.navC; save(); layout(); renderNav(); } })]));
   STEPS.forEach(function (st, i) {
-    if (st.id === 3) nav.appendChild(h('div', { class: 'plan', text: 'FULL PLAN — COMING NEXT' }));
+    if (st.locked && !(STEPS[i - 1] || {}).locked) nav.appendChild(h('div', { class: 'plan', text: 'FULL PLAN — COMING NEXT' }));
     var cur = S.cur && STEP_OF[S.cur] === st;
     if (st.locked) {
       var el = h('div', { class: 'ns lock' }, [h('div', { class: 'num', html: st.id }), h('div', { class: 'txt' }, [h('div', { class: 'nt', text: st.title }), h('div', { class: 'nd', text: '🔒 Not in this preview' })])]);
@@ -284,6 +400,12 @@ function renderNav() {
 }
 
 /* ---------- substep strip ---------- */
+function stripLabel(cx, name, col, n) {
+  var words = name.split(' '), lines = [name];
+  if (n >= 6 && name.length > 13) { var best = 1, bd = 1e9; for (var k = 1; k < words.length; k++) { var d = Math.abs(words.slice(0, k).join(' ').length - words.slice(k).join(' ').length); if (d < bd) { bd = d; best = k; } } lines = [words.slice(0, best).join(' '), words.slice(best).join(' ')]; }
+  return '<text x="' + cx + '" y="' + (lines.length > 1 ? 68 : 74) + '" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="15" font-weight="600" fill="' + col + '">' +
+    lines.map(function (l, i) { return '<tspan x="' + cx + '" dy="' + (i ? 15 : 0) + '">' + esc(l) + '</tspan>'; }).join('') + '</text>';
+}
 function renderStrip(st, box) {
   var subs = st.substeps, W = 1000, n = subs.length, gap = W / n;
   var NS = 'http://www.w3.org/2000/svg';
@@ -304,7 +426,7 @@ function renderStrip(st, box) {
     inner += '<rect x="' + (cx - 17) + '" y="17" width="34" height="34" rx="5" fill="' + (done ? '#0d2a1d' : '#0c131d') + '" stroke="' + col + '" stroke-width="2"/>' +
       '<line x1="' + (cx - 17) + '" y1="28" x2="' + (cx + 17) + '" y2="28" stroke="' + col + '" stroke-opacity=".45"/><line x1="' + (cx - 17) + '" y1="40" x2="' + (cx + 17) + '" y2="40" stroke="' + col + '" stroke-opacity=".45"/>' +
       '<text x="' + cx + '" y="' + 38.5 + '" text-anchor="middle" font-family="Orbitron,Arial,sans-serif" font-size="12" font-weight="700" fill="' + (ok || done ? '#fff' : '#5d6b80') + '">' + (done ? '✓' : (ok ? s.id : '🔒')) + '</text>' +
-      '<text x="' + cx + '" y="74" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="15" font-weight="600" fill="' + (cur ? '#46e3ff' : (ok ? '#c6d2e2' : '#5d6b80')) + '">' + esc(s.name) + '</text>';
+      stripLabel(cx, s.name, cur ? '#46e3ff' : (ok ? '#c6d2e2' : '#5d6b80'), n);
     g.innerHTML = inner;
     g.addEventListener('click', function () { if (ok) location.hash = '#sub-' + s.id; });
     g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ok) location.hash = '#sub-' + s.id; });
@@ -317,26 +439,31 @@ function renderStrip(st, box) {
 /* ---------- python highlighter + editor ---------- */
 var KW = /^(def|return|for|in|if|else|elif|import|from|as|lambda|and|or|not|True|False|None|while|with|class|try|except|is)$/;
 var BI = /^(print|len|range|int|float|str|list|dict|set|max|min|round|sorted|zip|open|sum|abs)$/;
-function hl(code) {
-  var re = /(#[^\n]*)|([fbr]?'(?:\\.|[^'\\\n])*'|[fbr]?"(?:\\.|[^"\\\n])*")|(____)|(\b\d+\.?\d*(?:e-?\d+)?\b)|([A-Za-z_]\w*)/g, out = '', last = 0, m;
+var KWJ = /^(const|let|var|function|return|for|of|in|if|else|while|await|async|new|true|false|null|undefined|Infinity|this|typeof|break|continue)$/;
+var BIJ = /^(console|Math|Array|tf|pg|Number|JSON|Object)$/;
+function hl(code, lang) {
+  var js = lang === 'js';
+  var re = js ? /(\/\/[^\n]*)|('(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`)|(____)|(\b\d+\.?\d*(?:e-?\d+)?\b)|([A-Za-z_$][\w$]*)/g
+              : /(#[^\n]*)|([fbr]?'(?:\\.|[^'\\\n])*'|[fbr]?"(?:\\.|[^"\\\n])*")|(____)|(\b\d+\.?\d*(?:e-?\d+)?\b)|([A-Za-z_]\w*)/g;
+  var K1 = js ? KWJ : KW, B1 = js ? BIJ : BI, out = '', last = 0, m;
   while ((m = re.exec(code))) {
     out += esc(code.slice(last, m.index)); last = re.lastIndex;
     if (m[1]) out += '<span class="t-c">' + esc(m[1]) + '</span>';
     else if (m[2]) out += '<span class="t-s">' + esc(m[2]).replace(/____/g, '<span class="gap">____</span>') + '</span>';
     else if (m[3]) out += '<span class="gap">____</span>';
     else if (m[4]) out += '<span class="t-n">' + m[4] + '</span>';
-    else { var w = m[5], nx = code[last]; out += KW.test(w) ? '<span class="t-k">' + w + '</span>' : BI.test(w) ? '<span class="t-b">' + w + '</span>' : nx === '(' ? '<span class="t-f">' + w + '</span>' : w; }
+    else { var w = m[5], nx = code[last]; out += K1.test(w) ? '<span class="t-k">' + w + '</span>' : B1.test(w) ? '<span class="t-b">' + w + '</span>' : nx === '(' ? '<span class="t-f">' + w + '</span>' : w; }
   }
   return out + esc(code.slice(last)) + '\n';
 }
-function Editor(box, code, onRun, onChange) {
-  var gut = h('div', { class: 'gut' }), pre = h('pre', { 'aria-hidden': 'true' }), ta = h('textarea', { spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', wrap: 'off', 'aria-label': 'Python code editor' });
+function Editor(box, code, onRun, onChange, lang) {
+  var gut = h('div', { class: 'gut' }), pre = h('pre', { 'aria-hidden': 'true' }), ta = h('textarea', { spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', wrap: 'off', 'aria-label': (lang === 'js' ? 'JavaScript' : 'Python') + ' code editor' });
   var ed = h('div', { class: 'ed' }, [gut, h('div', { class: 'edw' }, [pre, ta])]);
   box.appendChild(ed);
   var errLine = null;
   function paint() {
     var v = ta.value, lines = v.split('\n');
-    pre.innerHTML = hl(v);
+    pre.innerHTML = hl(v, lang);
     var g = ''; for (var i = 1; i <= lines.length; i++) g += '<div' + (i === errLine ? ' class="err"' : '') + '>' + i + '</div>';
     gut.innerHTML = g;
     var longest = lines.reduce(function (a, l) { return Math.max(a, l.length); }, 0);
@@ -356,7 +483,7 @@ function Editor(box, code, onRun, onChange) {
     }
     if (ev.key === 'Enter') {
       var ls2 = v.lastIndexOf('\n', s - 1) + 1, line = v.slice(ls2, s), ind = line.match(/^ */)[0];
-      if (/:\s*$/.test(line)) ind += '    ';
+      if (lang === 'js' ? /[{(\[]\s*$/.test(line) : /:\s*$/.test(line)) ind += lang === 'js' ? '  ' : '    ';
       ev.preventDefault(); ta.setRangeText('\n' + ind, s, e, 'end'); ta.dispatchEvent(new Event('input'));
     }
   });
@@ -405,7 +532,8 @@ function makeApi(id) {
       return kRun(code, null, function (t, e) { conAdd(t + '\n', e); }).then(function (m) { setBusy(false); if (m.error) conAdd(friendly(m.error) + '\n', true); return m; });
     },
     res: function (k) { return RES[k]; },
-    out: $('#out'), work: $('#work'), art: ART, getMech: function (k) { return SS(k).mech || {}; }
+    out: $('#out'), work: $('#work'), art: ART, getMech: function (k) { return SS(k).mech || {}; },
+    jsEval: jsEval, gpu: function () { return JSR.gpu; }
   };
 }
 function setBusy(b) { $('#kdot').className = 'kdot ' + (b ? 'busy' : 'ok'); }
@@ -415,9 +543,15 @@ var cur = { ed: null, viz: null };
 function openSub(id) {
   if (!SUB[id]) return;
   if (!openable(id)) { var b = firstBlock(id); id = b; }
-  var same = S.cur === id; S.cur = id; save();
+  var same = S.cur === id; S.cur = id; save(); updateGoal();
   renderNav(); renderWork(); renderOut();
   if (!same) { $('#work').scrollTop = 0; $('#out').scrollTop = 0; }
+}
+var GOAL1 = null;
+function updateGoal() {
+  var g = $('.goal'); if (!g) return; if (GOAL1 == null) GOAL1 = g.innerHTML;
+  var i3 = ORDER.indexOf('3g'), two = i3 >= 0 && ORDER.indexOf(S.cur) >= i3 && window.PG_STEP3_GOAL2;
+  g.innerHTML = two ? '<i>TARGET</i> ' + window.PG_STEP3_GOAL2 : GOAL1; g.classList.toggle('two', !!two);
 }
 function renderWork() {
   var id = S.cur, s = SUB[id], st = STEP_OF[id], w = $('#work'), ss = SS(id);
@@ -435,21 +569,24 @@ function renderWork() {
   if (s.example) card.appendChild(h('details', { class: 'ex' }, [h('summary', { text: 'Worked example (same idea, different values)' }), h('div', { class: 'exb', html: s.example })]));
   w.appendChild(card);
   if (s.predict) w.appendChild(renderPredict(id));
+  if (s.pre) { var pbx = h('div', { id: 'prebox' }); w.appendChild(pbx); s.pre.render(pbx, makePreApi(id)); }
+  if (s.long) w.appendChild(renderEpochs());
   cur.ed = null;
   if (s.kind === 'code') {
+    var js = s.lang === 'js';
     var box = h('div', { class: 'edbox' });
     var runB = h('button', { class: 'btn run', id: 'runbtn', text: '▶ RUN' });
-    var stopB = h('button', { class: 'btn stop', text: '■ Stop', style: 'display:none', title: 'Stops Python and restarts it. Your passed cells are rebuilt.' });
+    var stopB = h('button', { class: 'btn stop', text: '■ Stop', style: 'display:none', title: js ? 'Stops the run after the current batch.' : 'Stops Python and restarts it. Your passed cells are rebuilt.' });
     var resetB = h('button', { class: 'btn small', text: '↺ Reset this cell', title: 'Put back the starting code' });
     var copyB = h('button', { class: 'btn small', text: '⧉ Copy code' });
-    box.appendChild(h('div', { class: 'edbar' }, [h('span', { class: 'fn', text: 'cell_' + id + '.py — Python' }), h('span', { class: 'sp' }), copyB, resetB]));
-    cur.ed = Editor(box, ss.code || s.code, doRun, function (v) { ss.draft = v; save(); });
+    box.appendChild(h('div', { class: 'edbar' }, [h('span', { class: 'fn', text: js ? 'cell_' + id + '.js — JavaScript · TensorFlow.js' : 'cell_' + id + '.py — Python' }), h('span', { class: 'sp' }), copyB, resetB]));
+    cur.ed = Editor(box, ss.code || s.code, doRun, function (v) { ss.draft = v; save(); }, s.lang);
     if (ss.draft && ss.draft !== (ss.code || s.code)) cur.ed.set(ss.draft);
     var note = h('span', { class: 'note' });
     box.appendChild(h('div', { class: 'runrow' }, [runB, stopB, note, h('span', { class: 'note', style: 'margin-left:auto', text: 'Ctrl+Enter runs · Tab indents' })]));
-    w.appendChild(box);
+    if (s.twin) { var pair = h('div', { class: 'pair' }, [box, twinPanel(s)]); w.appendChild(pair); } else w.appendChild(box);
     runB.onclick = doRun;
-    stopB.onclick = function () { restartKernel(); };
+    stopB.onclick = function () { if (js) { JSR.k && JSR.k.stop(); stopB.textContent = '■ Stopping…'; } else restartKernel(); };
     resetB.onclick = function () { cur.ed.set(s.code); ss.draft = null; save(); };
     copyB.onclick = function () { copyText(cur.ed.get(), copyB); };
     cur.runB = runB; cur.stopB = stopB; cur.note = note;
@@ -459,11 +596,38 @@ function renderWork() {
     var stage = h('div', { class: 'scene', id: 'stage' }); w.appendChild(stage);
   }
 }
+function twinPanel(s) {
+  var copyB = h('button', { class: 'btn small', text: '⧉ Copy' });
+  copyB.onclick = function () { copyText(s.twin, copyB); };
+  var pre = h('pre', { class: 'twcode', html: hl(s.twin, 'py') });
+  return h('div', { class: 'twin' }, [h('div', { class: 'edbar' }, [h('span', { class: 'fn', html: '<b style="color:#ffcf6b">Same thing in Python Keras</b> · read-only · Keras 3' }), h('span', { class: 'sp' }), copyB]), pre]);
+}
+function renderEpochs() {
+  var box = h('div', { class: 'card epochs' });
+  var mode = epochsMode();
+  box.appendChild(h('div', { class: 'row' }, [h('b', { text: 'Training length:' })].concat(TEST_EPOCHS ? [h('span', { class: 'tagpill', text: 'test setting: ' + TEST_EPOCHS + ' epoch' + (TEST_EPOCHS > 1 ? 's' : '') + ' (from the page address)' })] :
+    [['quick', 'Quick · ' + EPOCHS.quick + ' epochs'], ['full', 'Full · ' + EPOCHS.full + ' epochs']].map(function (o) {
+      return h('button', { class: 'btn small' + (mode === o[0] ? ' on' : ''), text: o[1], onclick: function () { if (running) return; S.epochsMode = o[0]; save(); renderWork(); } });
+    }))));
+  var last = SS('3e').mech && SS('3e').mech.lastRes, per = last && last.hist && last.hist.length ? last.hist.reduce(function (a, x) { return a + x.sec; }, 0) / last.hist.length : null;
+  var g = JSR.gpu, soft = !JSR.ready ? '' : JSR.backend !== 'webgl' ? ' This browser has no WebGL, so TensorFlow.js uses the CPU: training will be VERY slow (many minutes per epoch).' : g && g.soft ? ' WebGL here runs on a software renderer (no graphics chip): expect several minutes per epoch.' : '';
+  box.appendChild(h('div', { class: 'hint', html: (per ? 'Your last run: <b>' + per.toFixed(1) + ' s per epoch</b> on ' + esc(last.backend.toUpperCase()) + ' → Quick ≈ ' + (per * EPOCHS.quick / 60).toFixed(1) + ' min, Full ≈ ' + (per * EPOCHS.full / 60).toFixed(1) + ' min. '
+    : 'Time depends on your graphics chip; the first epoch shows the real time and a countdown. ') + esc(soft) }));
+  return box;
+}
+function makePreApi(id) {
+  var a = makeApi(id), base = a.setMech;
+  a.setMech = function (patch) { var was = SUB[id].pre.need(SS(id).mech || {}); base(patch); if (was && !SUB[id].pre.need(SS(id).mech || {})) { updateRunBtn(); } };
+  return a;
+}
 function updateRunBtn() {
   if (!cur.runB) return;
   var s = SUB[S.cur], ss = SS(S.cur), why = '';
   if (!K.ready) why = 'Python is still loading (' + Math.round(100 * (prog.dataMB + prog.pyMB) / (prog.dataTotal + prog.pyTotal)) + '%). Wait a moment.';
   else if (replaying) why = 'Python is rebuilding your earlier cells. Wait a moment.';
+  else if (s.lang === 'js' && JSR.err) why = JSR.err;
+  else if (s.lang === 'js' && !JSR.ready) why = 'TensorFlow.js is still starting. Wait a moment.';
+  else if (s.pre && s.pre.need(ss.mech || {})) why = 'First do the hands-on part above: ' + s.pre.need(ss.mech || {}) + '.';
   else if (s.predict && !(ss.pred && ss.pred.locked)) why = 'Answer the prediction question above first.';
   else if (running) why = 'Code is running.';
   cur.runB.disabled = !!why; cur.runB.dataset.why = why;
@@ -504,6 +668,25 @@ function renderPredict(id) {
       var r = RES[id];
       if (r && SS(id).codePass) { var ok = r.best === pr.val; body.appendChild(h('div', { class: 'verdict ' + (ok ? 'good' : 'bad'), html: (ok ? '✓ Good bet. ' : '✗ Not this time. ') + 'You bet on <b>' + esc(pr.val) + '</b>. Winner: <b>' + esc(r.best) + '</b>. See the cards on the right.' })); }
       else body.appendChild(h('div', { class: 'verdict', style: 'background:#141028;border:1px solid #3d3368', html: 'Bet locked: <b>' + esc(pr.val) + '</b>. Now fill the gaps and run.' }));
+    }
+  } else if (P.format === 'draw') {
+    var holder2 = h('div'); body.appendChild(holder2);
+    var V3 = window.PGViz3;
+    if (!pr.locked) {
+      V3.drawGuess(holder2, P, { val: pr.sketch || null }, function (pts) { pr.sketch = pts; save(); }, false);
+      var hint2 = h('span', { class: 'hint', text: 'Draw from left to right, then tap Check. One try.' });
+      var ck = h('button', { class: 'btn', text: 'Check', onclick: function () {
+        var pts = pr.sketch || [], n = pts.filter(function (v) { return v != null; }).length;
+        if (n < 15) { hint2.textContent = 'Draw across most of the chart first (' + n + ' of 30 epochs drawn).'; return; }
+        var full = V3.fillGaps(pts); pr.good = P.judge(full) ? 1 : 0; lock(full);
+      } });
+      var clr = h('button', { class: 'btn small', text: 'Clear', onclick: function () { pr.sketch = null; save(); renderWork(); } });
+      body.appendChild(h('div', { class: 'row', style: 'margin-top:6px' }, [ck, clr, hint2]));
+    } else {
+      V3.drawGuess(holder2, P, pr, null, true);
+      body.appendChild(h('div', { class: 'verdict ' + (pr.good ? 'good' : 'bad'), html: pr.good ? '✓ Right. The validation score rises, then stops rising and slides down. The green dashes show the typical shape.' : '✗ Not quite. The validation score rises at first, then flattens and slides down if training goes on too long (green dashes). The train loss keeps falling; validation does not.' }));
+      body.appendChild(whyBox(P.reveal, 'Why (tap to open)'));
+      body.appendChild(h('div', { class: 'hint', text: 'After training, your real validation curve appears next to your sketch on the right.' }));
     }
   } else if (P.format === 'chart') {
     var holder = h('div'); body.appendChild(holder);
@@ -593,37 +776,43 @@ function refreshStatus() {
 }
 function nextHint(id) {
   var i = ORDER.indexOf(id), n = ORDER[i + 1];
-  if (!n) return 'Step 2 is complete.';
+  if (!n) return 'Step ' + STEP_OF[id].id + ' is complete.';
   return STEP_OF[n] !== STEP_OF[id] ? 'Step ' + STEP_OF[id].id + ' is complete — open Step ' + STEP_OF[n].id + ' in the list.' : 'Next: tap ' + n + ' “' + SUB[n].name + '” in the strip.';
 }
 
 /* ---------- run ---------- */
 function doRun() {
-  var id = S.cur, s = SUB[id], ss = SS(id);
+  var id = S.cur, s = SUB[id], ss = SS(id), js = s.lang === 'js';
   if (!cur.ed || cur.runB.disabled) return;
   var code = cur.ed.get(), gaps = (code.match(/____/g) || []).length;
   if (gaps) { VERD[id] = { pass: false, msg: 'Fill every gap marked ____ first (' + gaps + ' left). Type your answer in place of the underscores.' }; ERR[id] = null; showErr(null); refreshStatus(); cur.ed.focusGap(); return; }
   running = id; ERR[id] = null; showErr(null); VERD[id] = null; OUTTXT[id] = '';
   if (conEl) conEl.textContent = '';
   updateRunBtn(); refreshStatus(); setBusy(true);
-  if (K.mode !== 'page') cur.stopB.style.display = '';
+  if (K.mode !== 'page' || js) { cur.stopB.style.display = ''; cur.stopB.textContent = '■ Stop'; }
+  if (js && s.live) liveHook(id);
   var t0 = performance.now(), tick = setInterval(function () { var t = $('#otime'); if (t && running === id) t.textContent = ((performance.now() - t0) / 1000).toFixed(1) + ' s'; }, 100);
-  kRun(code, s.probe, function (t, e) { OUTTXT[id] += t + '\n'; if (S.cur === id) conAdd(t + '\n', e); }).then(function (m) {
-    clearInterval(tick); running = null; setBusy(false);
+  var outFn = function (t, e) { OUTTXT[id] += t + '\n'; if (S.cur === id) conAdd(t + '\n', e); };
+  (js ? jsRun(code, s.probe, outFn) : kRun(code, s.probe, outFn)).then(function (m) {
+    clearInterval(tick); running = null; setBusy(false); JSR.live = null;
     if (cur.stopB) cur.stopB.style.display = 'none';
     var t = $('#otime'); if (t) t.textContent = ((performance.now() - t0) / 1000).toFixed(1) + ' s';
-    if (m.error) {
-      ERR[id] = m.error; VERD[id] = { pass: false, msg: 'Python stopped with an error. Read the red box below.' };
+    if (m.error && m.error.type === 'Check') {
+      VERD[id] = { pass: false, msg: m.error.msg }; ss.codePass = false; save();
+      if (S.cur === id) { var vb0 = $('#vizbox'); if (vb0) vb0.innerHTML = ''; }
+    } else if (m.error) {
+      ERR[id] = m.error; VERD[id] = { pass: false, msg: m.error.type === 'Stopped' ? m.error.msg : (js ? 'JavaScript stopped with an error. Read the red box below.' : 'Python stopped with an error. Read the red box below.') };
       ss.codePass = false; save();
-      if (S.cur === id) { showErr(m.error); if (m.error.line && cur.ed) cur.ed.mark(m.error.line); }
+      if (S.cur === id) { showErr(m.error); if (m.error.line && cur.ed) cur.ed.mark(m.error.line); if (js && s.live && JSR.T && JSR.T.state && JSR.T.state.hist.length) { var vb1 = $('#vizbox'); if (vb1) { vb1.innerHTML = ''; window.PGViz3.curvesLive(vb1, makeApi(id)).update(JSR.T.state); } } }
     } else if (m.probe && m.probe.probe_error) {
       VERD[id] = { pass: false, msg: 'The checker could not read your results (' + m.probe.probe_error + '). Did you rename a variable?' }; ss.codePass = false; save();
     } else {
       RES[id] = m.probe; var v = s.check(m.probe); VERD[id] = v;
-      ss.codePass = !!v.pass; if (v.pass) { ss.code = code; } save();
+      ss.codePass = !!v.pass; if (v.pass) { ss.code = code; if (ss.mech) { ss.mech.lost = 0; ss.mech.stale = 0; } if (js) invalidateAfter(id); } save();
+      if (id === '3e' && v.pass) { var r = m.probe; ss.mech.lastRes = { epochs: r.epochs, done: r.done, hist: r.hist, best: r.best, restored: r.restored, sec: r.sec, backend: r.backend, gpu: r.gpu, nTrain: r.nTrain, nDef: r.nDef, cw: r.cw, quick: r.quick }; save(); }
       if (S.cur === id) drawViz(id);
       if (id === '2a' && v.pass && ss.mech) { ss.mech.keptCmd = null; ss.mech.kept = null; save(); }
-      if (s.predict && s.predict.format !== 'number' && v.pass && S.cur === id) { var pb = $('#predbox'); if (pb) pb.replaceWith(renderPredict(id)); }
+      if (s.predict && s.predict.format !== 'number' && s.predict.format !== 'draw' && v.pass && S.cur === id) { var pb = $('#predbox'); if (pb) pb.replaceWith(renderPredict(id)); }
       if (!OUTTXT[id] && conEl) conAdd('(no printed output)');
     }
     if (S.cur === id) refreshStatus();
@@ -662,6 +851,8 @@ if (licEl) licEl.addEventListener('click', function () {
     document.body.appendChild(z);
   });
 });
+initJS();
 route();
-window.PG = { PYODIDE_BASE: PYODIDE_BASE, pack: function () { return PACK; }, S: S, RES: RES, VERD: VERD, K: K, openSub: openSub, passed: passed, pendingOf: pendingOf, ORDER: ORDER, kEval: kEval, ready: function () { return K.ready && !replaying; } };
+window.PG = { PYODIDE_BASE: PYODIDE_BASE, pack: function () { return PACK; }, S: S, RES: RES, VERD: VERD, K: K, JSR: JSR, openSub: openSub, passed: passed, pendingOf: pendingOf, ORDER: ORDER, kEval: kEval, epochs: epochsNow,
+  ready: function () { return K.ready && !replaying; }, running: function () { return running; } };
 })();

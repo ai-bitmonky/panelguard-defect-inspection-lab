@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build ONE self-contained HTML file from site/ (same code, no fork).
 
-- every <script src="js/..."> is inlined, plus js/pyworker.js (the page-thread kernel core and the worker source)
+- every <script src="js/..."> is inlined (including TensorFlow.js, js/tf.min.js), plus js/pyworker.js (the page-thread kernel core and the worker source)
 - own data files go into window.PG_EMBED (text inline, binaries base64); engine.js pgFetch() reads them
 - Pyodide still comes from the single PYODIDE_BASE constant in engine.js (CDN)
 Usage: python3 tools/build_single.py
@@ -10,7 +10,6 @@ import base64, json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SITE = ROOT / 'site'
-OUT = ROOT / 'dist' / 'PanelGuard_Defect_Inspection_Lab_v0.1.html'
 TYPES = {'.png': 'image/png', '.json': 'application/json', '.md': 'text/markdown', '.js': 'text/javascript'}
 
 
@@ -30,6 +29,8 @@ def main():
         add('data/full/cell%04d.png' % pid, True)
 
     html = (SITE / 'index.html').read_text('utf-8')
+    ver = re.search(r'<title>[^<]*\b(v\d+\.\d+)</title>', html).group(1)       # file name follows the visible version
+    OUT = ROOT / 'dist' / ('PanelGuard_Defect_Inspection_Lab_%s.html' % ver)
     scripts = re.findall(r'<script src="(js/[\w.]+)"></script>', html)
     assert scripts, 'no scripts found'
     for s in scripts:

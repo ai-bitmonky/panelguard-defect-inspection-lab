@@ -209,7 +209,8 @@ function sceneGame(s, stage, out, api) {
   draw(); side();
 }
 function scene(s, stage, out, api) {
-  return ({ station: sceneStation, defects: sceneDefects, mistakes: sceneMistakes, game: sceneGame })[s.scene](s, stage, out, api);
+  var f = ({ station: sceneStation, defects: sceneDefects, mistakes: sceneMistakes, game: sceneGame })[s.scene] || (window.PGViz3 && window.PGViz3[s.scene]);
+  return f(s, stage, out, api);
 }
 
 /* ================= STEP 1 ================= */
@@ -605,5 +606,5 @@ function endCard(box, RES, api) {
   box.appendChild(c);
 }
 
-window.PGViz = { scene: scene, wall: wall, unitChart: unitChart, binLine: binLine, trays: trays, lens: lens, chips: chips, race: race, gate: gate, guessChart: guessChart, target: target, report: report, endCard: endCard };
+window.PGViz = { _h: { el: el, card: card, tiles: tiles, thumb: thumb, svg: svg, pct: pct, zoomIn: zoomIn, probCol: probCol }, scene: scene, wall: wall, unitChart: unitChart, binLine: binLine, trays: trays, lens: lens, chips: chips, race: race, gate: gate, guessChart: guessChart, target: target, report: report, endCard: endCard };
 })();

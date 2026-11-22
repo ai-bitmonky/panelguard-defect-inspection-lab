@@ -109,7 +109,8 @@ function fillImages(root, api) {
 var MON = {
   0: { monitor: 'STOP?', monitorSub: 'you decide', monitorTitle: 'CELL 0006' },
   1: { monitor: '2,624', monitorSub: 'real photos', monitorTitle: 'DATA', monitorColor: '#46e3ff' },
-  2: { monitor: 'SCORE', monitorSub: 'model decides', monitorTitle: 'MODEL', monitorColor: '#ffb547' }
+  2: { monitor: 'SCORE', monitorSub: 'model decides', monitorTitle: 'MODEL', monitorColor: '#ffb547' },
+  3: { monitor: 'CNN', monitorSub: 'learns filters', monitorTitle: 'NETWORK', monitorColor: '#a98bff' }
 };
 function banner(el, stepId, api) {
   var o = Object.assign({ vb: '290 20 510 210' }, MON[stepId] || MON[0]);

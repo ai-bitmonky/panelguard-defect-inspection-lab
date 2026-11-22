@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
-const html = fs.readFileSync('../dist/PanelGuard_Defect_Inspection_Lab_v0.1.html','utf8');
+const html = fs.readFileSync('../dist/PanelGuard_Defect_Inspection_Lab_v0.3.html','utf8');
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true }); const p = await b.newPage();
 const errs=[]; p.on('pageerror',e=>errs.push('PAGEERR '+e.message)); p.on('console',m=>{if(m.type()==='error')errs.push('CONSOLE '+m.text().slice(0,200))});
 for (const sb of ['allow-scripts','allow-scripts allow-same-origin', null]) {

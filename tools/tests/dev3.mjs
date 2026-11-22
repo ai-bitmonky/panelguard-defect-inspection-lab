@@ -1,0 +1,20 @@
+// Dev smoke: seeded Steps 0-2, open a Step 3 substep, print console errors. Usage: node dev3.mjs [sub]
+import { chromium } from 'playwright'; import { mirrorCDN } from './cdn.mjs'; import { spawn } from 'child_process';
+import path from 'path'; import { fileURLToPath } from 'url'; import { loadSteps, seedState, KEY } from './seed.mjs';
+const here = path.dirname(fileURLToPath(import.meta.url)); const site = path.resolve(here, '../../site');
+const srv = spawn('node', [path.resolve(here, '../serve.mjs'), site, '8766'], { stdio: 'pipe' }); await new Promise((r) => srv.stdout.once('data', r));
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
+const p = await b.newPage({ viewport: { width: 1366, height: 768 } }); await mirrorCDN(p.context());
+const errs = []; p.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.type() + ': ' + m.text().slice(0, 300)); }); p.on('pageerror', (e) => errs.push('PAGEERR ' + e.message + ' ' + (e.stack || '').split('\n')[1]));
+const { SUBS } = loadSteps();
+await p.goto('http://localhost:8766/index.html?pgEpochs=1');
+await p.evaluate(([k, v]) => localStorage.setItem(k, v), [KEY, seedState(SUBS)]);
+await p.reload();
+const t0 = Date.now();
+await p.waitForFunction(() => window.PG && window.PG.ready() && window.PG.RES['2e'] && window.PG.JSR.ready, null, { timeout: 400000 });
+console.log('ready after', (Date.now() - t0) / 1000, 's', await p.evaluate(() => [window.PG.JSR.backend, JSON.stringify(window.PG.JSR.gpu)]));
+await p.evaluate((i) => { location.hash = '#sub-' + i; }, process.argv[2] || '3a'); await p.waitForTimeout(1500);
+await p.screenshot({ path: path.resolve(here, '../shots/dev3.png') });
+console.log(await p.evaluate(() => window.PG.S.cur + ' | ' + window.PG.pendingOf(window.PG.S.cur)));
+console.log('errors:', errs);
+await b.close(); srv.kill();

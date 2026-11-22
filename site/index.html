@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>PanelGuard — Solar Panel Defect Inspection Lab v0.1</title>
+<title>PanelGuard — Solar Panel Defect Inspection Lab v0.3</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root{
@@ -170,6 +170,15 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
 .endc{border:1px solid #2f5d86;background:linear-gradient(135deg,#0b1a2a,#0d0f22);border-radius:14px;padding:14px}
 .endc h3{margin:0 0 6px;font-size:15px;color:#fff}
 .endc ul{margin:6px 0;padding-left:20px}
+/* step 3: twin code, training length, two-gate target */
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:10px;margin-bottom:10px;align-items:start}
+.pair .edbox{margin-bottom:0}
+.twin{border:1px solid #4a3d16;border-radius:12px;overflow:hidden;background:#0b0a06}
+.twin .edbar{background:#14110a;border-bottom-color:#3a3010}
+.twcode{margin:0;padding:10px 12px;font-family:var(--fm);font-size:12.5px;line-height:19px;white-space:pre;overflow:auto;max-height:52vh;color:#cfe1f5}
+.epochs{padding:8px 12px}.epochs .btn.on{border-color:var(--cy);background:#0f2232;color:#fff}
+.goal.two{border-color:#5c4610;background:#151109;white-space:normal;max-width:620px;font-size:13px;line-height:1.15}
+@media (max-width:1400px){.goal.two{max-width:440px}}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#1c2736;border-radius:6px}::-webkit-scrollbar-track{background:transparent}
 </style>
 </head>
@@ -178,10 +187,11 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
   <header class="top">
     <div class="brand">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#46e3ff"/><stop offset="1" stop-color="#3dffa0"/></linearGradient></defs><path d="M15 2 27 8v8c0 6-5 10-12 12C8 26 3 22 3 16V8z" fill="none" stroke="url(#lg)" stroke-width="2"/><rect x="9" y="9" width="12" height="12" rx="1.5" fill="#0d2233" stroke="#46e3ff"/><path d="M9 13h12M9 17h12" stroke="#46e3ff" stroke-width=".8"/></svg>
-      <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v0.1 preview</span>
+      <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v0.3 preview</span>
     </div>
     <div class="goal" title="The business target for every model in this course"><i>TARGET</i> catch at least&nbsp;<b>95 of every 100</b>&nbsp;defective cells, and count the good cells stopped</div>
     <div class="kstat"><span class="kdot" id="kdot"></span><span id="ktext">Python loading…</span></div>
+    <div class="kstat" id="tstat" style="min-width:0"><span class="kdot"></span>TensorFlow.js loading…</div>
   </header>
   <div class="loader" id="loader">
     <div class="ltext" id="ltext"><b>LOADING</b>Getting Python and the photos ready…</div>
@@ -196,12 +206,16 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
     <div class="rz" id="rz2" title="Drag to resize"></div>
     <section class="out" id="out"></section>
   </div>
-  <footer class="foot" title="Data licence: CC BY-NC-SA 4.0. Full text in data/LICENSE.md">Data: ELPV dataset (Buerhop-Lutz et al. 2018, EU PVSEC; Deitsch et al. 2019, Solar Energy; Deitsch et al. 2021, Machine Vision and Applications) · licence CC BY-NC-SA 4.0 · photos downscaled to 64×64 · <a id="lic" href="#" onclick="return false" style="color:#8d9bb0">full licence text</a> · Python: Pyodide + scikit-learn in your browser</footer>
+  <footer class="foot" title="Data licence: CC BY-NC-SA 4.0. Full text in data/LICENSE.md">Data: ELPV dataset (Buerhop-Lutz et al. 2018, EU PVSEC; Deitsch et al. 2019, Solar Energy; Deitsch et al. 2021, Machine Vision and Applications) · licence CC BY-NC-SA 4.0 · photos downscaled to 64×64 · <a id="lic" href="#" onclick="return false" style="color:#8d9bb0">full licence text</a> · Python: Pyodide + scikit-learn · TensorFlow.js — all in your browser · PanelGuard v0.3</footer>
 </div>
 <div class="tip" id="tip"></div>
+<script src="js/tf.min.js"></script>
 <script src="js/steps.js"></script>
+<script src="js/step3.js"></script>
+<script src="js/jskernel.js"></script>
 <script src="js/art.js"></script>
 <script src="js/viz.js"></script>
+<script src="js/viz3.js"></script>
 <script src="js/engine.js"></script>
 </body>
 </html>

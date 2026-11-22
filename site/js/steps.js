@@ -584,7 +584,7 @@ var step2 = {
 };
 
 var LOCKED = [
-  { id: 3, title: 'Train a CNN with Keras + TensorFlow' },
+  { id: 3, title: 'Train a CNN with Keras + TensorFlow' },   // replaced by js/step3.js when loaded
   { id: 4, title: 'See what the model looks at (heat maps, error gallery)' },
   { id: 5, title: 'Wire the inspection flow with LangGraph (pass / stop / send to human)' },
   { id: 6, title: 'Add the CrewAI quality crew (inspector, root-cause analyst, shift-report writer)' },
