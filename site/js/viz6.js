@@ -293,12 +293,13 @@ function controlRoom(r, host, api) {
     if (e) {
       var b = bubbleOf(e), w = workerOf(e.agent), col = BCOL[b.cls] || BCOL.note, light = b.cls === 'answer';
       var bb = el('div'); bb.id = 'bubble6';
-      bb.style.cssText = 'position:absolute;top:' + PAD + 'px;left:' + (w.x / 6.4) + '%;transform:translate(' + (w.x < 200 ? '-18%' : w.x > 440 ? '-82%' : '-50%') + ',-100%);max-width:76%;min-width:150px;padding:6px 9px;border-radius:12px;font-size:12px;line-height:1.35;white-space:pre-wrap;' +
+      bb.style.cssText = 'position:absolute;top:' + PAD + 'px;left:' + (w.x / 6.4) + '%;transform:translate(' + (w.x < 200 ? '-18%' : w.x > 440 ? '-82%' : '-50%') + ',-100%);max-width:76%;min-width:210px;padding:6px 9px;border-radius:12px;font-size:12px;line-height:1.35;white-space:pre-wrap;' +
         'background:' + col[0] + ';color:' + (light ? '#16202c' : '#e6eef8') + ';border:' + (b.cls === 'thought' ? '2px dashed ' : '2px solid ') + col[1] + ';box-shadow:0 4px 18px #000a;z-index:2;cursor:pointer';
       bb.innerHTML = '<div style="font-family:Orbitron,Arial;font-size:9px;letter-spacing:.12em;color:' + (light ? '#5b48a0' : col[1]) + ';margin-bottom:2px">' + esc(w.role.toUpperCase()) + ' · ' + esc(b.head) + '</div>' + esc(b.body) +
         '<i style="position:absolute;bottom:-9px;left:' + (w.x < 200 ? '18%' : w.x > 440 ? '82%' : '50%') + ';width:14px;height:14px;background:' + col[0] + ';border-right:2px solid ' + col[1] + ';border-bottom:2px solid ' + col[1] + ';transform:translateX(-50%) rotate(45deg)"></i>';
       bb.onclick = step; wrap.appendChild(bb);
-      var svH = wrap.querySelector('svg').getBoundingClientRect().height || 200; bb.style.top = (PAD + svH * (e.type === 'task_start' ? 0.31 : 0.39)) + 'px';
+      var svH = wrap.querySelector('svg').getBoundingClientRect().height || 200, hy = svH * (e.type === 'task_start' ? 0.31 : 0.39), pad = Math.max(PAD, bb.offsetHeight + 14 - hy);
+      wrap.style.paddingTop = pad + 'px'; bb.style.top = (pad + hy) + 'px';
     }
     wrap.querySelector('svg').addEventListener('click', function (ev2) { var g = ev2.target.closest && ev2.target.closest('[data-worker]'); if (g && !done && workerOf(nextRole()).key === g.getAttribute('data-worker')) step(); else if (g) shake(wrap); });
     ctrl.innerHTML = '';

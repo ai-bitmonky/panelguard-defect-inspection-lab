@@ -302,7 +302,7 @@ function refreshBridge() {
       live: JSR.T.live, trainingWatch: JSR.T.watch, trainState: function () { return JSR.T.state; },
       falseAlarmAt95: J.falseAlarmAt95, twoGates: J.twoGates, gatesFor: window.PG_STEP3_gatesFor, auc: J.auc,
       saveModel: saveModel,
-      mechOf: function (id) { try { return JSON.parse(JSON.stringify(SS(id).mech || {})); } catch (e) { return {}; } }   // read-only copy (Step 6 action_list reads the 4f boxes)
+      mechOf: function (id) { try { var rv = REVIEW && RV.subs[id] && RV.subs[id].mech && Object.keys(RV.subs[id].mech).length ? RV.subs[id] : S.subs[id]; return JSON.parse(JSON.stringify((rv && rv.mech) || {})); } catch (e) { return {}; } }   // read-only copy (Step 6 action_list reads the student's 4f boxes; never creates entries)
     };
     pg.rough = !!(REVIEW && RES['3e'] && RES['3e'].quick === 'review');
     if (window.PG_PG_EXTRA) Object.assign(pg, window.PG_PG_EXTRA(pg));
