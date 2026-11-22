@@ -20,12 +20,18 @@ const page = await browser.newPage({ viewport: { width: W, height: H } }); await
 const errors = [], external = [], failed = [];
 page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push('PAGEERROR ' + e.message));
-page.on('request', (r) => { const u = r.url(); if (!u.startsWith('http://localhost:' + PORT) && !u.startsWith('blob:') && !u.startsWith('data:')) external.push(u); });
+page.on('request', (r) => { const u = r.url(); if (!u.startsWith('http://localhost:' + PORT) && !u.startsWith('file:') && !u.startsWith('blob:') && !u.startsWith('data:')) external.push(u); });
 page.on('requestfailed', (r) => failed.push(r.url() + ' ' + (r.failure() && r.failure().errorText)));
 let n = 0; const shot = async (name) => { await page.screenshot({ path: `${shots}/${W}_${String(++n).padStart(2, '0')}_${name}.png` }); };
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 const t0 = Date.now();
-await page.goto(`http://localhost:${PORT}/index.html`);
+const TARGET = process.env.TARGET || `http://localhost:${PORT}/index.html`;
+log('target', TARGET);
+await page.goto(TARGET);
+{ await page.waitForFunction(() => window.PG && window.PG.pack(), null, { timeout: 60000 });
+  const ref = (await import('crypto')).createHash('sha256').update(fs.readFileSync(path.resolve(here, '../ref/cells64.u8'))).digest('hex');
+  const got = await page.evaluate(async () => { const h = await crypto.subtle.digest('SHA-256', window.PG.pack()); return [...new Uint8Array(h)].map((x) => x.toString(16).padStart(2, '0')).join(''); });
+  log('atlas sha256', got === ref ? 'IDENTICAL to cells64.u8' : 'DIFFERENT ' + got); if (got !== ref) errors.push('atlas hash mismatch'); }
 await page.waitForTimeout(1500); await shot('loading');
 const passed = (id) => page.evaluate((i) => window.PG.passed(i), id);
 const mech = (id) => page.evaluate((i) => (window.PG.S.subs[i] || {}).mech || {}, id);
@@ -53,7 +59,7 @@ await page.waitForTimeout(400); await shot('0d'); await expectPass('0d');
 
 // ---------- wait for Python ----------
 await page.waitForFunction(() => window.PG && window.PG.ready(), null, { timeout: 240000 });
-log('python ready after', ((Date.now() - t0) / 1000).toFixed(1), 's', await page.locator('#ktext').innerText());
+log('kernel mode', await page.evaluate(() => window.PG.K.mode)); log('python ready after', ((Date.now() - t0) / 1000).toFixed(1), 's', await page.locator('#ktext').innerText());
 
 const setCode = async (code) => { await page.locator('.edw textarea').fill(code); await page.locator('.ed').evaluate((e) => { e.scrollTop = 0; e.scrollLeft = 0; }); };
 const run = async (id, timeout = 180000) => {
@@ -131,7 +137,7 @@ log('reload + replay rebuilt in', ((Date.now() - tr) / 1000).toFixed(1), 's; 2e 
 await open('2c'); await page.waitForTimeout(500); await shot('2c_after_reload');
 // locked tooltip text check: clear progress in a fresh context
 const p2 = await browser.newPage({ viewport: { width: W, height: H } }); await mirrorCDN(p2.context());
-await p2.goto(`http://localhost:${PORT}/index.html#sub-2b`); await p2.evaluate(() => { try { localStorage.clear(); } catch (e) {} }); await p2.reload(); await p2.waitForTimeout(800);
+await p2.goto(TARGET + '#sub-2b'); await p2.evaluate(() => { try { localStorage.clear(); } catch (e) {} }); await p2.reload(); await p2.waitForTimeout(800);
 const lockTxt = await p2.evaluate(() => window.PG.S.cur);
 await p2.locator('.snode').nth(3).hover(); await p2.waitForTimeout(200); const tip = await p2.locator('#tip').innerText();
 log('fresh visit to #sub-2b landed on', lockTxt, '| locked tooltip:', tip);

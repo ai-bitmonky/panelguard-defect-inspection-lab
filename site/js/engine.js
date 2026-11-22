@@ -17,6 +17,16 @@ function h(tag, attrs, kids) {
 }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 var BASE = new URL('./', location.href).href;
+/* Own files: fetched normally, or taken from window.PG_EMBED when the single-file build is used (tools/build_single.py). */
+var EMB = window.PG_EMBED || null;
+function b64bytes(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+function pgFetch(path) {
+  if (!EMB) return fetch(path);
+  var e = EMB[path];
+  if (e == null) return Promise.resolve(new Response('not embedded: ' + path, { status: 404 }));
+  var body = e.b64 != null ? new Blob([b64bytes(e.b64)], { type: e.type }) : new Blob([e.text], { type: e.type });
+  return Promise.resolve(new Response(body, { status: 200, headers: { 'content-type': e.type, 'content-length': String(body.size) } }));
+}
 /* The ONE place that says where Python comes from (Pyodide runtime + wheels, same versions as pyodide-lock.json). */
 var PYODIDE_BASE = 'https://cdn.jsdelivr.net/pyodide/v314.0.8/full/';
 
@@ -65,12 +75,12 @@ function fatal(msg) {
   $('#kdot').className = 'kdot bad'; $('#ktext').textContent = 'Python not available';
 }
 function loadData() {
-  return fetch('data/labels.json').then(function (r) { if (!r.ok) throw new Error('labels.json: HTTP ' + r.status); return r.text(); }).then(function (txt) {
+  return pgFetch('data/labels.json').then(function (r) { if (!r.ok) throw new Error('labels.json: HTTP ' + r.status); return r.text(); }).then(function (txt) {
     LAB = JSON.parse(txt); LAB.text = txt;
     LAB.rows.forEach(function (r, i) { ID2I[r[0]] = i; });
     var n = LAB.rows.length, nd = LAB.rows.filter(function (r) { return r[1] >= 0.5; }).length;
     D = { n: n, nDef: nd, nOk: n - nd };
-    return fetch(ATLAS);
+    return pgFetch(ATLAS);
   }).then(function (r) {
     if (!r.ok) throw new Error(ATLAS + ': HTTP ' + r.status);
     var total = +r.headers.get('content-length') || 5623008; prog.dataTotal = total / 1048576;
@@ -113,12 +123,12 @@ function cellCanvas(id) {
   x.putImageData(im, 0, 0); return (CC[id] = c);
 }
 function drawCell(ctx, id, x, y, s) { var c = cellCanvas(id); if (c) ctx.drawImage(c, x, y, s, s); }
-var fullIdsP = fetch('data/full/index.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+var fullIdsP = pgFetch('data/full/index.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
 function fullURL(id) {
   if (FULL[id]) return FULL[id];
   return (FULL[id] = fullIdsP.then(function (ids) {
     if (ids.indexOf(id) < 0) return null;
-    return fetch('data/full/cell' + ('000' + id).slice(-4) + '.png').then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) { return b ? URL.createObjectURL(b) : null; });
+    return pgFetch('data/full/cell' + ('000' + id).slice(-4) + '.png').then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) { return b ? URL.createObjectURL(b) : null; });
   }).catch(function () { return null; }));
 }
 function meta(id) { var r = LAB && LAB.rows[ID2I[id]]; return r ? { id: r[0], prob: r[1], kind: r[2] } : null; }
@@ -150,10 +160,12 @@ function spawn(mode, dataP) {
   var init = { cmd: 'init', pyBase: PYODIDE_BASE, help: window.PG_PY_HELP };
   if (mode === 'page') {
     var s2 = h('script', { src: 'js/pyworker.js' });
-    s2.onload = function () {
+    var startPage = function () {
       import(PYODIDE_BASE + 'pyodide.mjs').then(function (mod) { K.pageHandle = window.PGKernelCore(konmsg, mod.loadPyodide, window.PG_PY_HELP); K.pageHandle(init); dataP.then(sendData); },
         function (e) { fatal('Could not load ' + PYODIDE_BASE + 'pyodide.mjs — ' + (e && e.message || e)); });
     };
+    if (window.PGKernelCore) { startPage(); return; }
+    s2.onload = startPage;
     s2.onerror = function () { fatal('js/pyworker.js could not be loaded.'); };
     document.head.appendChild(s2); return;
   }
@@ -173,7 +185,7 @@ function spawn(mode, dataP) {
     dataP.then(sendData);
   };
   if (mode === 'file') go('js/pyworker.js');
-  else fetch('js/pyworker.js').then(function (r) { return r.text(); }).then(function (t) { go(URL.createObjectURL(new Blob([t], { type: 'text/javascript' }))); }).catch(fail);
+  else pgFetch('js/pyworker.js').then(function (r) { return r.text(); }).then(function (t) { go(URL.createObjectURL(new Blob([t], { type: 'text/javascript' }))); }).catch(fail);
 }
 function kcall(msg, out) {
   var id = 'k' + (++K.seq); msg.id = id;
@@ -639,8 +651,17 @@ prog.text = 'Downloading 2,624 real cell photos (5.4 MB)…';
 var dataP = loadData();
 dataP.then(function () { if (S.cur) { if (SUB[S.cur].kind === 'scene') renderOut(); } }).catch(function (e) { fatal('The photo pack could not be loaded: ' + e.message); });
 if (typeof WebAssembly === 'undefined') fatal('This browser has no WebAssembly, so Python cannot run here.');
-else spawn(typeof Worker === 'undefined' ? 'page' : 'file', dataP);
+else spawn(typeof Worker === 'undefined' ? 'page' : (EMB ? 'blob' : 'file'), dataP);
 whenReady().then(replay).then(function () { refreshStatus(); });
+var licEl = document.getElementById('lic');
+if (licEl) licEl.addEventListener('click', function () {
+  pgFetch('data/LICENSE.md').then(function (r) { return r.text(); }).then(function (t) {
+    var z = h('div', { class: 'zoom', style: 'position:fixed;z-index:70;align-items:stretch;justify-content:flex-start' });
+    z.appendChild(h('button', { class: 'btn small', text: '✕ Close', style: 'align-self:flex-end', onclick: function () { z.remove(); } }));
+    z.appendChild(h('pre', { text: t, style: 'white-space:pre-wrap;overflow:auto;flex:1;font-size:12px;color:#c6d2e2;max-width:900px;margin:0 auto' }));
+    document.body.appendChild(z);
+  });
+});
 route();
 window.PG = { PYODIDE_BASE: PYODIDE_BASE, pack: function () { return PACK; }, S: S, RES: RES, VERD: VERD, K: K, openSub: openSub, passed: passed, pendingOf: pendingOf, ORDER: ORDER, kEval: kEval, ready: function () { return K.ready && !replaying; } };
 })();
