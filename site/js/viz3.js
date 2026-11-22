@@ -423,9 +423,10 @@ function curveChart(hist, epochs, opt) {
   var losses = []; hist.forEach(function (h) { if (h.loss != null) losses.push(h.loss); losses.push(h.valLoss); });
   var lmax = Math.max(0.8, Math.max.apply(null, losses.length ? losses : [1]) * 1.05);
   var YL = function (v) { return B - (B - Tt) * v / lmax; };
-  var amin = 0.5, YA = function (v) { return B - (B - Tt) * (Math.max(amin, v) - amin) / (1 - amin); };
+  var aucs = hist.map(function (h) { return h.valAuc; }).filter(isFinite), amin = Math.min(0.5, Math.floor((Math.min.apply(null, aucs.length ? aucs : [0.5]) - 0.02) * 10) / 10);
+  var YA = function (v) { return B - (B - Tt) * (Math.max(amin, v) - amin) / (1 - amin); };
   var o = '<rect x="' + L + '" y="' + Tt + '" width="' + (R - L) + '" height="' + (B - Tt) + '" fill="#070b11" stroke="#1b2533"/>';
-  [0.5, 0.6, 0.7, 0.8, 0.9, 1].forEach(function (v) { o += '<line x1="' + L + '" x2="' + R + '" y1="' + YA(v) + '" y2="' + YA(v) + '" stroke="#121b28"/>' + T(R + 4, YA(v) + 4, v.toFixed(1), { s: 10, f: 'Space Mono,monospace', c: '#46e3ff' }); });
+  [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1].filter(function (v) { return v >= amin - 1e-9; }).forEach(function (v) { o += '<line x1="' + L + '" x2="' + R + '" y1="' + YA(v) + '" y2="' + YA(v) + '" stroke="#121b28"/>' + T(R + 4, YA(v) + 4, v.toFixed(1), { s: 10, f: 'Space Mono,monospace', c: '#46e3ff' }); });
   [0, lmax / 2, lmax].forEach(function (v) { o += T(L - 4, YL(v) + 4, v.toFixed(2), { s: 10, f: 'Space Mono,monospace', c: '#ffb547', a: 'end' }); });
   var ticks = E <= 10 ? Array.from({ length: E }, function (_, i) { return i + 1; }) : [1, 5, 10, 15, 20, 25, 30].filter(function (e) { return e <= E; });
   ticks.forEach(function (e) { o += T(X(e), B + 13, e, { a: 'middle', s: 10, f: 'Space Mono,monospace', c: '#8d9bb0' }); });
@@ -474,7 +475,7 @@ function blend(r, host, api) {
   var c = card(host, 'SIDE BY SIDE — VALIDATION TRAY', r.n + ' cells, each model at its own 95%-recall cutoff. Live numbers.');
   var k = 1000 / r.n, rows = [[r.baseline + ' (Step 2)', r.base], ['CNN alone', r.cnn], ['Blend (CNN weight ' + r.bestW + ')', r.blend]];
   var best = Math.min(r.base.far, r.cnn.far, r.blend.far);
-  var t = '<table style="width:100%;border-collapse:collapse;font-size:14px"><tr style="color:#8d9bb0;font-size:12px;text-align:right"><td style="text-align:left">model</td><td>ranking score</td><td>recall</td><td>false-alarm rate</td><td>per 1,000: defects missed</td><td>good cells stopped</td></tr>';
+  var t = '<style>.sbs td{padding:4px 5px}</style><table class="sbs" style="width:100%;border-collapse:collapse;font-size:14px"><tr style="color:#8d9bb0;font-size:12px;text-align:right"><td style="text-align:left">model</td><td>ranking score</td><td>recall</td><td>false-alarm rate</td><td>per 1,000: defects missed</td><td>good cells stopped</td></tr>';
   rows.forEach(function (x) { var q = x[1], b = q.far === best; t += '<tr style="border-top:1px solid #1b2533;text-align:right' + (b ? ';color:#3dffa0;font-weight:700' : '') + '"><td style="text-align:left;padding:5px 2px">' + x[0] + '</td><td>' + f3(q.auc) + '</td><td>' + pct(q.rec) + '</td><td>' + pct(q.far) + '</td><td>' + n0(q.fn * k) + '</td><td><b>' + n0(q.fp * k) + '</b></td></tr>'; });
   c.appendChild(el('div', null, t + '</table>'));
   var cnnWins = r.cnn.far < r.base.far;
