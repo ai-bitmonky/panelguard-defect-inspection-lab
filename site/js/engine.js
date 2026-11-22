@@ -62,6 +62,8 @@ function setReview(on) {
   } catch (e) { location.reload(); }
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(REVIEW ? Object.assign({}, S, { cur: RV.studentCur }) : S)); } catch (e) {} }
+/* very small screens: a plain note first (\u201cShow it anyway\u201d hides it for this visit) */
+(function () { var b = document.getElementById('smallgo'); if (b) b.onclick = function () { document.body.classList.add('bigok'); }; })();
 /* storage blocked (e.g. a sandboxed frame without same-origin): say so plainly, once, in the footer */
 (function () {
   var ok = true; try { localStorage.setItem(KEY + '.probe', '1'); localStorage.removeItem(KEY + '.probe'); } catch (e) { ok = false; }
@@ -426,10 +428,14 @@ function friendly(e) {
   if ((x = m.match(/index (\d+) is out of bounds for axis (\d+) with size (\d+)/))) return 'There is no position ' + x[1] + ' there: that axis has only ' + x[3] + ' entries (0 to ' + (x[3] - 1) + ').';
   if ((x = m.match(/module 'numpy' has no attribute '(.+?)'/))) return 'numpy has nothing called “' + x[1] + '”. Check the spelling.';
   if (/n_splits=1/.test(m) || /at least one train\/test split/.test(m)) return 'Cross-validation needs at least 2 folds.';
-  if (t === 'KeyError') return 'There is no entry called ' + m + '.';
-  if (t === 'TypeError') return 'A value has the wrong type: ' + m;
-  if (t === 'ValueError') return 'A value is not allowed here: ' + m;
-  return t + ': ' + m;
+  if (/did not contain a loop with signature matching types.*Str|not supported between instances of .*'str'|can't multiply sequence by non-int|unsupported operand type\(s\).*'str'/.test(m)) return 'A number is needed here, but the gap holds text (something in quotes). Type the number without quotes.';
+  if (/only integers, slices .* are valid indices|indices must be integers/.test(m)) return 'A position inside [ ] must be a whole number (or a list of positions), not text or a decimal. Check the gap.';
+  if ((x = m.match(/could not be broadcast together with shapes (\S+) (\S+)/))) return 'Two arrays do not fit together (shapes ' + x[1] + ' and ' + x[2] + '). Check the name in the gap: it must be the one with the matching length.';
+  if (t === 'KeyError') return 'There is no entry called ' + m + '. Check the spelling: capital letters count.';
+  if (t === 'AttributeError' && (x = m.match(/object has no attribute '(.+?)'/))) return 'There is nothing called “' + x[1] + '” on that object. Check the spelling.';
+  if (t === 'TypeError') return 'A value has the wrong type here. Check the gap on the marked line (a name, a number or text in quotes?).';
+  if (t === 'ValueError') return 'A value is not allowed here. Check the gap on the marked line.';
+  return 'Python stopped with an error (' + t + ') on the marked line. Check the gap there; the full message is under “Show the raw Python message”.';
 }
 
 /* ---------- tooltip ---------- */
