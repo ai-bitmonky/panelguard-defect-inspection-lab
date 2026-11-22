@@ -612,6 +612,8 @@ var cur = { ed: null, viz: null };
 function openSub(id) {
   if (!SUB[id]) return;
   if (!openable(id)) { var b = firstBlock(id); id = b; }
+  /* the address must name the page really shown: after a link to a locked page, tapping that page later must change the hash again */
+  try { if (/^#sub-/.test(location.hash) && location.hash !== '#sub-' + id) history.replaceState(null, '', '#sub-' + id); } catch (e) {}
   var same = S.cur === id; S.cur = id; save(); updateGoal();
   renderNav(); renderWork(); renderOut();
   if (!same) { $('#work').scrollTop = 0; $('#out').scrollTop = 0; }

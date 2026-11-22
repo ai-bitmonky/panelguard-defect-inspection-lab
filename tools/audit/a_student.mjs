@@ -10,7 +10,7 @@ const { SUBS } = loadSteps();
 const DIST = process.env.DIST || path.resolve(here, '../../dist/PanelGuard_Defect_Inspection_Lab_v1.0.html');
 const PROFILE = process.env.PROFILE || '/tmp/audit_prof', FROM = process.env.FROM || '0a', EPOCHS = process.env.EPOCHS ? +process.env.EPOCHS : 0;
 if (process.env.FRESH === '1') fs.rmSync(PROFILE, { recursive: true, force: true });
-const OUTJ = path.resolve(here, 'a_student_results.json');
+const OUTJ = path.resolve(here, process.env.OUTJ || 'a_student_results.json');
 const R = fs.existsSync(OUTJ) && FROM !== '0a' ? JSON.parse(fs.readFileSync(OUTJ, 'utf8')) : { cells: {}, mech: {}, fails: [], notes: [], live: {}, errors: [] };
 const saveR = () => fs.writeFileSync(OUTJ, JSON.stringify(R, null, 1));
 const W = 1366, H = 768;
@@ -166,7 +166,7 @@ if (at('3e')) await guard('3e', async () => {
     await page.mouse.move(...pts[0]); await page.mouse.down(); for (const p of pts) await page.mouse.move(p[0], p[1], { steps: 2 }); await page.mouse.up(); }
   await F.locator('#predbox button', { hasText: 'Check' }).first().click(); await page.waitForTimeout(300);
   expect(await ev(() => !!window.PG.S.subs['3e'].pred.locked), '3e draw prediction locked', '3e');
-  if (!EPOCHS) { await F.locator('.card.epochs button', { hasText: 'Quick' }).click(); await page.waitForTimeout(300); }
+  if (!EPOCHS) { await F.locator('.card.epochs button', { hasText: process.env.FULL === '1' ? 'Full' : 'Quick' }).click(); await page.waitForTimeout(300); }
   const mode = await ev(() => ({ mode: window.PG.S.epochsMode, epochs: window.PG.epochs() })); log('3e training length:', JSON.stringify(mode)); R.live.epochSetting = mode;
   await shot('3e_setting');
   // blank + wrong answers

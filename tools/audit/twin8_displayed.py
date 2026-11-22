@@ -44,8 +44,8 @@ LABd = NS['LAB']; order = [x[0] for x in IN['scores']]; rows = sorted(tl, key=la
 NS['trial'] = {'defects_passed': sum(1 for r in tl if LABd[int(r['id'])] == 1 and r['decision'] == 'pass'), 'defects': sum(LABd.values())}
 NS['y_rows'] = [LABd[int(r['id'])] for r in rows]; NS['passed_rows'] = [r['decision'] == 'pass' for r in rows]
 run('8c')
-print('8c displayed: Wilson', round(100 * NS['lo'], 3), round(100 * NS['hi'], 3), 'vs JS', [round(x, 3) for x in IN['interval']], '| bootstrap (numpy rng)', np.percentile(NS['boot'], [2.5, 97.5]).round(2), 'vs JS (seeded LCG)', [round(x, 2) for x in IN['bootInterval']], '| under_target', NS['under_target'])
-ok = ok and abs(100 * NS['lo'] - IN['interval'][0]) < 0.01 and abs(100 * NS['hi'] - IN['interval'][1]) < 0.01
+print('8c displayed: Wilson', round(100 * NS['lo'], 3), round(100 * NS['hi'], 3), 'vs JS', [round(x, 3) for x in IN['interval']], '| bootstrap', NS['boot_interval'], 'vs JS', IN['bootInterval'], 'EXACT' if all(abs(a - b) < 1e-9 for a, b in zip(NS['boot_interval'], IN['bootInterval'])) else 'DIFFERENT', '| under_target', NS['under_target'])
+ok = ok and all(abs(a - b) < 1e-9 for a, b in zip(NS['boot_interval'], IN['bootInterval'])) and abs(100 * NS['lo'] - IN['interval'][0]) < 0.01 and abs(100 * NS['hi'] - IN['interval'][1]) < 0.01
 # 8d
 NS['p_cnn'] = np.array(IN['pCnnVal']); ID2I = NS['ID2I']
 run('8d')

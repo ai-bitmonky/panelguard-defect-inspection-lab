@@ -406,7 +406,7 @@ var step2 = {
 'models = {',
 "    'Logistic regression': LogisticRegression(C=0.1, max_iter=2000),",
 "    'Random forest':       RandomForestClassifier(n_estimators=100, random_state=0),",
-"    'SVC (RBF)':           SVC(C=3, probability=True, random_state=0),",
+"    'SVC (RBF)':           SVC(C=3, probability=True, random_state=0),   # probability=True: scikit-learn below 1.11",
 '}',
 'folds = StratifiedKFold(n_splits=____, shuffle=True, random_state=0)',
 '',
