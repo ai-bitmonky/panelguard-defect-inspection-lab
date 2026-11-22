@@ -43,6 +43,7 @@ for (const id of ['6b', '6c', '6d', '6e', '6f']) {
 }
 if (RES['6f']) {
   const NS = J.NS, F = NS.facts();
+  if (!WR.poor) { const v = await runCell(SUBS['6d'], FILLS['6d'].wrong[0]); WR.poor = v.r; }
   console.log('\n=== REAL REPORT (scripted model) ===\n' + RES['6e'].raw);
   console.log('\n=== PLANTED COPY ===', JSON.stringify(RES['6f'].planted.planted), '\nflagged:', RES['6f'].onPlanted.wrong, '| real ok:', RES['6f'].onReal.ok);
   console.log('\n=== GUARDRAIL ATTEMPTS ===\n' + RES['6f'].attempts.map((a, i) => `draft ${i + 1}: ${a.ok ? 'PASS' : 'FAIL ' + a.feedback}`).join('\n') + '\n--- final ---\n' + RES['6f'].final);

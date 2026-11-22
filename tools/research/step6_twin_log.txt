@@ -1,0 +1,51 @@
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+/tmp/cvenv/lib/python3.13/site-packages/pydantic/main.py:250: UserWarning: A function callback cannot be saved in a checkpoint; it is dropped and will not run after a restore. Use a module-level named function instead.
+  validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+crewai 1.15.44 | JS runner: 1.0 (CrewAI-style; prompts from crewai 1.15) | inputs: tools/tests/js_cells6.test.mjs (Node, TF.js CPU, test fixture model)
+SAME  tool results (4 tools)
+SAME  6d run 1 (writer first, context []): the poor report
+future-task context -> 1 validation error for Crew
+  Value error, Task 'Write the shift quality report for the plant manager.' has a context dependency on a future task 'Read the facts of the last shift with your tool and s
+SAME  6e task outputs (inspector, analyst, writer)
+SAME  system prompts the model is given (6c badges)
+SAME  tool calls in order (step_callback)
+step_callback got 8 steps: ['AgentAction', 'ToolResult']
+SAME  checker on the planted copy
+SAME  checker on the real report
+SAME  guardrail drafts (draft 1 sent back, draft 2 passes)
+SAME  guarded final report
+
+=== PYTHON CREWAI REPORT ===
+SHIFT QUALITY REPORT — for the plant manager
+RESULT: 3.6 defects passed per 100 (6 of 165). Target: at most 5 per 100 → TARGET MET.
+COST: 541 person checks per 1,000 cells (284 this shift).
+WHERE IT FAILS: poly cells — 6 of 84 defects passed (7.1 per 100).
+TOP ACTIONS:
+• More poly defect photos for training (6 of 84 poly defects passed).
+• Expert re-check of the unsure labels (2 of 17 unsure defects passed).
+• Work the action list: 6 mistakes sorted — 2 “need more photos like this”, 2 “ask the expert to re-check the label”, 1 “needs a sharper photo”, 1 “model looked at the wrong place”.
+NOTE: person answers — a perfect checker: the expert label answered every paused cell. Real people make mistakes.
+
+TWIN MATCHES
