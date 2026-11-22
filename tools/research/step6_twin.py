@@ -157,7 +157,7 @@ def w_inspector(facts, ctx):
 
 
 def w_analyst(facts, ctx):
-    S, W, L = facts.get("slice_table"), facts.get("worst_cases"), ["WHERE FAILURES CLUSTER — slices of the validation tray"]
+    S, W, L = facts.get("slice_table"), facts.get("worst_cases"), ["WHERE FAILURES CLUSTER — slices of the validation tray at the first gates (before the poly gate)"]
 
     def pair(lab, an, A, bn, B):
         same = A["passed_per_100"] == B["passed_per_100"]
@@ -183,7 +183,7 @@ def w_writer(facts, ctx):
     m6 = re.search(r"Person answers: (.*)", ctx)
     L.append("RESULT: " + ("%s defects passed per 100 (%s of %s). Target: at most %s per 100 → %s" % (m1[3], m1[1], m1[2], m1[4], "TARGET MET." if float(m1[3]) <= float(m1[4]) else "TARGET MISSED.") if m1 else "not known — no shift facts were given to me."))
     L.append("COST: " + (m2[2] + " person checks per 1,000 cells" + (" (" + m3[1] + " this shift)." if m3 else ".") if m2 else "not known — no shift facts were given to me."))
-    L.append("WHERE IT FAILS: " + ("%s cells — %s of %s defects passed (%s per 100)." % (m4[1], m4[2], m4[3], m4[4]) if m4 else "not known — no analysis was given to me."))
+    L.append("WHERE IT FAILS: " + ("%s cells — %s of %s defects passed (%s per 100) at the first gates, before the poly gate." % (m4[1], m4[2], m4[3], m4[4]) if m4 else "not known — no analysis was given to me."))
     L.append("TOP ACTIONS:")
     L.append("• " + ("More %s defect photos for training (%s of %s %s defects passed)." % (m4[1], m4[2], m4[3], m4[1]) if m4 else "More photos for the weakest group: not known (no analysis)."))
     L.append("• " + ("Expert re-check of the %s labels (%s of %s %s defects passed)." % (m5[1], m5[2], m5[3], m5[1]) if m5 else "Label re-check: not known (no analysis)."))

@@ -41,7 +41,7 @@ SAME  guarded final report
 SHIFT QUALITY REPORT — for the plant manager
 RESULT: 3.6 defects passed per 100 (6 of 165). Target: at most 5 per 100 → TARGET MET.
 COST: 541 person checks per 1,000 cells (284 this shift).
-WHERE IT FAILS: poly cells — 6 of 84 defects passed (7.1 per 100).
+WHERE IT FAILS: poly cells — 6 of 84 defects passed (7.1 per 100) at the first gates, before the poly gate.
 TOP ACTIONS:
 • More poly defect photos for training (6 of 84 poly defects passed).
 • Expert re-check of the unsure labels (2 of 17 unsure defects passed).

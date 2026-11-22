@@ -3062,7 +3062,7 @@ function regWriters() {
       '• Person answers: ' + F.person_answers].join('\n');
   });
   S.register(/analyst/i, function (x) {
-    var Sl = x.facts.slice_table, W = x.facts.worst_cases, L = ['WHERE FAILURES CLUSTER — slices of the validation tray'];
+    var Sl = x.facts.slice_table, W = x.facts.worst_cases, L = ['WHERE FAILURES CLUSTER — slices of the validation tray at the first gates (before the poly gate)'];
     function pair(lab, an, A, bn, B) {
       var same = A.passed_per_100 === B.passed_per_100, w = A.passed_per_100 >= B.passed_per_100 ? [an, A, bn, B] : [bn, B, an, A];
       return '• ' + lab + ': ' + (same ? 'no difference' : w[0] + ' is weaker') + ' — ' + w[0] + ' ' + w[1].defects_passed + ' of ' + w[1].defects + ' defects passed (' + w[1].passed_per_100 + ' per 100); ' + w[2] + ' ' + w[3].defects_passed + ' of ' + w[3].defects + ' (' + w[3].passed_per_100 + ' per 100)';
@@ -3085,7 +3085,7 @@ function regWriters() {
     var m6 = ctx.match(/Person answers: (.*)/);
     L.push('RESULT: ' + (m1 ? m1[3] + ' defects passed per 100 (' + m1[1] + ' of ' + m1[2] + '). Target: at most ' + m1[4] + ' per 100 → ' + (+m1[3] <= +m1[4] ? 'TARGET MET.' : 'TARGET MISSED.') : 'not known — no shift facts were given to me.'));
     L.push('COST: ' + (m2 ? m2[2] + ' person checks per 1,000 cells' + (m3 ? ' (' + m3[1] + ' this shift).' : '.') : 'not known — no shift facts were given to me.'));
-    L.push('WHERE IT FAILS: ' + (m4 ? m4[1] + ' cells — ' + m4[2] + ' of ' + m4[3] + ' defects passed (' + m4[4] + ' per 100).' : 'not known — no analysis was given to me.'));
+    L.push('WHERE IT FAILS: ' + (m4 ? m4[1] + ' cells — ' + m4[2] + ' of ' + m4[3] + ' defects passed (' + m4[4] + ' per 100) at the first gates, before the poly gate.' : 'not known — no analysis was given to me.'));
     L.push('TOP ACTIONS:');
     L.push('• ' + (m4 ? 'More ' + m4[1] + ' defect photos for training (' + m4[2] + ' of ' + m4[3] + ' ' + m4[1] + ' defects passed).' : 'More photos for the weakest group: not known (no analysis).'));
     L.push('• ' + (m5 ? 'Expert re-check of the ' + m5[1] + ' labels (' + m5[2] + ' of ' + m5[3] + ' ' + m5[1] + ' defects passed).' : 'Label re-check: not known (no analysis).'));
@@ -3433,6 +3433,8 @@ var s6e = { id: '6e', name: 'Kick off', kind: 'code', lang: 'js',
 'from crewai import Crew, Process',
 '',
 'trace = []',
+'# crewai 1.15.44: the step_callback reached no step when these Agent objects had already run in another crew,',
+'# so the verified twin hires fresh agents for this crew (tools/research/step6_twin.py).',
 'quality_crew = Crew(agents=[inspector, analyst, writer],',
 '                    tasks=[inspect_shift, find_causes, write_report],',
 '                    process=Process.sequential,',
