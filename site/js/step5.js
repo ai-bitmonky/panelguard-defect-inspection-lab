@@ -459,7 +459,7 @@ var s5e = { id: '5e', name: 'Shoot again, but not forever', kind: 'code', lang: 
   check: function (r) {
     if (r.missing) return { pass: false, msg: 'Missing: ' + r.missing.join(', ') + '. Run the whole cell.' };
     if (r.loop && !r.recursion) return { pass: false, msg: J().lgFriendly(r.raw) || 'LangGraph stopped with an error: ' + r.raw.split('\n')[0] };
-    if (r.loop && r.maxTries === 'Infinity') return { pass: false, msg: 'No way out: the camera fault copy went check_photo → reshoot → check_photo … again and again. LangGraph stopped it after 25 steps (its recursion limit). Now put the cap: type 2 in gap 1.' };
+    if (r.loop && r.maxTries === 'Infinity') return { pass: false, msg: 'No way out: the camera fault copy went check_photo → reshoot → check_photo … again and again. LangGraph stopped it after ' + ((r.raw.match(/Recursion limit of (\d+)/) || [])[1] || 25) + ' steps (its recursion limit). Now put the cap: type 2 in gap 1.' };
     if (r.loop) return { pass: false, msg: 'Still an endless loop, even with MAX_TRIES = ' + r.maxTries + ': when the cap is reached, afterCheck must send the cell to \'human_check\', not back to reshoot.' };
     var f = r.trails.slice(0, 3), bad = f.filter(function (t) { return t.path.indexOf('human_check') < 0; });
     if (bad.length) return { pass: false, msg: 'Camera fault copy ' + bad[0].id + ' was recorded without a person ever looking at it. When the cap is reached, send it to \'human_check\'.' };
