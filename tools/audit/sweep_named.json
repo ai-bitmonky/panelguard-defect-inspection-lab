@@ -11,7 +11,7 @@
    "msg": "The first station could not add its line: the log started as nothing (null). Start it as an empty list: [].",
    "err": "",
    "flag": "RAW?",
-   "sec": 0.658
+   "sec": 0.66
   },
   {
    "vizBad": null,
@@ -24,7 +24,7 @@
    "msg": "“concatx” is not something a list can do, so the second line could not be added. The list method that gives back a NEW, longer list is concat.",
    "err": "",
    "flag": "",
-   "sec": 0.659
+   "sec": 0.663
   },
   {
    "vizBad": null,
@@ -37,7 +37,7 @@
    "msg": "push adds to the old list and gives back its LENGTH (a number), so after the first station the log is a number and the second station breaks. Use the method that gives back a NEW list: concat.",
    "err": "",
    "flag": "",
-   "sec": 0.658
+   "sec": 0.659
   }
  ],
  "7d": [
@@ -52,7 +52,7 @@
    "msg": "Command({ update }) only changes card fields; it cannot carry the person's answer into the paused flow. The Command option that hands the answer to the paused flow is resume.",
    "err": "",
    "flag": "",
-   "sec": 3.18
+   "sec": 0.853
   },
   {
    "vizBad": null,
@@ -65,7 +65,7 @@
    "msg": "The Command was empty: nothing was handed to the paused flow. The Command option that hands the answer to the paused flow is resume.",
    "err": "",
    "flag": "",
-   "sec": 3.577
+   "sec": 1.416
   }
  ],
  "8c": [
@@ -81,7 +81,7 @@
    "msg": "z is the TEXT “1.96” (in quotes), not a number. Type the number without quotes: 1.96.",
    "err": "",
    "flag": "",
-   "sec": 1.627
+   "sec": 1.43
   }
  ]
 }

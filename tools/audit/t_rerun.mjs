@@ -15,7 +15,7 @@ const run = async (id, code) => { await page.locator('.edw textarea').first().fi
   await page.waitForFunction((i) => window.PG.VERD[i] != null && window.PG.running() == null, id, { timeout: 1800000 }); await page.waitForTimeout(300);
   return { v: await ev((i) => window.PG.VERD[i], id), err: await ev(() => (document.getElementById('errbox') || {}).innerText || '') }; };
 await page.goto('file://' + DIST); await page.waitForFunction(() => window.PG && window.PG.ready() && window.PG.JSR.ready && window.PG.RES['8e'], null, { timeout: 2400000 });
-expect(await ev(() => /v1\.1/.test(document.title)), 'running ' + await ev(() => document.title));
+expect(await ev(() => /v1\.[12]/.test(document.title)), 'running ' + await ev(() => document.title));
 expect(await ev(() => window.PG.ORDER.every((i) => window.PG.passed(i))), 'v1.1 replay of the whole live-model session: every substep still passed');
 const T = [['1c', ['0'], (r) => /EVERY cell gets 1/.test(r.v.msg)], ['3a', ['[64, 64, 2624, 1]', '255'], (r) => /graphics chip cannot hold/.test(r.err) && !/Requested texture/.test(r.err.split('Show the raw')[0])],
   ['3f', ['0', 'bestFar'], (r) => !r.v.pass && /SAME cell/.test(r.v.msg)], ['4c', ['2', 'w', 'abs'], (r) => !r.v.pass]];
