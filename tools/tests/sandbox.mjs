@@ -1,12 +1,13 @@
 // Embeds the site in sandboxed iframes like an artifact host would, then loads Python and runs one real cell.
-import { chromium } from 'playwright'; import { spawn } from 'child_process'; import http from 'http';
+import { chromium } from 'playwright';
+import { mirrorCDN, hits as cdnHits } from './cdn.mjs'; import { spawn } from 'child_process'; import http from 'http';
 const site = spawn('node', ['../serve.mjs', '../../site', '8768'], { env: { ...process.env, CORS: '1' } }); await new Promise((r) => site.stdout.once('data', r));
 const cfgs = { 'allow-scripts allow-same-origin': 'same-origin sandbox', 'allow-scripts': 'opaque-origin sandbox (no allow-same-origin)' };
 let port = 8790; const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
 for (const [sb, label] of Object.entries(cfgs)) {
   const html = `<!doctype html><body style="margin:0"><iframe id=f sandbox="${sb}" src="http://localhost:8768/index.html" style="width:1366px;height:768px;border:0"></iframe>`;
   const hostSrv = http.createServer((q, s) => { s.writeHead(200, { 'content-type': 'text/html' }); s.end(html); }).listen(++port);
-  const p = await b.newPage({ viewport: { width: 1366, height: 768 } }); const errs = [];
+  const p = await b.newPage({ viewport: { width: 1366, height: 768 } }); await mirrorCDN(p.context()); const errs = [];
   p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text().slice(0, 160)); });
   await p.goto(`http://127.0.0.1:${port}/`);
   const f = p.frameLocator('#f'); const fr = p.frames().find((x) => x.url().includes('8768'));

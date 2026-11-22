@@ -1,6 +1,6 @@
 /* PanelGuard Python kernel: Pyodide + scikit-learn.
    Runs as a module Web Worker, or (fallback) in the page, or under Node for tests.
-   Messages in:  {cmd:'init', base} {cmd:'data', buf, labels} {cmd:'run', id, code, probe} {cmd:'eval', id, code}
+   Messages in:  {cmd:'init', pyBase} {cmd:'data', buf, labels} {cmd:'run', id, code, probe} {cmd:'eval', id, code}
    Messages out: {type:'progress'|'ready'|'stdout'|'result'|'fatal', ...} */
 (function (G) {
 'use strict';
@@ -46,16 +46,21 @@ function Core(post, loadPyodideFn, helpCode) {
       post({ type: 'ready', versions: JSON.parse(v), pyodide: py.version });
     }
   }
-  async function init(base) {
+  var stageURL = '';
+  async function init(pyBase) {
     try {
       prog(0, 'Starting Python (Pyodide core, 12 MB)…');
-      py = await loadPyodideFn({ indexURL: base + 'pyodide/', stdout: function () {}, stderr: function () {} });
+      stageURL = pyBase + 'pyodide.asm.wasm';
+      py = await loadPyodideFn({ indexURL: pyBase, stdout: function () {}, stderr: function () {} });
       prog(WEIGHTS.core, 'Loading numpy (3 MB)…');
+      stageURL = pyBase + 'numpy-*.whl';
       var quiet = { messageCallback: function () {}, errorCallback: function (m) { post({ type: 'stdout', id: null, text: m, err: true }); } };
       await py.loadPackage(['numpy'], quiet);
       prog(WEIGHTS.numpy, 'Loading scipy (14 MB, the biggest part)…');
+      stageURL = pyBase + 'scipy-*.whl';
       await py.loadPackage(['scipy'], quiet);
       prog(WEIGHTS.scipy, 'Loading scikit-learn (5 MB)…');
+      stageURL = pyBase + 'scikit_learn-*.whl';
       await py.loadPackage(['scikit-learn'], quiet);
       prog(WEIGHTS.sklearn, 'Python is ready.');
       py.runPython(BOOT);
@@ -66,7 +71,7 @@ function Core(post, loadPyodideFn, helpCode) {
       try { py.FS.mkdir('/data'); } catch (e) {}
       pyIn = true; maybeReady();
     } catch (e) {
-      post({ type: 'fatal', text: 'Python could not start: ' + (e && e.message ? e.message : String(e)) });
+      post({ type: 'fatal', text: 'Python could not be loaded from ' + stageURL + ' — ' + (e && e.message ? e.message : String(e)) });
     }
   }
   function data(buf, labels) {
@@ -97,7 +102,7 @@ function Core(post, loadPyodideFn, helpCode) {
     post(out);
   }
   return function handle(m) {
-    if (m.cmd === 'init') init(m.base);
+    if (m.cmd === 'init') init(m.pyBase);
     else if (m.cmd === 'data') data(m.buf, m.labels);
     else if (m.cmd === 'run') run(m);
     else if (m.cmd === 'eval') run({ id: m.id, code: null, probe: m.code });
@@ -116,10 +121,10 @@ if (typeof WorkerGlobalScope !== 'undefined' && G instanceof WorkerGlobalScope) 
       // Classic worker (used inside opaque-origin sandboxes, where module blob workers fail):
       // Pyodide 314 probes importScripts() to refuse classic workers, so hide it; Pyodide itself only uses import().
       if (typeof G.importScripts === 'function') G.importScripts = function () { throw new Error('importScripts is disabled in the PanelGuard kernel'); };
-      import(m.base + 'pyodide/pyodide.mjs').then(function (mod) {
+      import(m.pyBase + 'pyodide.mjs').then(function (mod) {
         handle = Core(function (x) { postMessage(x); }, mod.loadPyodide, m.help);
         handle(m); queue.forEach(handle); queue = [];
-      }, function (e) { postMessage({ type: 'fatal', text: 'Could not load pyodide.mjs: ' + (e && e.message || e) }); });
+      }, function (e) { postMessage({ type: 'fatal', text: 'Could not load ' + m.pyBase + 'pyodide.mjs — ' + (e && e.message || e) }); });
     } else if (handle) handle(m); else queue.push(m);
   };
 }

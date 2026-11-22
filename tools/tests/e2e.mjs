@@ -1,6 +1,7 @@
 // Full browser test: real Chrome (headless), local static server, completes Steps 0-2 by script.
 // Usage: node e2e.mjs [from-substep]   (screenshots go to tools/shots/)
 import { chromium } from 'playwright';
+import { mirrorCDN, hits as cdnHits } from './cdn.mjs';
 import { spawn } from 'child_process';
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
 import vm from 'vm';
@@ -15,7 +16,7 @@ const srv = spawn('node', [path.resolve(here, '../serve.mjs'), site, String(PORT
 await new Promise((r) => srv.stdout.once('data', r));
 const W = +(process.env.W || 1366), H = +(process.env.H || 768);
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
-const page = await browser.newPage({ viewport: { width: W, height: H } });
+const page = await browser.newPage({ viewport: { width: W, height: H } }); await mirrorCDN(page.context());
 const errors = [], external = [], failed = [];
 page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push('PAGEERROR ' + e.message));
@@ -129,7 +130,7 @@ await page.reload(); await page.waitForFunction(() => window.PG && window.PG.rea
 log('reload + replay rebuilt in', ((Date.now() - tr) / 1000).toFixed(1), 's; 2e passed:', await passed('2e'));
 await open('2c'); await page.waitForTimeout(500); await shot('2c_after_reload');
 // locked tooltip text check: clear progress in a fresh context
-const p2 = await browser.newPage({ viewport: { width: W, height: H } });
+const p2 = await browser.newPage({ viewport: { width: W, height: H } }); await mirrorCDN(p2.context());
 await p2.goto(`http://localhost:${PORT}/index.html#sub-2b`); await p2.evaluate(() => { try { localStorage.clear(); } catch (e) {} }); await p2.reload(); await p2.waitForTimeout(800);
 const lockTxt = await p2.evaluate(() => window.PG.S.cur);
 await p2.locator('.snode').nth(3).hover(); await p2.waitForTimeout(200); const tip = await p2.locator('#tip').innerText();

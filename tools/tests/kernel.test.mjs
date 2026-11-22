@@ -5,7 +5,8 @@ const here = path.dirname(fileURLToPath(import.meta.url)); const site = path.res
 const ctx = { console, setInterval, clearInterval, setTimeout }; ctx.globalThis = ctx; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(site + 'js/steps.js', 'utf8'), ctx);
 vm.runInContext(fs.readFileSync(site + 'js/pyworker.js', 'utf8'), ctx);
-const { loadPyodide } = await import(site + 'pyodide/pyodide.mjs');
+const pyBase = path.resolve(here, '../cdn-mirror/pyodide/v314.0.8/full') + '/';
+const { loadPyodide } = await import(pyBase + 'pyodide.mjs');
 const only = process.argv[2] ? process.argv[2].split(',') : null;
 let pending = null, log = [];
 const post = (m) => { if (m.type === 'stdout') log.push(m.text); else if (m.type === 'progress') {} else if (pending) { const p = pending; pending = null; p(m); } };
@@ -13,8 +14,8 @@ const handle = ctx.PGKernelCore(post, loadPyodide, ctx.PG_PY_HELP);
 const call = (m) => new Promise((res) => { pending = res; handle(m); });
 const t0 = Date.now();
 const readyP = new Promise((res) => { pending = res; });
-handle({ cmd: 'init', base: site });
-handle({ cmd: 'data', buf: fs.readFileSync(site + 'data/cells64.u8'), labels: fs.readFileSync(site + 'data/labels.json', 'utf8') });
+handle({ cmd: 'init', pyBase });
+handle({ cmd: 'data', buf: fs.readFileSync(path.resolve(here, '../ref/cells64.u8')), labels: fs.readFileSync(site + 'data/labels.json', 'utf8') });
 const rd = await readyP; if (rd.type !== 'ready') { console.log('init msg', rd); process.exit(1); }
 console.log('READY', JSON.stringify(rd.versions), 'pyodide', rd.pyodide, ((Date.now() - t0) / 1000).toFixed(1) + 's');
 let fails = 0; const results = {};

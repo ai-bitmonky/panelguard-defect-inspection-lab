@@ -17,6 +17,8 @@ function h(tag, attrs, kids) {
 }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 var BASE = new URL('./', location.href).href;
+/* The ONE place that says where Python comes from (Pyodide runtime + wheels, same versions as pyodide-lock.json). */
+var PYODIDE_BASE = 'https://cdn.jsdelivr.net/pyodide/v314.0.8/full/';
 
 /* ---------- storage (optional) ---------- */
 var KEY = 'panelguard.v0.1';
@@ -50,7 +52,7 @@ function stepDone(st) { return st.substeps.length && st.substeps.every(function 
 
 /* ---------- data ---------- */
 var PACK = null, LAB = null, ID2I = {}, FULL = {}, D = null;
-var prog = { dataMB: 0, dataTotal: 10.75, pyMB: 0, pyTotal: 33.8, text: '' };
+var prog = { dataMB: 0, dataTotal: 5.36, pyMB: 0, pyTotal: 33.8, text: '' };
 function showProg() {
   var done = prog.dataMB + prog.pyMB, tot = prog.dataTotal + prog.pyTotal;
   $('#lbar').style.width = Math.min(100, 100 * done / tot).toFixed(1) + '%';
@@ -68,10 +70,10 @@ function loadData() {
     LAB.rows.forEach(function (r, i) { ID2I[r[0]] = i; });
     var n = LAB.rows.length, nd = LAB.rows.filter(function (r) { return r[1] >= 0.5; }).length;
     D = { n: n, nDef: nd, nOk: n - nd };
-    return fetch('data/cells64.u8');
+    return fetch(ATLAS);
   }).then(function (r) {
-    if (!r.ok) throw new Error('cells64.u8: HTTP ' + r.status);
-    var total = +r.headers.get('content-length') || 10747904; prog.dataTotal = total / 1048576;
+    if (!r.ok) throw new Error(ATLAS + ': HTTP ' + r.status);
+    var total = +r.headers.get('content-length') || 5623008; prog.dataTotal = total / 1048576;
     if (!r.body || !r.body.getReader) return r.arrayBuffer().then(function (b) { prog.dataMB = prog.dataTotal; showProg(); return b; });
     var rd = r.body.getReader(), parts = [], got = 0;
     return (function pump() {
@@ -80,7 +82,26 @@ function loadData() {
         parts.push(x.value); got += x.value.length; prog.dataMB = got / 1048576; showProg(); return pump();
       });
     })();
-  }).then(function (buf) { PACK = new Uint8Array(buf); prog.dataMB = prog.dataTotal; showProg(); });
+  }).then(function (buf) { prog.text = 'Unpacking the photos…'; showProg(); return decodeAtlas(buf, LAB.rows.length); })
+    .then(function (u8) { PACK = u8; prog.dataMB = prog.dataTotal; showProg(); });
+}
+/* The photo pack is a lossless 8-bit grayscale PNG atlas: 64 tiles per row, 64x64 px each, row-major by cell order.
+   Decode without colour management, take one channel, and rebuild the (cells, 64, 64) byte array. */
+var ATLAS = 'data/cells64_atlas.png';
+function decodeAtlas(buf, n) {
+  var blob = new Blob([buf], { type: 'image/png' });
+  return createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' }).then(function (bm) {
+    var W = bm.width, H = bm.height, cols = W / 64;
+    var c = document.createElement('canvas'); c.width = W; c.height = H;
+    var x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(bm, 0, 0);
+    var px = x.getImageData(0, 0, W, H).data, out = new Uint8Array(n * 4096);
+    for (var i = 0; i < n; i++) {
+      var tx = (i % cols) * 64, ty = Math.floor(i / cols) * 64, o = i * 4096;
+      for (var yy = 0; yy < 64; yy++) { var row = ((ty + yy) * W + tx) * 4; for (var xx = 0; xx < 64; xx++) out[o + yy * 64 + xx] = px[row + xx * 4]; }
+    }
+    if (bm.close) bm.close();
+    return out;
+  });
 }
 var CC = {};
 function cellCanvas(id) {
@@ -126,12 +147,12 @@ function sendData() {
 }
 function spawn(mode, dataP) {
   K.mode = mode;
-  var init = { cmd: 'init', base: BASE, help: window.PG_PY_HELP };
+  var init = { cmd: 'init', pyBase: PYODIDE_BASE, help: window.PG_PY_HELP };
   if (mode === 'page') {
     var s2 = h('script', { src: 'js/pyworker.js' });
     s2.onload = function () {
-      import(BASE + 'pyodide/pyodide.mjs').then(function (mod) { K.pageHandle = window.PGKernelCore(konmsg, mod.loadPyodide, window.PG_PY_HELP); K.pageHandle(init); dataP.then(sendData); },
-        function (e) { fatal('pyodide/pyodide.mjs could not be loaded: ' + (e && e.message || e)); });
+      import(PYODIDE_BASE + 'pyodide.mjs').then(function (mod) { K.pageHandle = window.PGKernelCore(konmsg, mod.loadPyodide, window.PG_PY_HELP); K.pageHandle(init); dataP.then(sendData); },
+        function (e) { fatal('Could not load ' + PYODIDE_BASE + 'pyodide.mjs — ' + (e && e.message || e)); });
     };
     s2.onerror = function () { fatal('js/pyworker.js could not be loaded.'); };
     document.head.appendChild(s2); return;
@@ -144,7 +165,7 @@ function spawn(mode, dataP) {
     K.w = w;
     var live = false;
     w.onmessage = function (ev) {
-      if (ev.data && ev.data.type === 'fatal' && !K.ready && !got) { console.warn('kernel mode ' + mode + ' failed: ' + ev.data.text); live = false; return fail(); }
+      if (ev.data && ev.data.type === 'fatal' && !K.ready && !got) { console.warn('kernel mode ' + mode + ' failed: ' + ev.data.text); K.lastFatal = ev.data.text; live = false; return fail(); }
       live = true; konmsg(ev.data);
     };
     w.onerror = function (ev) { if (!live) { ev.preventDefault && ev.preventDefault(); fail(); } else fatal('The Python worker stopped: ' + (ev.message || 'unknown error')); };
@@ -614,12 +635,12 @@ window.addEventListener('hashchange', route);
 layout();
 resizer($('#rz1'), 'nav'); resizer($('#rz2'), 'out');
 showProg();
-prog.text = 'Downloading 2,624 real cell photos (10.7 MB)…';
+prog.text = 'Downloading 2,624 real cell photos (5.4 MB)…';
 var dataP = loadData();
 dataP.then(function () { if (S.cur) { if (SUB[S.cur].kind === 'scene') renderOut(); } }).catch(function (e) { fatal('The photo pack could not be loaded: ' + e.message); });
 if (typeof WebAssembly === 'undefined') fatal('This browser has no WebAssembly, so Python cannot run here.');
 else spawn(typeof Worker === 'undefined' ? 'page' : 'file', dataP);
 whenReady().then(replay).then(function () { refreshStatus(); });
 route();
-window.PG = { S: S, RES: RES, VERD: VERD, K: K, openSub: openSub, passed: passed, pendingOf: pendingOf, ORDER: ORDER, kEval: kEval, ready: function () { return K.ready && !replaying; } };
+window.PG = { PYODIDE_BASE: PYODIDE_BASE, pack: function () { return PACK; }, S: S, RES: RES, VERD: VERD, K: K, openSub: openSub, passed: passed, pendingOf: pendingOf, ORDER: ORDER, kEval: kEval, ready: function () { return K.ready && !replaying; } };
 })();

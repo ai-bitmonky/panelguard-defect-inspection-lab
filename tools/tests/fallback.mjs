@@ -1,5 +1,6 @@
 // Checks the two kernel fallbacks: blob: module worker, and page-thread Pyodide (no Worker at all).
-import { chromium } from 'playwright'; import { spawn } from 'child_process';
+import { chromium } from 'playwright';
+import { mirrorCDN, hits as cdnHits } from './cdn.mjs'; import { spawn } from 'child_process';
 const srv = spawn('node', ['../serve.mjs', '../../site', '8767']); await new Promise((r) => srv.stdout.once('data', r));
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
 const cases = {
@@ -8,7 +9,7 @@ const cases = {
 };
 let bad = 0;
 for (const [name, fn] of Object.entries(cases)) {
-  const p = await b.newPage(); const errs = [];
+  const p = await b.newPage(); await mirrorCDN(p.context()); const errs = [];
   p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
   await p.addInitScript(fn);
   const t = Date.now();
