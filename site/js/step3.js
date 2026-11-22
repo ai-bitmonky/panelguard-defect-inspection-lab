@@ -151,7 +151,7 @@ var s3c = { id: '3c', name: 'Build the network', kind: 'code', lang: 'js',
   ].join('\n'),
   probe: async function (NS) {
     var m = NS.model; if (!m || !m.layers) return { missing: ['model'] };
-    var L = m.layers.map(function (l) {
+    var L = m.layers.filter(function (l) { return l.getClassName() !== 'InputLayer'; }).map(function (l) {
       var c = l.getConfig ? l.getConfig() : {};
       return { name: l.name, cls: l.getClassName(), out: (l.outputShape || []).slice(), params: l.countParams(), filters: c.filters, act: c.activation, units: c.units };
     });
@@ -336,7 +336,7 @@ var s3e = { id: '3e', name: 'Train it', kind: 'code', lang: 'js', long: true,
     if (r.missing) return { pass: false, msg: 'Missing: ' + r.missing.join(', ') + '. Keep the keeper line.' };
     if (r.done < r.epochs) return { pass: false, msg: 'Training stopped after ' + r.done + ' of ' + r.epochs + ' epochs. Run it again to the end.' };
     if (r.restored == null) return { pass: false, msg: 'Training ran, but the best epoch was not put back. Keep the line keeper.restoreBest().' };
-    return { pass: true, msg: 'Trained ' + r.epochs + ' epochs in ' + (r.sec / 60).toFixed(1) + ' min on ' + r.backend.toUpperCase() + '. Best epoch ' + r.best.epoch + ': validation ranking score ' + f3(r.best.valAuc) + ' (kept).' };
+    return { pass: true, msg: 'Trained ' + r.epochs + (r.epochs === 1 ? ' epoch' : ' epochs') + ' in ' + (r.sec / 60).toFixed(1) + ' min on ' + r.backend.toUpperCase() + '. Best epoch ' + r.best.epoch + ': validation ranking score ' + f3(r.best.valAuc) + ' (kept).' };
   },
   example: '<p>A smoke detector model with <b>900 normal</b> and <b>100 smoke</b> readings, one sigmoid output:</p><pre>m.compile({ optimizer: tf.train.adam(0.01), loss: \'binaryCrossentropy\' });\nconst w = { 0: 1000 / (2 * 900), 1: 1000 / (2 * 100) };   // 0.56 and 5.0</pre><p>The rare class gets the big weight, so missing one costs as much as missing many of the common class.</p>',
   render: function (r, el, api) { V().curves(r, el, api); },
@@ -411,7 +411,7 @@ var s3f = { id: '3f', name: 'Score it and blend it', kind: 'code', lang: 'js',
     var pb = ref.map(function (c, i) { return bw * c + (1 - bw) * ps[i]; });
     var blendOk = NS.pBlend.length === pb.length && NS.pBlend.every(function (v, i) { return Math.abs(v - pb[i]) < 1e-9; });
     function row(name, s) { var r = P.rates(y, s, P.cutAt(y, s, 0.95)); r.name = name; r.auc = P.auc(y, s); return r; }
-    return { cnnOk: cnnOk, blendOk: blendOk, wOk: Math.abs(NS.bestW - bw) < 1e-9, bestW: NS.bestW, refW: bw, refFar: bf, ws: ws, n: y.length, nTrain: pg.idx_train.length,
+    return { blendScores: pb, y: y.slice(), cnnOk: cnnOk, blendOk: blendOk, wOk: Math.abs(NS.bestW - bw) < 1e-9, bestW: NS.bestW, refW: bw, refFar: bf, ws: ws, n: y.length, nTrain: pg.idx_train.length,
       base: row(pg.baseline, ps), cnn: row('CNN', ref), blend: row('Blend', pb), baseline: pg.baseline,
       cells: pg.cell_val.map(function (id, i) { return [id, Math.round(ref[i] * 1e4) / 1e4, y[i], pg.prob_val[i], pg.kind_val[i]]; }) };
   },

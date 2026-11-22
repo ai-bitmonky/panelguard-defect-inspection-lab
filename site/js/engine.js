@@ -214,7 +214,8 @@ function restartKernel() {
 /* ---------- JavaScript kernel (cell language 'js': TensorFlow.js in this page) ---------- */
 var JSR = { k: null, T: null, ready: false, err: null, backend: null, gpu: null, live: null, liveId: null, pending: [] };
 var EPOCHS = { quick: 10, full: 30 };
-var TEST_EPOCHS = (function () { try { var m = location.search.match(/[?&]pgEpochs=(\d+)/); return m ? Math.max(1, +m[1]) : null; } catch (e) { return null; } })();
+/* Test setting only (shown plainly in the app): ?pgEpochs=N in the address, or window.PG_TEST_EPOCHS for srcdoc frames that have no address. */
+var TEST_EPOCHS = (function () { try { if (window.PG_TEST_EPOCHS) return Math.max(1, +window.PG_TEST_EPOCHS); var m = location.search.match(/[?&]pgEpochs=(\d+)/); return m ? Math.max(1, +m[1]) : null; } catch (e) { return null; } })();
 function epochsMode() { return TEST_EPOCHS ? 'test' : (S.epochsMode === 'full' ? 'full' : 'quick'); }
 function epochsNow() { return TEST_EPOCHS || EPOCHS[epochsMode()]; }
 function gpuInfo() {
@@ -551,7 +552,7 @@ var GOAL1 = null;
 function updateGoal() {
   var g = $('.goal'); if (!g) return; if (GOAL1 == null) GOAL1 = g.innerHTML;
   var i3 = ORDER.indexOf('3g'), two = i3 >= 0 && ORDER.indexOf(S.cur) >= i3 && window.PG_STEP3_GOAL2;
-  g.innerHTML = two ? '<i>TARGET</i> ' + window.PG_STEP3_GOAL2 : GOAL1; g.classList.toggle('two', !!two);
+  g.innerHTML = two ? '<i>TARGET</i><span>' + window.PG_STEP3_GOAL2 + '</span>' : GOAL1; g.classList.toggle('two', !!two);
 }
 function renderWork() {
   var id = S.cur, s = SUB[id], st = STEP_OF[id], w = $('#work'), ss = SS(id);
@@ -731,7 +732,7 @@ function renderOut() {
   o.appendChild(h('div', { id: 'errbox' }));
   o.appendChild(h('div', { id: 'vizbox' }));
   o.appendChild(h('div', { id: 'whybox' }));
-  o.appendChild(h('div', { class: 'conh', text: 'PRINTED BY PYTHON' }));
+  o.appendChild(h('div', { class: 'conh', text: s.lang === 'js' ? 'PRINTED BY console.log' : 'PRINTED BY PYTHON' }));
   conEl = h('div', { class: 'con', id: 'con' }); o.appendChild(conEl);
   if (OUTTXT[id]) conAdd(OUTTXT[id]); else conAdd(ss.codePass && !RES[id] ? '(rebuilding…)' : '(nothing yet — press RUN)');
   o.appendChild(h('div', { id: 'endbox' }));
@@ -744,8 +745,8 @@ function showErr(e) {
   b.innerHTML = '';
   if (!e) return;
   b.appendChild(h('div', { class: 'chk fail errc' }, [h('span', { class: 'ic', text: 'ERROR' }), h('div', {}, [
-    h('div', { html: esc(friendly(e)) + (e.line ? ' <b>(line ' + e.line + ')</b>' : '') }),
-    e.tb ? h('details', {}, [h('summary', { text: 'Show the raw Python message' }), h('pre', { text: e.tb })]) : null])]));
+    h('div', { html: esc((SUB[S.cur] && SUB[S.cur].lang === 'js' ? window.PGJS.friendly : friendly)(e)) + (e.line ? ' <b>(line ' + e.line + ')</b>' : '') }),
+    e.tb ? h('details', {}, [h('summary', { text: SUB[S.cur] && SUB[S.cur].lang === 'js' ? 'Show the raw JavaScript message' : 'Show the raw Python message' }), h('pre', { text: e.tb })]) : null])]));
 }
 function drawViz(id) {
   var vb = $('#vizbox'); if (!vb) return;
@@ -760,11 +761,11 @@ function refreshStatus() {
     if (s.kind === 'scene') {
       cb.appendChild(pend ? h('div', { class: 'chk todo' }, [h('span', { class: 'ic', text: 'TO DO' }), h('div', { text: 'Now: ' + pend + '.' })])
                           : h('div', { class: 'chk pass' }, [h('span', { class: 'ic', text: 'DONE' }), h('div', { text: 'Done. ' + nextHint(id) })]));
-    } else if (running === id) cb.appendChild(h('div', { class: 'chk wait' }, [h('span', { class: 'ic', text: 'RUN' }), h('div', { text: 'Python is working on it…' })]));
+    } else if (running === id) cb.appendChild(h('div', { class: 'chk wait' }, [h('span', { class: 'ic', text: 'RUN' }), h('div', { text: s.lang === 'js' ? (s.live ? 'Training in your browser… watch the curves below.' : 'Your code is running…') : 'Python is working on it…' })]));
     else if (v && !v.pass) cb.appendChild(h('div', { class: 'chk fail' }, [h('span', { class: 'ic', text: 'CHECK' }), h('div', { text: v.msg })]));
     else if (v && v.pass && pend) cb.appendChild(h('div', { class: 'chk todo' }, [h('span', { class: 'ic', text: 'ALMOST' }), h('div', { html: '✓ ' + esc(v.msg) + '<br>Now: <b>' + esc(pend) + '</b>.' })]));
     else if (v && v.pass) cb.appendChild(h('div', { class: 'chk pass' }, [h('span', { class: 'ic', text: 'PASS' }), h('div', { text: v.msg + ' ' + nextHint(id) })]));
-    else if (ss.codePass && !RES[id]) cb.appendChild(h('div', { class: 'chk wait' }, [h('span', { class: 'ic', text: 'WAIT' }), h('div', { text: 'You passed this before. Python is rebuilding it…' })]));
+    else if (ss.codePass && !RES[id]) cb.appendChild(h('div', { class: 'chk wait' }, [h('span', { class: 'ic', text: 'WAIT' }), h('div', { text: 'You passed this before. ' + (s.lang === 'js' ? 'Your earlier cells are being rebuilt…' : 'Python is rebuilding it…') })]));
     else cb.appendChild(h('div', { class: 'chk todo' }, [h('span', { class: 'ic', text: 'TO DO' }), h('div', { text: pend ? 'Now: ' + pend + '.' : '' })]));
   }
   var wb = $('#whybox');

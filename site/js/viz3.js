@@ -116,7 +116,7 @@ function stack(r, host, api) {
   var row = el('div'); row.style.cssText = 'display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap'; c.appendChild(row);
   var bytes = r.sample.map(function (v) { return Math.round(v * 255); });
   var cv = bytesCanvas(bytes, 0, 64); var wrapc = el('div'); wrapc.style.cssText = 'position:relative;width:176px;height:176px'; wrapc.appendChild(px(cv, 176));
-  var y0 = 14, x0 = 14, N = 7, s = 176 / 64;
+  var y0 = 14, x0 = 12, N = 7, s = 176 / 64;
   var box = el('div'); box.style.cssText = 'position:absolute;left:' + (x0 * s) + 'px;top:' + (y0 * s) + 'px;width:' + (N * s) + 'px;height:' + (N * s) + 'px;outline:2px solid #ffb547'; wrapc.appendChild(box);
   row.appendChild(wrapc);
   var g = '<table style="border-collapse:collapse;font-family:Space Mono,monospace;font-size:11px">';
@@ -153,18 +153,20 @@ function sceneFilter(s, stage, out, api) {
   var img = new Float32Array(4096); for (var i = 0; i < 4096; i++) img[i] = b[i] / 255;
   var M = masks(), anim = null, showMask = false;
   stage.innerHTML = '';
-  var wrap = el('div'); wrap.style.cssText = 'display:flex;gap:16px;padding:14px;flex-wrap:wrap;align-items:flex-start;justify-content:center'; stage.appendChild(wrap);
+  var wrap = el('div'); wrap.style.cssText = 'display:flex;gap:12px;padding:12px 8px;flex-wrap:wrap;align-items:flex-start;justify-content:center'; stage.appendChild(wrap);
   function fig(title) { var f = el('div'); f.style.cssText = 'text-align:center;position:relative'; f.appendChild(el('div', null, '<span style="font-family:Orbitron,Arial,sans-serif;font-size:11px;letter-spacing:.14em;color:#8d9bb0">' + title + '</span>')); wrap.appendChild(f); return f; }
   var fIn = fig('REAL CELL ' + CRACK_ID + ' (INPUT)'), fK = fig('YOUR 3 × 3 FILTER'), fOut = fig('WHAT THE FILTER SEES');
-  var S = 200, cIn = document.createElement('canvas'); cIn.width = cIn.height = 64; cIn.getContext('2d').drawImage(api.canvas(CRACK_ID), 0, 0);
+  var S = 160, cIn = document.createElement('canvas'); cIn.width = cIn.height = 64; cIn.getContext('2d').drawImage(api.canvas(CRACK_ID), 0, 0);
   var inWrap = el('div'); inWrap.style.cssText = 'position:relative;width:' + S + 'px;height:' + S + 'px;margin-top:4px'; inWrap.appendChild(px(cIn, S));
   var win = el('div'); win.style.cssText = 'position:absolute;width:' + (3 * S / 64) + 'px;height:' + (3 * S / 64) + 'px;outline:2px solid #46e3ff;box-shadow:0 0 8px #46e3ff;display:none'; inWrap.appendChild(win);
   var mk = document.createElement('canvas'); mk.width = mk.height = 64; mk.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;display:none'; inWrap.appendChild(mk);
   fIn.appendChild(inWrap);
   var mx = mk.getContext('2d'), mi = mx.createImageData(64, 64); for (i = 0; i < 4096; i++) { var cr = M.crack[i], br = M.bar[i]; mi.data[4 * i] = cr ? 255 : br ? 255 : 0; mi.data[4 * i + 1] = cr ? 77 : br ? 181 : 0; mi.data[4 * i + 2] = cr ? 106 : br ? 71 : 0; mi.data[4 * i + 3] = cr || br ? 150 : 0; } mx.putImageData(mi, 0, 0);
-  var tog = el('button', 'btn small', 'Show crack + busbar zones'); tog.style.marginTop = '6px';
-  tog.onclick = function () { showMask = !showMask; mk.style.display = showMask ? 'block' : 'none'; tog.textContent = showMask ? 'Hide zones' : 'Show crack + busbar zones'; };
+  var tog = el('button', 'btn small', 'Show the zones'); tog.style.marginTop = '6px';
+  tog.onclick = function () { showMask = !showMask; mk.style.display = showMask ? 'block' : 'none'; tog.textContent = showMask ? 'Hide the zones' : 'Show the zones'; };
   fIn.appendChild(tog);
+  var zl = el('div', 'hint', '<span style="color:#ff4d6a">■</span> crack zone · <span style="color:#ffb547">■</span> busbar zone'); zl.style.display = 'none'; fIn.appendChild(zl);
+  tog.addEventListener('click', function () { zl.style.display = showMask ? 'block' : 'none'; });
   var grid = el('div'); grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,58px);gap:5px;margin-top:8px'; fK.appendChild(grid);
   fK.appendChild(el('div', 'hint', 'tap a square: 0 → +1 → −1'));
   fK.style.maxWidth = '200px';
@@ -236,22 +238,23 @@ function layers3c(r, host, api) {
   var c = card(host, 'YOUR NETWORK — REAL SHAPES', 'Read from your model object. Each picture shows the data shape after that block. Tap a block to open it.');
   var holder = el('div'); c.appendChild(holder);
   var det = el('div'); c.appendChild(det);
-  var W = 440, Hh = 190;
+  var W = 440, Hh = 206;
   function draw() {
     var o = '', x = 4, n = B.length + 1, slot = (W - 8) / n;
     function box(cx, side, depth, col, label, sub, idx) {
-      var s = side, d = Math.min(26, depth / 6 + 4), y = 96 - s / 2;
+      var s = side, d = Math.min(22, depth / 7 + 4), y = 76 - s / 2;
       var g = '<g data-b="' + idx + '" style="cursor:pointer">';
       for (var k = 3; k >= 0; k--) g += '<rect x="' + (cx - s / 2 + k * d / 4) + '" y="' + (y - k * d / 4) + '" width="' + s + '" height="' + s + '" fill="' + (k ? '#0b121b' : '#0f2232') + '" stroke="' + col + '" stroke-opacity="' + (k ? .45 : 1) + '"/>';
-      g += T(cx + d / 2, 150, label, { a: 'middle', s: 11, f: 'Space Mono,monospace', c: '#e6eef8' }) + T(cx + d / 2, 165, sub, { a: 'middle', s: 11, c: '#8d9bb0' });
-      if (sel === idx) g += '<rect x="' + (cx - slot / 2 + 4) + '" y="4" width="' + (slot - 8) + '" height="176" rx="8" fill="none" stroke="#ffb547" stroke-width="2"/>';
-      return g + '<rect x="' + (cx - slot / 2 + 4) + '" y="4" width="' + (slot - 8) + '" height="176" fill="transparent"/></g>';
+      var ly = idx % 2 ? 172 : 146;
+      g += '<line x1="' + (cx + d / 2) + '" y1="' + (y + s + 2) + '" x2="' + (cx + d / 2) + '" y2="' + (ly - 11) + '" stroke="#26344a"/>' + T(cx + d / 2, ly, label, { a: 'middle', s: 10.5, f: 'Space Mono,monospace', c: '#e6eef8' }) + T(cx + d / 2, ly + 13, sub, { a: 'middle', s: 11, c: '#8d9bb0' });
+      if (sel === idx) g += '<rect x="' + (cx - slot / 2 + 2) + '" y="4" width="' + (slot - 4) + '" height="196" rx="8" fill="none" stroke="#ffb547" stroke-width="2"/>';
+      return g + '<rect x="' + (cx - slot / 2 + 2) + '" y="4" width="' + (slot - 4) + '" height="196" fill="transparent"/></g>';
     }
     var cx = 4 + slot / 2;
-    o += box(cx, 64 * 0.9, 1, '#46e3ff', '64×64×1', 'input', -1);
+    o += box(cx, 44, 1, '#46e3ff', '64×64×1', 'input', -1);
     B.forEach(function (b, i) {
       cx += slot; var sh = b.out;
-      if (b.kind === 'block') o += box(cx, Math.max(8, sh[1] * 1.6), sh[3], i === big && m.tapBig ? '#3dffa0' : '#a98bff', sh[1] + '×' + sh[2] + '×' + sh[3], n0(b.params) + ' w', i);
+      if (b.kind === 'block') o += box(cx, Math.max(8, sh[1] * 1.3), sh[3], i === big && m.tapBig ? '#3dffa0' : '#a98bff', sh[1] + '×' + sh[2] + '×' + sh[3], n0(b.params) + ' w', i);
       else o += box(cx, 10, sh[sh.length - 1] || 1, '#ffb547', String(sh[sh.length - 1]), (b.kind === 'GlobalAveragePooling2D' ? 'average' : b.kind === 'Dense' ? 'score' : b.kind.toLowerCase()) + (b.params ? ' · ' + b.params + ' w' : ''), i);
     });
     var s = svg(W, Hh, o); holder.innerHTML = ''; holder.appendChild(s);
@@ -309,14 +312,14 @@ function sortAug(box, api) {
     w.appendChild(px(augCanvas(api, a.k), 88)); w.appendChild(el('div', null, a.name));
     w.setAttribute('data-aug', a.k);
     if (m.checked && m.bins[a.k]) { var ok = (m.bins[a.k] === 'real') === a.real; w.style.borderColor = ok ? '#3dffa0' : '#ff4d6a'; w.appendChild(el('div', null, ok ? '<span style="color:#3dffa0">✓</span>' : '<span style="color:#ff4d6a">✗</span>')); }
-    if (!m.sortOk) dragTok(w, function (b) { put(a.k, b); }, function () { sel = sel === a.k ? null : a.k; draw(); });
+    if (!m.sortOk) dragTok(w, function (b) { put(a.k, b); }, function () { if (sel && sel !== a.k && m.bins[a.k]) { put(sel, m.bins[a.k]); return; } sel = sel === a.k ? null : a.k; draw(); });
     return w;
   }
   function put(k, b) { m.bins[k] = b; m.checked = 0; sel = null; api.setMech({ bins: m.bins, checked: 0 }); draw(); }
   function draw() {
     pool.innerHTML = ''; bins.innerHTML = '';
     AUG.forEach(function (a) { if (!m.bins[a.k]) pool.appendChild(cardEl(a)); });
-    if (!pool.children.length) pool.appendChild(el('span', 'hint', 'All cards sorted.'));
+    pool.style.minHeight = '110px'; if (!pool.children.length) { pool.appendChild(el('span', 'hint', 'All cards sorted.')); pool.style.minHeight = '0'; }
     [['real', 'STILL A REAL CELL PHOTO', '#3dffa0'], ['fake', 'NOT A REAL CELL PHOTO', '#ff4d6a']].forEach(function (b) {
       var d = el('div', null, '<div style="font-family:Orbitron,Arial,sans-serif;font-size:10.5px;color:' + b[2] + '">' + b[1] + '</div>');
       d.setAttribute('data-drop', b[0]); d.style.cssText = 'min-height:130px;border:1px solid ' + b[2] + '66;border-radius:10px;padding:6px;background:#0a0f16';
@@ -384,7 +387,7 @@ function drawGuess(holder, P, pr, onSet, locked) {
     o += T((L + R) / 2, Hh - 4, 'epoch (one pass over all train photos)', { a: 'middle', s: 12, c: '#8d9bb0' });
     o += '<text transform="translate(14 ' + ((Tt + B) / 2) + ') rotate(-90)" text-anchor="middle" font-family="Rajdhani,Arial,sans-serif" font-size="12" fill="#8d9bb0">validation score →</text>';
     o += T(L + 4, Tt + 12, 'high', { s: 11, c: '#5d6b80' }) + T(L + 4, B - 4, 'low', { s: 11, c: '#5d6b80' });
-    if (locked) o += line(P.answer, '#3dffa0', '6 4', 2.5) + T(R - 4, Y(P.answer[N - 1]) + 16, 'typical real shape', { a: 'end', s: 12, c: '#3dffa0' });
+    if (locked) o += line(P.answer, '#3dffa0', '6 4', 2.5) + T(R - 4, Y(P.answer[N - 1]) - 26, 'typical real shape', { a: 'end', s: 12, c: '#3dffa0' });
     o += line(pts, '#a98bff') + (locked ? T(X(2), Y(pts[2] || 0.5) - 8, 'your line', { s: 12, c: '#a98bff' }) : '');
     if (!locked && pts.every(function (v) { return v == null; })) o += T((L + R) / 2, (Tt + B) / 2, 'press here and drag from left to right', { a: 'middle', s: 15, c: '#ffb547', w: 700 });
     s.innerHTML = o;
@@ -443,7 +446,7 @@ function curves(r, host, api) {
   tiles(c, [[r.best.epoch + ' / ' + r.epochs, 'best epoch (kept)', 'g'], [f3(r.best.valAuc), 'best validation score', 'c'], [f3(last.valAuc), 'last epoch score', 'a']]);
   tiles(c, [[per.toFixed(1) + ' s', 'per epoch', 'c'], [(r.sec / 60).toFixed(1) + ' min', 'total', 'c'], [r.backend.toUpperCase(), 'TensorFlow.js backend', r.backend === 'webgl' ? 'g' : 'r']]);
   c.appendChild(el('p', 'hint', 'Ran on: ' + gpuText(r) + '. ' + (r.saved ? 'Weights saved in this browser: a reload brings this model back.' : r.restoredFrom ? '' : 'Could not save the weights in this browser (storage is blocked here). After a reload you will need to train again.')));
-  if (r.epochs < 30) c.appendChild(el('p', 'hint', 'Trained for ' + r.epochs + ' epochs (' + (r.epochs === 10 ? 'Quick' : 'test') + ' setting). Full is 30 epochs; it usually scores a little better.'));
+  if (r.epochs < 30) c.appendChild(el('p', 'hint', 'Trained for ' + r.epochs + (r.epochs === 1 ? ' epoch (' : ' epochs (') + (r.epochs === 10 ? 'Quick' : 'test') + ' setting). Full is 30 epochs; it usually scores a little better.'));
 }
 function curvesLive(host, api) {
   var box = el('div'); host.appendChild(box);
