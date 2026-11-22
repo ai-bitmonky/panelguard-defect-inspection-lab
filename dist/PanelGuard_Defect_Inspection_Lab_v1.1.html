@@ -9857,6 +9857,16 @@ function setReview(on) {
   } catch (e) { location.reload(); }
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(REVIEW ? Object.assign({}, S, { cur: RV.studentCur }) : S)); } catch (e) {} }
+/* storage blocked (e.g. a sandboxed frame without same-origin): say so plainly, once, in the footer */
+(function () {
+  var ok = true; try { localStorage.setItem(KEY + '.probe', '1'); localStorage.removeItem(KEY + '.probe'); } catch (e) { ok = false; }
+  if (ok) return;
+  var show = function () { var f = document.querySelector('.foot'); if (!f || document.getElementById('nostore')) return;
+    var b = document.createElement('b'); b.id = 'nostore'; b.style.cssText = 'color:#ffb547;flex:none';
+    b.textContent = 'Progress is NOT saved in this viewer (it blocks browser storage): a reload starts again. Open the downloaded file directly to keep your work.';
+    f.insertBefore(b, f.firstChild); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', show); else show();
+})();
 function SSs(id) { return S.subs[id] || (S.subs[id] = { mech: {}, pred: {} }); }           // the student's real progress
 function SS(id) { return REVIEW ? (RV.subs[id] || (RV.subs[id] = { mech: {}, pred: {} })) : SSs(id); }
 
