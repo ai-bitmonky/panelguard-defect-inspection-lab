@@ -220,7 +220,8 @@ var s7b = { id: '7b', name: 'Show one cell', kind: 'code', lang: 'js',
 "console.log('cell ' + oneCell.card.id + ' -> ' + oneCell.lamp.word + ' in ' + oneCell.ms.toFixed(0) + ' ms');"
   ]),
   twin: L([
-"import gradio as gr                    # gradio 6.32.0 \u2014 the whole app: tools/research/step7_gradio_app.py",
+"# EXCERPT. The same logic, runnable: app.py in your take-home project (8g, \u201cTake it home\u201d).",
+"import gradio as gr                    # gradio 6.32.0",
 "LAMPS = {'pass': ('PASS', 'circle', '#2ee07a'), 'person': ('CHECK', 'triangle', '#ffb21e'),",
 "         'stop': ('STOP', 'square', '#ff5050'), 'none': ('NO VERDICT', 'ring', '#a3afbf')}",
 "",
@@ -357,6 +358,7 @@ var s7c = { id: '7c', name: 'Run the line', kind: 'code', lang: 'js',
 "console.log('counts after 5 cells:', JSON.stringify(counts));"
   ]),
   twin: L([
+"# EXCERPT. The same logic, runnable: app.py in your take-home project (8g, \u201cTake it home\u201d).",
 "def new_session():",
 "    return {'counts': {'pass': 0, 'person': 0, 'stop': 0, 'none': 0, 'total': 0, 'byPerson': 0},",
 "            'queue': [], 'answers': [], 'next': 0, 'times': [], 'shown_at': None}",
@@ -541,6 +543,7 @@ var s7d = { id: '7d', name: 'The person\'s queue', kind: 'code', lang: 'js',
 "console.log('waiting for a person:', queue.length, 'cells');"
   ]),
   twin: L([
+"# EXCERPT. The same logic, runnable: app.py in your take-home project (8g, \u201cTake it home\u201d).",
 "from langgraph.types import Command",
 "",
 "def answer(S, said):                       # resume the SAME paused flow with the person's answer",
@@ -681,6 +684,7 @@ var s7e = { id: '7e', name: 'The shift board', kind: 'code', lang: 'js',
 "console.log('defects passed:', board.all.passed, 'of', board.all.defects, '=', board.all.per100, 'per 100 (target', board.target + ')');"
   ]),
   twin: L([
+"# EXCERPT. The same logic, runnable: app.py in your take-home project (8g, \u201cTake it home\u201d).",
 "def shift_board(log, size=50):",
 "    blocks = []",
 "    for i in range(0, len(log), size):",
@@ -793,6 +797,7 @@ var s7f = { id: '7f', name: 'One button, one report', kind: 'code', lang: 'js',
 "console.log(report1.held ? 'HELD: ' + report1.why : 'report ready, ' + report1.drafts + ' drafts, removed: ' + JSON.stringify(report1.removed));"
   ]),
   twin: L([
+"# EXCERPT. The same logic, runnable: crew.py (the report) and app.py in your take-home project (8g, \u201cTake it home\u201d).",
 "def report_crew():                         # a FRESH 6f crew for each press (crewai: workers and jobs run right once)",
 "    inspector, analyst, writer = hire()",
 "    sloppy = Agent(role=writer.role, goal=writer.goal, backstory=writer.backstory,",
@@ -942,6 +947,7 @@ var s7g = { id: '7g', name: 'Break it before the plant does', kind: 'code', lang
 "console.log('console ready: lamp', console1.lamp.word, '· queue', queue.length, '· cells counted', counts.total);"
   ]),
   twin: L([
+"# EXCERPT. The same logic, runnable: app.py in your take-home project (8g, \u201cTake it home\u201d).",
 "def build():",
 "    with gr.Blocks(title='PanelGuard \u00b7 operator console') as demo:",
 "        ...                                # photo + lamp, counters, queue + 3 buttons, START / STOP LINE, board, report",

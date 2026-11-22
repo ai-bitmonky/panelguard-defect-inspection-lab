@@ -161,10 +161,10 @@ await step('3d', { pre: async () => { const put = async (k, bin) => { await tap(
 // 3e: the LIVE training (no fixture anywhere in this script)
 if (at('3e')) await guard('3e', async () => {
   await open('3e'); await lockCheck('3e');
-  { const s = F.locator('#predbox svg'); await s.scrollIntoViewIfNeeded(); const b = await s.boundingBox(); const pts = [];
+  if (!(await ev(() => !!(window.PG.S.subs['3e'].pred || {}).locked))) { const s = F.locator('#predbox svg'); await s.scrollIntoViewIfNeeded(); const b = await s.boundingBox(); const pts = [];
     for (let i = 0; i <= 30; i++) { const x = b.x + b.width * (0.1 + 0.88 * i / 30); const v = i < 15 ? 0.2 + 0.6 * i / 15 : 0.8 - 0.3 * (i - 15) / 15; pts.push([x, b.y + b.height * (0.06 + 0.78 * (1 - v))]); }
-    await page.mouse.move(...pts[0]); await page.mouse.down(); for (const p of pts) await page.mouse.move(p[0], p[1], { steps: 2 }); await page.mouse.up(); }
-  await F.locator('#predbox button', { hasText: 'Check' }).first().click(); await page.waitForTimeout(300);
+    await page.mouse.move(...pts[0]); await page.mouse.down(); for (const p of pts) await page.mouse.move(p[0], p[1], { steps: 2 }); await page.mouse.up();
+  await F.locator('#predbox button', { hasText: 'Check' }).first().click(); await page.waitForTimeout(300); }
   expect(await ev(() => !!window.PG.S.subs['3e'].pred.locked), '3e draw prediction locked', '3e');
   if (!EPOCHS) { await F.locator('.card.epochs button', { hasText: process.env.FULL === '1' ? 'Full' : 'Quick' }).click(); await page.waitForTimeout(300); }
   const mode = await ev(() => ({ mode: window.PG.S.epochsMode, epochs: window.PG.epochs() })); log('3e training length:', JSON.stringify(mode)); R.live.epochSetting = mode;

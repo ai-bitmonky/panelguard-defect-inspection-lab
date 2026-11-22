@@ -279,6 +279,7 @@ function gpuInfo() {
   try {
     var c = document.createElement('canvas'), gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return { name: 'none', soft: true };
     var d = gl.getExtension('WEBGL_debug_renderer_info'), n = String(d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    if (n === 'Apple GPU' && !/Macintosh|iPhone|iPad/.test(navigator.userAgent)) return { name: 'not told by this browser (Safari-type browsers hide it)', soft: false, hidden: true };   // WebKit masks the renderer name
     return { name: n, soft: /swiftshader|llvmpipe|software|basic render/i.test(n) };
   } catch (e) { return { name: 'unknown', soft: false }; }
 }

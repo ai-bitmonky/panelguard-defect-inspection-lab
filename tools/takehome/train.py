@@ -103,7 +103,7 @@ def main():
     Xs = X.astype(np.float32) / 255
     pca = PCA(n_components=40, svd_solver='full', random_state=0).fit(small32(Xs)[idx_train])     # learn from TRAIN only
     F = features(Xs, pca)
-    svc = Pipeline([('scale', StandardScaler()), ('model', SVC(C=3, probability=True, random_state=0))]).fit(F[idx_train], y[idx_train])
+    svc = Pipeline([('scale', StandardScaler()), ('model', SVC(C=3, probability=True, random_state=0))])   # needs scikit-learn < 1.11 (see requirements.txt).fit(F[idx_train], y[idx_train])
     p_svc = svc.predict_proba(F[idx_val])[:, 1]
     print(f'Step 2 SVC · good cells stopped at 95% recall: {100 * false_alarms_at_95(y[idx_val], p_svc):.1f}%')
 
