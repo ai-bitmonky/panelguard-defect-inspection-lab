@@ -1,0 +1,7 @@
+Photo quality stats on all 2624 real photos (64x64, 0-255). Used to place the Step 5 check_photo gates.
+mean brightness    min   13.8  p1   72.1  p50  156.5  max  228.1
+spread (std)       min    4.4  p1   16.0  p50   28.1  max   88.3
+contrast (p95-p5)  min    9.0  p1   52.2  p50   96.0  max  240.0
+mean < 20: 4 photos: [(1836, 1.0, 'poly', np.float64(15.5)), (1895, 1.0, 'poly', np.float64(14.4)), (1896, 1.0, 'poly', np.float64(13.8)), (1897, 1.0, 'poly', np.float64(16.2))]
+others: min mean 26.2, min spread 6.3, min contrast 16
+gates: DARK = 20 (mean), BLANK = 3 (spread), FLAT = 12 (contrast)

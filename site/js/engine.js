@@ -286,7 +286,7 @@ function refreshBridge() {
     var pg = {
       pixels: PACK, n: b.n, idx_train: b.idx_train, idx_val: b.idx_val, y_train: b.y_train, y_val: b.y_val, p_val: b.p_val,
       cell_val: b.cell_val, prob_val: b.prob_val, kind_val: b.kind_val, baseline: b.baseline,
-      cellIndex: function (id) { return i2[id]; },
+      cellIndex: function (id) { return i2[id]; }, kindOf: function (id) { var r = LAB.rows[i2[id]]; return r ? r[2] : null; },
       get epochs() { return epochsNow(); }, epochsMode: epochsMode(), gpu: JSR.gpu,
       live: JSR.T.live, trainingWatch: JSR.T.watch, trainState: function () { return JSR.T.state; },
       falseAlarmAt95: J.falseAlarmAt95, twoGates: J.twoGates, gatesFor: window.PG_STEP3_gatesFor, auc: J.auc,
@@ -629,7 +629,7 @@ function renderWork() {
     var stopB = h('button', { class: 'btn stop', text: '■ Stop', style: 'display:none', title: js ? 'Stops the run after the current batch.' : 'Stops Python and restarts it. Your passed cells are rebuilt.' });
     var resetB = h('button', { class: 'btn small', text: '↺ Reset this cell', title: 'Put back the starting code' });
     var copyB = h('button', { class: 'btn small', text: '⧉ Copy code' });
-    box.appendChild(h('div', { class: 'edbar' }, [h('span', { class: 'fn', text: js ? 'cell_' + id + '.js — JavaScript · TensorFlow.js' : 'cell_' + id + '.py — Python' }), h('span', { class: 'sp' }), copyB, resetB]));
+    box.appendChild(h('div', { class: 'edbar' }, [h('span', { class: 'fn', text: js ? 'cell_' + id + '.js — ' + (s.edLabel || 'JavaScript · TensorFlow.js') : 'cell_' + id + '.py — Python' }), h('span', { class: 'sp' }), copyB, resetB]));
     cur.ed = Editor(box, ss.code || s.code, doRun, function (v) { ss.draft = v; save(); }, s.lang);
     if (ss.draft && ss.draft !== (ss.code || s.code)) cur.ed.set(ss.draft);
     var note = h('span', { class: 'note' });
@@ -652,7 +652,7 @@ function twinPanel(s) {
   var copyB = h('button', { class: 'btn small', text: '⧉ Copy' });
   copyB.onclick = function () { copyText(s.twin, copyB); };
   var pre = h('pre', { class: 'twcode', html: hl(s.twin, 'py') });
-  return h('div', { class: 'twin' }, [h('div', { class: 'edbar' }, [h('span', { class: 'fn', html: '<b style="color:#ffcf6b">Same thing in Python Keras</b> · read-only · Keras 3' }), h('span', { class: 'sp' }), copyB]), pre]);
+  return h('div', { class: 'twin' }, [h('div', { class: 'edbar' }, [h('span', { class: 'fn', html: '<b style="color:#ffcf6b">' + esc(s.twinTitle || 'Same thing in Python Keras') + '</b> · ' + esc(s.twinNote || 'read-only · Keras 3') }), h('span', { class: 'sp' }), copyB]), pre]);
 }
 function renderEpochs() {
   var box = h('div', { class: 'card epochs' });
@@ -679,6 +679,7 @@ function updateRunBtn() {
   else if (replaying) why = 'Python is rebuilding your earlier cells. Wait a moment.';
   else if (s.lang === 'js' && JSR.err) why = JSR.err;
   else if (s.lang === 'js' && !JSR.ready) why = 'TensorFlow.js is still starting. Wait a moment.';
+  else if (s.lang === 'js' && STEP_OF[S.cur].id === 5 && !window.LangGraph) why = 'LangGraph could not be loaded (js/langgraph.min.js). Reload the page.';
   else if (!REVIEW && s.pre && s.pre.need(ss.mech || {})) why = 'First do the hands-on part above: ' + s.pre.need(ss.mech || {}) + '.';
   else if (!REVIEW && s.predict && !(ss.pred && ss.pred.locked)) why = 'Answer the prediction question above first.';
   else if (running) why = 'Code is running.';
@@ -773,6 +774,8 @@ function renderPredict(id) {
       holder.innerHTML = '<div class="hint">Getting the real curve from Python…</div>';
       whenReady().then(function () { return replayDone(); }).then(function () { return kEval(s.preProbe); }).then(function (r) { if (r && r.curve) { PRE[id] = r; if (S.cur === id) draw(); } else holder.innerHTML = '<div class="hint">' + (REVIEW ? REVIEW_MSG : 'Could not read p_val yet. Finish 2c first.') + '</div>'; });
     }
+  } else if (P.render) {                                  // a format with its own renderer (e.g. Step 5 'lanes')
+    P.render(body, makeApi(id), pr, lock, whyBox);
   }
   return box;
 }
@@ -844,7 +847,8 @@ function refreshStatus() {
   var wb = $('#whybox');
   if (wb) { wb.innerHTML = ''; if ((passed(id) || (REVIEW && VERD[id] && VERD[id].pass)) && RES[id] && s.explain) wb.appendChild(whyBox(s.explain(RES[id], ss.mech || {}))); }
   var eb = $('#endbox');
-  if (eb) { eb.innerHTML = ''; if (id === '2e' && (passed('2e') || (REVIEW && RES['2e']))) V.endCard(eb, RES, makeApi(id)); }
+  if (eb) { eb.innerHTML = ''; if (id === '2e' && (passed('2e') || (REVIEW && RES['2e']))) V.endCard(eb, RES, makeApi(id));
+    else if (s.endCard && RES[id] && (passed(id) || (REVIEW && VERD[id] && VERD[id].pass))) s.endCard(eb, makeApi(id)); }
   var strip = $('.strip'); if (strip) renderStrip(STEP_OF[id], strip);
   renderNav();
 }

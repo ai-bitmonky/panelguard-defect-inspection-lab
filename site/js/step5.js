@@ -697,6 +697,8 @@ var s5g = { id: '5g', name: 'Run a shift', kind: 'code', lang: 'js',
     remember: 'The flow guarantees the routing. The quality still depends on the scores and the people.' }; }
 };
 
+s5d.predict.render = function (body, api, pr, lock, whyBox) { V().lanesPredict(body, api, pr, lock, whyBox, s5d.predict); };
+
 var step5 = { id: 5, title: 'Wire the inspection flow with LangGraph', short: 'state, stations, fork, loop cap, human pause, shift',
   story: 'You have scores and two gates. Now wire the real line: every cell is checked, scored, routed, and recorded — and unsure cells really wait for a person. LangGraph is the wiring; the talking AI agents come in Step 6.',
   substeps: [s5a, s5b, s5c, s5d, s5e, s5f, s5g] };

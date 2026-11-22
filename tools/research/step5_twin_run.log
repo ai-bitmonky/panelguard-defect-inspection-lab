@@ -1,0 +1,14 @@
+langgraph 1.2.24 | JS run: 1.7.5 | source: tools/tests/js_cells5.test.mjs (Node, TF.js CPU, test fixture model)
+real photos flagged: 4 [1836, 1895, 1896, 1897] | fault copies: ['too dark', 'almost blank', 'low contrast']
+no cap -> GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+cap 2 trails: [('F1', 2, 'waiting'), ('F2', 2, 'waiting'), ('F3', 2, 'waiting'), (1896, 2, 'waiting'), (496, 1, 'stop')]
+pause/resume: True ('human_check',) -> stop ()
+3 shifts x 525 cells in 8.6 s
+MATCH  low_poly 
+MATCH  shift1 
+   shift1 lanes {'pass': 199, 'person': 240, 'stop': 86} | defects passed 8 of 165 | good stopped 4 | poly defects passed 6 of 84 | person wrong 0
+MATCH  shift2 
+   shift2 lanes {'pass': 199, 'person': 240, 'stop': 86} | defects passed 16 of 165 | good stopped 26 | poly defects passed 9 of 84 | person wrong 30
+MATCH  shift3 
+   shift3 lanes {'pass': 155, 'person': 284, 'stop': 86} | defects passed 6 of 165 | good stopped 4 | poly defects passed 4 of 84 | person wrong 0
+TWIN MATCHES
