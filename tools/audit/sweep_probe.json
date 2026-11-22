@@ -1,0 +1,28 @@
+{
+ "3a": [
+  {
+   "kind": "given",
+   "w": [
+    "[2624, 64, 64, 1]",
+    "'255'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nError: Argument 'b' passed to 'div' must be numeric tensor, but got string tensor (line 3)\n",
+   "flag": "RAW?",
+   "sec": 0.665
+  },
+  {
+   "kind": "given",
+   "w": [
+    "[2624, 64, 64, 1]",
+    "255"
+   ],
+   "pass": true,
+   "msg": "X is [2624, 64, 64, 1], values 0 to 1. Train tray 1574 photos, validation 525.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 6.156
+  }
+ ]
+}

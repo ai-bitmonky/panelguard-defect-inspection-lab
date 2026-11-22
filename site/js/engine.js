@@ -254,6 +254,7 @@ function pyPlain(e) {
   var x = String(e || '');
   var m = x.match(/^NameError: name '(.+?)' is not defined/); if (m) return 'Python does not know the name “' + m[1] + '”. Check the spelling: it must be a name from the Python steps (Steps 1–2).';
   if (/^SyntaxError/.test(x)) return 'Python could not read the expression your gap makes. Check the spelling and the brackets.';
+  if (/0 sample\(s\)/.test(x)) return 'The gap gave an EMPTY list of cells, so there is nothing to score. Type the name of the tray (its list of cell positions).';
   if ((m = x.match(/^(IndexError|KeyError|TypeError|ValueError|AttributeError): (.*)$/))) return 'Python could not do it: ' + m[2].slice(0, 120) + '. Check the name you typed in the gap.';
   return 'Python stopped: ' + x.slice(0, 160);
 }
@@ -431,6 +432,7 @@ function friendly(e) {
   if (/did not contain a loop with signature matching types.*Str|not supported between instances of .*'str'|can't multiply sequence by non-int|unsupported operand type\(s\).*'str'/.test(m)) return 'A number is needed here, but the gap holds text (something in quotes). Type the number without quotes.';
   if (/only integers, slices .* are valid indices|indices must be integers/.test(m)) return 'A position inside [ ] must be a whole number (or a list of positions), not text or a decimal. Check the gap.';
   if ((x = m.match(/could not be broadcast together with shapes (\S+) (\S+)/))) return 'Two arrays do not fit together (shapes ' + x[1] + ' and ' + x[2] + '). Check the name in the gap: it must be the one with the matching length.';
+  if (/0 sample\(s\)/.test(m)) return 'The gap gave an EMPTY list ([]), so there is nothing to learn from or score. Type the name of the tray or array the line needs.';
   if (t === 'KeyError') return 'There is no entry called ' + m + '. Check the spelling: capital letters count.';
   if (t === 'AttributeError' && (x = m.match(/object has no attribute '(.+?)'/))) return 'There is nothing called “' + x[1] + '” on that object. Check the spelling.';
   if (t === 'TypeError') return 'A value has the wrong type here. Check the gap on the marked line (a name, a number or text in quotes?).';

@@ -82,7 +82,8 @@
   "3f: 3f opens in order",
   "3f: next part 3g locked before 3f is done; tooltip: “Locked. First finish 3e “Train it”: run the code until the check passes.”",
   "3f: starter code with gaps does not run: “undefined”",
-  "3f: 3f driver threw: page.waitForFunction: Target page, context or browser has been closed"
+  "3f: 3f driver threw: page.waitForFunction: Target page, context or browser has been closed",
+  "3e: 3e driver threw: page.waitForTimeout: Target page, context or browser has been closed"
  ],
  "notes": [],
  "live": {

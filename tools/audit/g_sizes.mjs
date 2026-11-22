@@ -3,7 +3,7 @@
 // scrolled to the end) and machine-check: page scrolls sideways, text clipped by overflow:hidden, elements sticking out of their panel.
 import { chromium } from 'playwright'; import { mirrorCDN } from '../tests/cdn.mjs';
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
-const here = path.dirname(fileURLToPath(import.meta.url)); const shots = path.resolve(here, 'shots_sizes'); fs.mkdirSync(shots, { recursive: true });
+const here = path.dirname(fileURLToPath(import.meta.url)); const shots = path.resolve(here, process.env.SHOTDIR || 'shots_sizes'); fs.mkdirSync(shots, { recursive: true });
 const DIST = process.env.DIST || path.resolve(here, '../../dist/PanelGuard_Defect_Inspection_Lab_v1.0.html');
 const PROFILE = process.env.PROFILE || '/tmp/audit_prof'; const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const ctx = await chromium.launchPersistentContext(PROFILE, { executablePath: '/usr/bin/google-chrome', headless: true, viewport: { width: 1366, height: 768 } });
@@ -27,7 +27,7 @@ const AUDIT = () => {
     } }
   return [...new Set(out)].slice(0, 25);
 };
-for (const [w, h] of [[1366, 768], [1920, 1080]]) {
+for (const [w, h] of (process.env.SIZES || '1366x768,1920x1080').split(',').map((x) => x.split('x').map(Number))) {
   await page.setViewportSize({ width: w, height: h }); await page.waitForTimeout(600);
   for (const id of ORDER) {
     await page.evaluate((i) => { if (location.hash === '#sub-' + i) location.hash = '#x'; }, id); await page.waitForTimeout(80); await page.evaluate((i) => { location.hash = '#sub-' + i; }, id); await page.waitForTimeout(1300);
@@ -38,6 +38,6 @@ for (const [w, h] of [[1366, 768], [1920, 1080]]) {
     R[w + '_' + id] = [...new Set([...a, ...b])]; if (R[w + '_' + id].length) log(w, id, JSON.stringify(R[w + '_' + id]).slice(0, 600));
   }
 }
-fs.writeFileSync(path.resolve(here, 'g_sizes_results.json'), JSON.stringify({ R, errors }, null, 1));
+fs.writeFileSync(path.resolve(here, process.env.OUTJ || 'g_sizes_results.json'), JSON.stringify({ R, errors }, null, 1));
 log('pages with machine findings:', Object.values(R).filter((x) => x.length).length, 'of', Object.keys(R).length, '| console errors', errors.length, JSON.stringify(errors.slice(0, 3)));
 await ctx.close(); process.exit(0);

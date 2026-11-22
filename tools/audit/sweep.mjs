@@ -36,12 +36,13 @@ const RAW = /\n\s+at |Traceback|line \d+, in |^\w*Error:|TypeError|ReferenceErro
 await page.goto('file://' + DIST); await page.waitForFunction(() => window.PG && window.PG.S, null, { timeout: 120000 });
 await page.locator('#revbtn').click(); await page.waitForTimeout(1500);
 await page.waitForFunction(() => window.PG.ready() && window.PG.JSR.ready, null, { timeout: 1800000 });
-await open('8e'); await page.locator('#runupto').click(); await page.waitForFunction(() => !window.PG.runningUpTo(), null, { timeout: 3600000 });
+await open(process.env.UPTO || '8e'); await page.locator('#runupto').click(); await page.waitForFunction(() => !window.PG.runningUpTo(), null, { timeout: 3600000 });
 log('run up to 8e:', await ev(() => (document.getElementById('rvstat') || {}).textContent));
 const R = fs.existsSync(OUT) && ONLY ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
 let ids = Object.keys(SUBS).filter((i) => SUBS[i].kind === 'code' && (SUBS[i].ref || []).length); ids = ids.filter((i) => i !== '3c').concat(['3c']); if (ONLY) ids = ids.filter((i) => ONLY.includes(i));
+const EXTRA = process.env.VARS ? JSON.parse(process.env.VARS) : null;
 for (const id of ids) {
-  await open(id); const list = variants(SUBS[id].ref); R[id] = [];
+  await open(id); const list = EXTRA ? EXTRA[id].map((w) => ({ kind: 'given', w })) : variants(SUBS[id].ref); R[id] = [];
   for (const x of list) {
     const r = await run(id, fill(SUBS[id].code, x.w)); const plainMsg = r.err ? r.err.split(/Show the raw/)[0] : '';
     const flag = r.v && r.v.pass ? 'PASSED' : (RAW.test(r.v ? r.v.msg : '') || RAW.test(plainMsg.replace(/^ERROR\s*/, '')) ? 'RAW?' : (r.v ? '' : 'NO VERDICT'));

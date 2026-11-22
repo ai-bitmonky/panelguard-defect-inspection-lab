@@ -202,9 +202,13 @@ body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
 @media (max-width:1400px){.goal.two{max-width:440px}.goal{white-space:normal;line-height:1.15;max-width:440px}}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#1c2736;border-radius:6px}::-webkit-scrollbar-track{background:transparent}
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}.tbl th{color:#8d9bb0;font-weight:600;text-align:left;font-size:12px;padding:3px 6px;border-bottom:1px solid var(--line)}.tbl td{padding:3px 6px;border-bottom:1px solid #121a24;font-family:var(--fm);font-size:12.5px}
+#small{display:none;position:fixed;inset:0;z-index:9999;background:#05080c;color:#dfe8f3;align-items:center;justify-content:center;padding:24px;font-size:16px;line-height:1.4}
+#small>div{max-width:440px}#small b{font-family:var(--fh);letter-spacing:.08em;color:#46e3ff;font-size:15px}
+@media (max-width:899px),(max-height:499px){body:not(.bigok) #small{display:flex}}
 </style>
 </head>
 <body>
+<div id="small" role="dialog" aria-label="Screen too small"><div><b>PANELGUARD NEEDS A BIGGER SCREEN</b><p>This course has code, a live output panel and hands-on drawings side by side. It needs a laptop or desktop screen at least 1024 pixels wide, in Chrome. On this screen the pages do not fit.</p><p>Open this page on a computer. Your work is kept in this browser only, so start on the computer you will use.</p><button class="btn" id="smallgo">Show it anyway</button></div></div>
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
@@ -2729,7 +2733,7 @@ function only(o, allowed, what) {
 /* ---------- tool ---------- */
 function tool(spec) {
   only(spec, ['name', 'description', 'args', 'run'], 'tool');
-  if (typeof spec.name !== 'string' || !/^[a-z][a-z0-9_]*$/.test(spec.name)) throw CrewError('A tool name is text in small letters with _ , in quotes, e.g. \'line_speed\'. Got: ' + (typeof spec.name === 'string' ? '“' + spec.name + '”' : String(spec.name)) + '.');
+  if (typeof spec.name !== 'string' || !/^[a-z][a-z0-9_]*$/.test(spec.name)) throw CrewError('A tool name is text in small letters with _ , in quotes, e.g. \'line_speed\'. Got: ' + (typeof spec.name === 'string' ? '“' + spec.name + '”' : Array.isArray(spec.name) ? 'a list, not text' : spec.name == null ? 'nothing' : typeof spec.name === 'object' ? 'an object, not text' : String(spec.name)) + '.');
   if (typeof spec.description !== 'string' || spec.description.trim().length < 10) throw CrewError('Tool ' + spec.name + ' needs a description (a sentence): the model reads it to decide when to use the tool.');
   if (typeof spec.run !== 'function') throw CrewError('Tool ' + spec.name + ' needs run: a function that returns the facts.');
   var args = spec.args || {}, props = {};
@@ -4053,7 +4057,7 @@ var s7c = { id: '7c', name: 'Run the line', kind: 'code', lang: 'js',
     if (r.err) return { pass: false, msg: 'onResult stopped with an error while counting a cell. Count under the lamp\'s key: r.lamp.key.' };
     var nan = Object.keys(r.after).filter(function (k) { return typeof r.after[k] !== 'number' || isNaN(r.after[k]); });
     if (nan.length || r.sum !== r.after.total) { var odd = Object.keys(r.after).filter(function (k) { return ['pass', 'person', 'stop', 'none', 'total', 'byPerson'].indexOf(k) < 0; });
-      return { pass: false, msg: 'After 5 cells the counters show PASS ' + (r.after.pass || 0) + ', CHECK ' + (r.after.person || 0) + ', STOP ' + (r.after.stop || 0) + ', NO VERDICT ' + (r.after.none || 0) + ' — together ' + r.sum + ', but ' + r.after.total + ' cells arrived.' + (odd.length ? ' The cells were counted under names that are not lamp counters (' + odd.map(function (k) { return '“' + k + '”'; }).join(', ') + ').' : '') + ' Each cell must go under its lamp\'s counter: type key.' }; }
+      return { pass: false, msg: 'After 5 cells the counters show PASS ' + (r.after.pass || 0) + ', CHECK ' + (r.after.person || 0) + ', STOP ' + (r.after.stop || 0) + ', NO VERDICT ' + (r.after.none || 0) + ' — together ' + r.sum + ', but ' + r.after.total + ' cells arrived.' + (odd.length ? ' The cells were counted under ' + (odd.indexOf('undefined') >= 0 ? 'a name the lamp does not have (the lamp field you typed does not exist)' : 'names that are not lamp counters (' + odd.map(function (k) { return '“' + k + '”'; }).join(', ') + ')') + '.' : '') + ' Each cell must go under its lamp\'s counter: type key.' }; }
     var t = r.tests.filter(function (x) { return x.up !== 1 || x.total !== 1 || x.nan.length; })[0];
     if (t) return { pass: false, msg: 'With ' + t.what + ' the “' + t.key + '” counter went up by ' + t.up + '. Every cell counts once under its own lamp: r.lamp.key.' };
     return { pass: true, msg: '5 real cells counted: ' + ['pass', 'person', 'stop', 'none'].map(function (k) { return k + ' ' + r.after[k]; }).join(', ') + '. A flow error counts as NO VERDICT. Median decision ' + (r.speed ? r.speed.medianMs.toFixed(0) + ' ms' : '?') + '.' };
@@ -5006,18 +5010,21 @@ var s8c = { id: '8c', name: 'How sure is that number?', kind: 'code', lang: 'js'
 "print('bootstrap:', [round(b, 1) for b in boot_interval])",
 "under_target = 100 * hi <= 5                    # the WHOLE interval under the target?"
   ]),
-  probe: async function (NS, pg) {
+  probe: async function (NS, pg, tf, code) {
     need8b(NS);
     if (!NS.interval || !NS.bootInterval || !('underTarget' in NS) || !('z' in NS)) return { missing: ['z', 'interval', 'bootInterval', 'underTarget'].filter(function (k) { return !(k in NS); }) };
     var k = NS.trial.all.defPassed, n = NS.trial.all.def, ref = wilsonRef(k, n, 1.96), wald = [100 * (k / n - 1.96 * Math.sqrt(k / n * (1 - k / n) / n)), 100 * (k / n + 1.96 * Math.sqrt(k / n * (1 - k / n) / n))];
     var m = pg.mechOf ? pg.mechOf('8c') : {};
-    return { k: k, n: n, z: NS.z, interval: NS.interval.slice(), ref: ref, wald: wald, boot: NS.bootInterval.slice(), underTarget: NS.underTarget, refUnder: ref[1] <= TARGET, target: TARGET, point: 100 * k / n,
+    var ix = code && (code.match(/underTarget\s*=\s*interval\[\s*([^\]]*?)\s*\]/) || [])[1];
+    return { pos: ix == null ? null : ix, k: k, n: n, z: NS.z, interval: NS.interval.slice(), ref: ref, wald: wald, boot: NS.bootInterval.slice(), underTarget: NS.underTarget, refUnder: ref[1] <= TARGET, target: TARGET, point: 100 * k / n,
       hist: NS.boot.filter(function (x, i) { return i % 20 === 0; }), honest: honesty(NS, pg), pulls: (m && m.dots) || [] };
   },
   check: function (r) {
     if (r.missing) return { pass: false, msg: 'Missing: ' + r.missing.join(', ') + '. Run the whole cell.' };
+    if (typeof r.z === 'string') return { pass: false, msg: 'z is the TEXT “' + r.z + '” (in quotes), not a number. Type the number without quotes: 1.96.' };
     if (typeof r.z !== 'number' || Math.abs(r.z - 1.96) > 1e-9) return { pass: false, msg: r.z === 1.645 || r.z === 1.64 ? 'z = ' + r.z + ' gives a 90% interval: too narrow. 95% needs 1.96.' : r.z === 2.58 || r.z === 2.576 ? 'z = ' + r.z + ' gives a 99% interval. The plan asks for 95%: 1.96.' : 'z is ' + r.z + '. For 95% type 1.96.' };
     if (Math.abs(r.interval[0] - r.ref[0]) > 1e-9 || Math.abs(r.interval[1] - r.ref[1]) > 1e-9) return { pass: false, msg: 'Your interval is ' + r.interval.map(function (x) { return x.toFixed(1); }).join(' to ') + ' per 100. It must be built from the defects that passed (' + r.k + ' of ' + r.n + '): type kPassed.' };
+    if (r.pos != null && r.pos !== '1' && !(+r.pos === 1)) return { pass: false, msg: 'underTarget reads interval[' + r.pos + ']. The interval has 2 ends: position 0 (bottom) and position 1 (top). A promise needs the TOP end under the target: position 1.' };
     if (r.underTarget !== r.refUnder) return { pass: false, msg: 'underTarget says ' + r.underTarget + ', but the interval goes up to ' + r.ref[1].toFixed(1) + ' per 100 (target ' + r.target + '). Compare the TOP end: position 1.' };
     return { pass: true, msg: 'Between ' + r.ref[0].toFixed(1) + ' and ' + r.ref[1].toFixed(1) + ' defects passed per 100 (Wilson 95%; bootstrap ' + r.boot[0].toFixed(1) + ' to ' + r.boot[1].toFixed(1) + '). ' + (r.refUnder ? 'The whole interval is under the target of ' + r.target + '.' : 'The interval reaches above the target of ' + r.target + ': the trial cannot promise the target.') };
   },
@@ -5794,8 +5801,12 @@ function friendly(e) {
   if ((x = m.match(/Requested texture size \[(\d+)x(\d+)\] greater than WebGL maximum.*?\[(\d+)x/))) return 'This tensor has a shape the graphics chip cannot hold (one side would be ' + (+x[1]).toLocaleString('en-US') + ' long; this browser allows at most ' + (+x[3]).toLocaleString('en-US') + '). Usually the numbers in the shape are in the wrong order: the photo count comes first, then rows, columns, channels.';
   if ((x = m.match(/Unknown loss (\S+)/))) return 'TensorFlow.js has no loss called “' + x[1] + '”. Check the spelling letter by letter: capital letters count.';
   if ((x = m.match(/Axis must be|axis.*out of range|Invalid axis/i))) return 'That axis does not exist here: ' + m;
+  if (/must be numeric tensor, but got string tensor|must be a number|Expected .* to be (a )?number|to be a positive integer, but got "|to be a 'number' > 0 but got "|shape comprised of positive integers/.test(m)) return 'A number is needed here, but the gap holds text (something in quotes). Type the number without quotes.';
+  if ((x = m.match(/Operands could not be broadcast together with shapes (\S+) and (\S+)/))) return 'Two tensors do not fit together (shapes ' + x[1] + ' and ' + x[2].replace(/\.$/, '') + '). Check the name in the gap: it must be the one with the matching shape.';
+  if (/Failed to link vertex and fragment shaders|WebGL context lost|CONTEXT_LOST/i.test(m)) return 'The browser\'s graphics engine (WebGL) failed for a moment. Reload the page: your passed cells come back by themselves.';
   if ((x = lgFriendly(m))) return x;
-  return t + ': ' + m;
+  if (m.length < 100 && !/\n/.test(m)) return 'JavaScript stopped: ' + m.replace(/^Error: /, '').replace(/[.\s]+$/, '') + '. Check the gap on the marked line.';
+  return 'JavaScript stopped with an error (' + t + ') on the marked line. Check the gap there; the full message is under “Show the raw JavaScript message”.';
 }
 /* MiniCrew (Step 6) errors are already plain; the CrewAI rule about future tasks gets a plainer line first */
 function crewFriendly(m) {
@@ -5897,7 +5908,7 @@ function create(opt) {
     catch (e) { res.error = errOf(e, code); }
     res.ms = Date.now() - t0;
     if (!res.error && probe) {
-      try { res.probe = await probe(NS, BUILT.pg, tf); }
+      try { res.probe = await probe(NS, BUILT.pg, tf, code); }
       catch (e) { if (e && e.pgCheck) res.error = errOf(e, code); else res.probe = { probe_error: (e && e.name || 'Error') + ': ' + (e && e.message || e) }; }
     }
     out = null;
@@ -9876,6 +9887,8 @@ function setReview(on) {
   } catch (e) { location.reload(); }
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(REVIEW ? Object.assign({}, S, { cur: RV.studentCur }) : S)); } catch (e) {} }
+/* very small screens: a plain note first (\u201cShow it anyway\u201d hides it for this visit) */
+(function () { var b = document.getElementById('smallgo'); if (b) b.onclick = function () { document.body.classList.add('bigok'); }; })();
 /* storage blocked (e.g. a sandboxed frame without same-origin): say so plainly, once, in the footer */
 (function () {
   var ok = true; try { localStorage.setItem(KEY + '.probe', '1'); localStorage.removeItem(KEY + '.probe'); } catch (e) { ok = false; }
@@ -10066,6 +10079,7 @@ function pyPlain(e) {
   var x = String(e || '');
   var m = x.match(/^NameError: name '(.+?)' is not defined/); if (m) return 'Python does not know the name “' + m[1] + '”. Check the spelling: it must be a name from the Python steps (Steps 1–2).';
   if (/^SyntaxError/.test(x)) return 'Python could not read the expression your gap makes. Check the spelling and the brackets.';
+  if (/0 sample\(s\)/.test(x)) return 'The gap gave an EMPTY list of cells, so there is nothing to score. Type the name of the tray (its list of cell positions).';
   if ((m = x.match(/^(IndexError|KeyError|TypeError|ValueError|AttributeError): (.*)$/))) return 'Python could not do it: ' + m[2].slice(0, 120) + '. Check the name you typed in the gap.';
   return 'Python stopped: ' + x.slice(0, 160);
 }
@@ -10240,10 +10254,15 @@ function friendly(e) {
   if ((x = m.match(/index (\d+) is out of bounds for axis (\d+) with size (\d+)/))) return 'There is no position ' + x[1] + ' there: that axis has only ' + x[3] + ' entries (0 to ' + (x[3] - 1) + ').';
   if ((x = m.match(/module 'numpy' has no attribute '(.+?)'/))) return 'numpy has nothing called “' + x[1] + '”. Check the spelling.';
   if (/n_splits=1/.test(m) || /at least one train\/test split/.test(m)) return 'Cross-validation needs at least 2 folds.';
-  if (t === 'KeyError') return 'There is no entry called ' + m + '.';
-  if (t === 'TypeError') return 'A value has the wrong type: ' + m;
-  if (t === 'ValueError') return 'A value is not allowed here: ' + m;
-  return t + ': ' + m;
+  if (/did not contain a loop with signature matching types.*Str|not supported between instances of .*'str'|can't multiply sequence by non-int|unsupported operand type\(s\).*'str'/.test(m)) return 'A number is needed here, but the gap holds text (something in quotes). Type the number without quotes.';
+  if (/only integers, slices .* are valid indices|indices must be integers/.test(m)) return 'A position inside [ ] must be a whole number (or a list of positions), not text or a decimal. Check the gap.';
+  if ((x = m.match(/could not be broadcast together with shapes (\S+) (\S+)/))) return 'Two arrays do not fit together (shapes ' + x[1] + ' and ' + x[2] + '). Check the name in the gap: it must be the one with the matching length.';
+  if (/0 sample\(s\)/.test(m)) return 'The gap gave an EMPTY list ([]), so there is nothing to learn from or score. Type the name of the tray or array the line needs.';
+  if (t === 'KeyError') return 'There is no entry called ' + m + '. Check the spelling: capital letters count.';
+  if (t === 'AttributeError' && (x = m.match(/object has no attribute '(.+?)'/))) return 'There is nothing called “' + x[1] + '” on that object. Check the spelling.';
+  if (t === 'TypeError') return 'A value has the wrong type here. Check the gap on the marked line (a name, a number or text in quotes?).';
+  if (t === 'ValueError') return 'A value is not allowed here. Check the gap on the marked line.';
+  return 'Python stopped with an error (' + t + ') on the marked line. Check the gap there; the full message is under “Show the raw Python message”.';
 }
 
 /* ---------- tooltip ---------- */

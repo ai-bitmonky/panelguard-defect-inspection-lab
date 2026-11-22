@@ -305,18 +305,21 @@ var s8c = { id: '8c', name: 'How sure is that number?', kind: 'code', lang: 'js'
 "print('bootstrap:', [round(b, 1) for b in boot_interval])",
 "under_target = 100 * hi <= 5                    # the WHOLE interval under the target?"
   ]),
-  probe: async function (NS, pg) {
+  probe: async function (NS, pg, tf, code) {
     need8b(NS);
     if (!NS.interval || !NS.bootInterval || !('underTarget' in NS) || !('z' in NS)) return { missing: ['z', 'interval', 'bootInterval', 'underTarget'].filter(function (k) { return !(k in NS); }) };
     var k = NS.trial.all.defPassed, n = NS.trial.all.def, ref = wilsonRef(k, n, 1.96), wald = [100 * (k / n - 1.96 * Math.sqrt(k / n * (1 - k / n) / n)), 100 * (k / n + 1.96 * Math.sqrt(k / n * (1 - k / n) / n))];
     var m = pg.mechOf ? pg.mechOf('8c') : {};
-    return { k: k, n: n, z: NS.z, interval: NS.interval.slice(), ref: ref, wald: wald, boot: NS.bootInterval.slice(), underTarget: NS.underTarget, refUnder: ref[1] <= TARGET, target: TARGET, point: 100 * k / n,
+    var ix = code && (code.match(/underTarget\s*=\s*interval\[\s*([^\]]*?)\s*\]/) || [])[1];
+    return { pos: ix == null ? null : ix, k: k, n: n, z: NS.z, interval: NS.interval.slice(), ref: ref, wald: wald, boot: NS.bootInterval.slice(), underTarget: NS.underTarget, refUnder: ref[1] <= TARGET, target: TARGET, point: 100 * k / n,
       hist: NS.boot.filter(function (x, i) { return i % 20 === 0; }), honest: honesty(NS, pg), pulls: (m && m.dots) || [] };
   },
   check: function (r) {
     if (r.missing) return { pass: false, msg: 'Missing: ' + r.missing.join(', ') + '. Run the whole cell.' };
+    if (typeof r.z === 'string') return { pass: false, msg: 'z is the TEXT “' + r.z + '” (in quotes), not a number. Type the number without quotes: 1.96.' };
     if (typeof r.z !== 'number' || Math.abs(r.z - 1.96) > 1e-9) return { pass: false, msg: r.z === 1.645 || r.z === 1.64 ? 'z = ' + r.z + ' gives a 90% interval: too narrow. 95% needs 1.96.' : r.z === 2.58 || r.z === 2.576 ? 'z = ' + r.z + ' gives a 99% interval. The plan asks for 95%: 1.96.' : 'z is ' + r.z + '. For 95% type 1.96.' };
     if (Math.abs(r.interval[0] - r.ref[0]) > 1e-9 || Math.abs(r.interval[1] - r.ref[1]) > 1e-9) return { pass: false, msg: 'Your interval is ' + r.interval.map(function (x) { return x.toFixed(1); }).join(' to ') + ' per 100. It must be built from the defects that passed (' + r.k + ' of ' + r.n + '): type kPassed.' };
+    if (r.pos != null && r.pos !== '1' && !(+r.pos === 1)) return { pass: false, msg: 'underTarget reads interval[' + r.pos + ']. The interval has 2 ends: position 0 (bottom) and position 1 (top). A promise needs the TOP end under the target: position 1.' };
     if (r.underTarget !== r.refUnder) return { pass: false, msg: 'underTarget says ' + r.underTarget + ', but the interval goes up to ' + r.ref[1].toFixed(1) + ' per 100 (target ' + r.target + '). Compare the TOP end: position 1.' };
     return { pass: true, msg: 'Between ' + r.ref[0].toFixed(1) + ' and ' + r.ref[1].toFixed(1) + ' defects passed per 100 (Wilson 95%; bootstrap ' + r.boot[0].toFixed(1) + ' to ' + r.boot[1].toFixed(1) + '). ' + (r.refUnder ? 'The whole interval is under the target of ' + r.target + '.' : 'The interval reaches above the target of ' + r.target + ': the trial cannot promise the target.') };
   },

@@ -69,8 +69,12 @@ function friendly(e) {
   if ((x = m.match(/Requested texture size \[(\d+)x(\d+)\] greater than WebGL maximum.*?\[(\d+)x/))) return 'This tensor has a shape the graphics chip cannot hold (one side would be ' + (+x[1]).toLocaleString('en-US') + ' long; this browser allows at most ' + (+x[3]).toLocaleString('en-US') + '). Usually the numbers in the shape are in the wrong order: the photo count comes first, then rows, columns, channels.';
   if ((x = m.match(/Unknown loss (\S+)/))) return 'TensorFlow.js has no loss called “' + x[1] + '”. Check the spelling letter by letter: capital letters count.';
   if ((x = m.match(/Axis must be|axis.*out of range|Invalid axis/i))) return 'That axis does not exist here: ' + m;
+  if (/must be numeric tensor, but got string tensor|must be a number|Expected .* to be (a )?number|to be a positive integer, but got "|to be a 'number' > 0 but got "|shape comprised of positive integers/.test(m)) return 'A number is needed here, but the gap holds text (something in quotes). Type the number without quotes.';
+  if ((x = m.match(/Operands could not be broadcast together with shapes (\S+) and (\S+)/))) return 'Two tensors do not fit together (shapes ' + x[1] + ' and ' + x[2].replace(/\.$/, '') + '). Check the name in the gap: it must be the one with the matching shape.';
+  if (/Failed to link vertex and fragment shaders|WebGL context lost|CONTEXT_LOST/i.test(m)) return 'The browser\'s graphics engine (WebGL) failed for a moment. Reload the page: your passed cells come back by themselves.';
   if ((x = lgFriendly(m))) return x;
-  return t + ': ' + m;
+  if (m.length < 100 && !/\n/.test(m)) return 'JavaScript stopped: ' + m.replace(/^Error: /, '').replace(/[.\s]+$/, '') + '. Check the gap on the marked line.';
+  return 'JavaScript stopped with an error (' + t + ') on the marked line. Check the gap there; the full message is under “Show the raw JavaScript message”.';
 }
 /* MiniCrew (Step 6) errors are already plain; the CrewAI rule about future tasks gets a plainer line first */
 function crewFriendly(m) {
@@ -172,7 +176,7 @@ function create(opt) {
     catch (e) { res.error = errOf(e, code); }
     res.ms = Date.now() - t0;
     if (!res.error && probe) {
-      try { res.probe = await probe(NS, BUILT.pg, tf); }
+      try { res.probe = await probe(NS, BUILT.pg, tf, code); }
       catch (e) { if (e && e.pgCheck) res.error = errOf(e, code); else res.probe = { probe_error: (e && e.name || 'Error') + ': ' + (e && e.message || e) }; }
     }
     out = null;

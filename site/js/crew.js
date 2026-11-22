@@ -32,7 +32,7 @@ function only(o, allowed, what) {
 /* ---------- tool ---------- */
 function tool(spec) {
   only(spec, ['name', 'description', 'args', 'run'], 'tool');
-  if (typeof spec.name !== 'string' || !/^[a-z][a-z0-9_]*$/.test(spec.name)) throw CrewError('A tool name is text in small letters with _ , in quotes, e.g. \'line_speed\'. Got: ' + (typeof spec.name === 'string' ? '“' + spec.name + '”' : String(spec.name)) + '.');
+  if (typeof spec.name !== 'string' || !/^[a-z][a-z0-9_]*$/.test(spec.name)) throw CrewError('A tool name is text in small letters with _ , in quotes, e.g. \'line_speed\'. Got: ' + (typeof spec.name === 'string' ? '“' + spec.name + '”' : Array.isArray(spec.name) ? 'a list, not text' : spec.name == null ? 'nothing' : typeof spec.name === 'object' ? 'an object, not text' : String(spec.name)) + '.');
   if (typeof spec.description !== 'string' || spec.description.trim().length < 10) throw CrewError('Tool ' + spec.name + ' needs a description (a sentence): the model reads it to decide when to use the tool.');
   if (typeof spec.run !== 'function') throw CrewError('Tool ' + spec.name + ' needs run: a function that returns the facts.');
   var args = spec.args || {}, props = {};

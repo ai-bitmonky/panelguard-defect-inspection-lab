@@ -1,0 +1,2269 @@
+{
+ "1a": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "uint",
+    "2624"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe sizes do not fit: the data has 2,686,976 values, but shape (2624,64,64) needs a different number. Check the gap. (line 9)\n",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Uint8",
+    "2624"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nnumpy has nothing called “Uint8”. Check the spelling. (line 5)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "2624"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython could not read this code (invalid syntax). Check brackets, quotes, commas and the spaces at the start of the line. (line 5)\n",
+   "flag": "",
+   "sec": 0.662
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "uint8",
+    "2625"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe sizes do not fit: the data has 10,747,904 values, but shape (2625,64,64) needs a different number. Check the gap. (line 9)\n",
+   "flag": "",
+   "sec": 0.663
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "uint8",
+    "'2624'"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value has the wrong type here. Check the gap on the marked line (a name, a number or text in quotes?). (line 9)\n",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "2624",
+    "uint8"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython could not read this code (invalid syntax. Perhaps you forgot a comma?). Check brackets, quotes, commas and the spaces at the start of the line. (line 5)\n",
+   "flag": "",
+   "sec": 0.662
+  }
+ ],
+ "1b": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "mon",
+    "0.67"
+   ],
+   "pass": false,
+   "msg": "n_mono = 0. That is not the mono count. Type the word exactly as in the labels: all small letters.",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Mono",
+    "0.67"
+   ],
+   "pass": false,
+   "msg": "n_mono = 0. That is not the mono count. Type the word exactly as in the labels: all small letters.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "0.67"
+   ],
+   "pass": false,
+   "msg": "n_mono = 0. That is not the mono count. Type the word exactly as in the labels: all small letters.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "mono",
+    "67"
+   ],
+   "pass": false,
+   "msg": "n_unsure = 295. The unsure values are the two in the middle of 0, 0.33, ?, 1.0.",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "mono",
+    "'0.67'"
+   ],
+   "pass": false,
+   "msg": "n_unsure = 0. The unsure values are the two in the middle of 0, 0.33, ?, 1.0.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "0.67",
+    "mono"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “mono”. Check the spelling. If it comes from an earlier substep, run that one again. (line 8)\n",
+   "flag": "",
+   "sec": 0.66
+  }
+ ],
+ "1c": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "50"
+   ],
+   "pass": false,
+   "msg": "y must hold 0 (good) and 1 (defect). Now EVERY cell gets 0: your cut puts all cells on one side. Move your cut.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'0.5'"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA number is needed here, but the gap holds text (something in quotes). Type the number without quotes. (line 2)\n",
+   "flag": "",
+   "sec": 0.661
+  }
+ ],
+ "1d": [
+  {
+   "kind": "wrong case",
+   "w": [
+    "Y"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “Y”. Check the spelling. If it comes from an earlier substep, run that one again. (line 6)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value is not allowed here. Check the gap on the marked line. (line 6)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "prob"
+   ],
+   "pass": false,
+   "msg": "The trays are not split by the label. Defect share per tray: 31.3% / 31.2% / 31.2%. Stratify on the label you made in 1c.",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  }
+ ],
+ "1e": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "256",
+    "4096"
+   ],
+   "pass": false,
+   "msg": "The largest value is 0.9961. It must be exactly 1.0. 255 ÷ ? = 1.",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'255'",
+    "4096"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value has the wrong type here. Check the gap on the marked line (a name, a number or text in quotes?). (line 1)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "255",
+    "4097"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe sizes do not fit: the data has 10,747,904 values, but shape (2624,4097) needs a different number. Check the gap. (line 3)\n",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "255",
+    "'4096'"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value has the wrong type here. Check the gap on the marked line (a name, a number or text in quotes?). (line 3)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "4096",
+    "255"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe sizes do not fit: the data has 10,747,904 values, but shape (2624,255) needs a different number. Check the gap. (line 3)\n",
+   "flag": "",
+   "sec": 0.662
+  }
+ ],
+ "2a": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "idx_trai"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “idx_trai”. Check the spelling. If it comes from an earlier substep, run that one again. (line 30)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Idx_train"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “Idx_train”. Check the spelling. If it comes from an earlier substep, run that one again. (line 30)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value is not allowed here. Check the gap on the marked line. (line 30)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "PCA learned from 525 cells: that is a validation or test tray. Use the train tray.",
+   "err": "",
+   "flag": "",
+   "sec": 2.694
+  }
+ ],
+ "2b": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "6",
+    "idx_train"
+   ],
+   "pass": false,
+   "msg": "You used 6 folds. The plan says 5.",
+   "err": "",
+   "flag": "",
+   "sec": 37.104
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'5'",
+    "idx_train"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value is not allowed here. Check the gap on the marked line. (line 11)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "5",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nFeatures and labels have different lengths (1574 vs 0). They must be the same cells, in the same order. (line 17)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "idx_train",
+    "5"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value is not allowed here. Check the gap on the marked line. (line 11)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "5",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nFeatures and labels have different lengths (1574 vs 525). They must be the same cells, in the same order. (line 17)\n",
+   "flag": "",
+   "sec": 0.658
+  }
+ ],
+ "2c": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "2"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThere is no position 2 there: that axis has only 2 entries (0 to 1). (line 1)\n",
+   "flag": "",
+   "sec": 1.067
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'1'"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA position inside [ ] must be a whole number (or a list of positions), not text or a decimal. Check the gap. (line 1)\n",
+   "flag": "",
+   "sec": 0.663
+  }
+ ],
+ "2d": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "95"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nYour condition kept nothing, so there is nothing to take the max of. Check your number: recall runs from 0 to 1. (line 6)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'0.95'"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA number is needed here, but the gap holds text (something in quotes). Type the number without quotes. (line 5)\n",
+   "flag": "",
+   "sec": 0.658
+  }
+ ],
+ "2e": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "cu",
+    "tn"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “cu”. Check the spelling. If it comes from an earlier substep, run that one again. (line 3)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Cut",
+    "tn"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “Cut”. Check the spelling. If it comes from an earlier substep, run that one again. (line 3)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "tn"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nTwo arrays do not fit together (shapes (525,) and (0,)). Check the name in the gap: it must be the one with the matching length. (line 3)\n",
+   "flag": "",
+   "sec": 0.663
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "cut",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value has the wrong type here. Check the gap on the marked line (a name, a number or text in quotes?). (line 11)\n",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "tn",
+    "cut"
+   ],
+   "pass": false,
+   "msg": "Recall is 0.0%. Use the cutoff you found in 2d, not a new number.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  }
+ ],
+ "3a": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "[2624, 64, 64, 1]",
+    "256"
+   ],
+   "pass": false,
+   "msg": "The largest value is 0.9961. It must be exactly 1.0. 255 ÷ ? = 1.",
+   "err": "",
+   "flag": "",
+   "sec": 3.804
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "[2624, 64, 64, 1]",
+    "'255'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA number is needed here, but the gap holds text (something in quotes). Type the number without quotes. (line 3)\n",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "255",
+    "[2624, 64, 64, 1]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThis needs a LIST of rows here, but it got something else (“e” has no .forEach). Check the name you typed in the gap: it must be the list itself, not a report or a single value. (line 3)\n",
+   "flag": "",
+   "sec": 0.658
+  }
+ ],
+ "3d": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "3"
+   ],
+   "pass": false,
+   "msg": "No photo was flipped left-right (only up-down or unchanged). Axis 1 runs top to bottom, axis 3 is the one gray channel. Which axis runs left to right?",
+   "err": "",
+   "flag": "",
+   "sec": 1.068
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'2'"
+   ],
+   "pass": false,
+   "msg": "No photo was flipped left-right (only up-down or unchanged). Axis 1 runs top to bottom, axis 3 is the one gray channel. Which axis runs left to right?",
+   "err": "",
+   "flag": "",
+   "sec": 1.062
+  }
+ ],
+ "3e": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "binaryCrossentrop",
+    "nDef"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nTensorFlow.js has no loss called “binaryCrossentrop”. Check the spelling letter by letter: capital letters count. (line 2)\n",
+   "flag": "",
+   "sec": 0.662
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "BinaryCrossentropy",
+    "nDef"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nTensorFlow.js has no loss called “BinaryCrossentropy”. Check the spelling letter by letter: capital letters count. (line 2)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "nDef"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nTensorFlow.js has no loss called “[]”. Check the spelling letter by letter: capital letters count. (line 2)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "binaryCrossentropy",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "The weight for defects is Infinity. With 492 defects in 1574 train cells it should be 1574 / (2 × 492) = 1.600: each defect counts 2.2× a good cell.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "nDef",
+    "binaryCrossentropy"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nTensorFlow.js has no loss called “nDef”. Check the spelling letter by letter: capital letters count. (line 2)\n",
+   "flag": "",
+   "sec": 0.658
+  }
+ ],
+ "3f": [
+  {
+   "kind": "wrong case",
+   "w": [
+    "I",
+    "bestFar"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “I”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 11)\n",
+   "flag": "",
+   "sec": 18.235
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "bestFar"
+   ],
+   "pass": false,
+   "msg": "Your loop kept CNN weight 0, but the fewest false alarms come at weight 0.9 (54.2%). Mix each CNN score with the Step 2 score of the same cell, and keep a weight only when it beats the best so far.",
+   "err": "",
+   "flag": "",
+   "sec": 37.632
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "i",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Your loop kept CNN weight 0, but the fewest false alarms come at weight 0.9 (54.2%). Mix each CNN score with the Step 2 score of the same cell, and keep a weight only when it beats the best so far.",
+   "err": "",
+   "flag": "",
+   "sec": 37.878
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "bestFar",
+    "i"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “i”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 13)\n",
+   "flag": "",
+   "sec": 17.292
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "c",
+    "bestFar"
+   ],
+   "pass": false,
+   "msg": "Your loop kept CNN weight 0, but the fewest false alarms come at weight 0.9 (54.2%). Mix each CNN score with the Step 2 score of the same cell, and keep a weight only when it beats the best so far.",
+   "err": "",
+   "flag": "",
+   "sec": 41.941
+  }
+ ],
+ "3g": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "5",
+    "0.95"
+   ],
+   "pass": false,
+   "msg": "low is empty: the list position is past the end. 5% must be written as a fraction of 1.",
+   "err": "",
+   "flag": "",
+   "sec": 0.662
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'0.05'",
+    "0.95"
+   ],
+   "pass": true,
+   "msg": "Gates 0.346 and 0.421: 8 of 165 defects pass (4.8%); 539 of every 1,000 cells go to a person.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 0.66
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "0.05",
+    "95"
+   ],
+   "pass": false,
+   "msg": "Your high gate is Infinity. The lowest gate where the auto-stop pile is still at least 95% real defects is 0.421. Write 95% as a fraction of 1.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "0.05",
+    "'0.95'"
+   ],
+   "pass": true,
+   "msg": "Gates 0.346 and 0.421: 8 of 165 defects pass (4.8%); 539 of every 1,000 cells go to a person.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 0.659
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "0.95",
+    "0.05"
+   ],
+   "pass": false,
+   "msg": "With your low gate 0.439, 156 of 165 defects (94.5%) would pass unchecked. The rule is at most 5%: write it as a fraction.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  }
+ ],
+ "4b": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "STE",
+    "base"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “STE”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 11)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "sTEP",
+    "base"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “sTEP”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 11)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "base"
+   ],
+   "pass": false,
+   "msg": "Your map does not match the cover-up rule. Row r of patches must start at r × STEP pixels, like the columns (c × STEP).",
+   "err": "",
+   "flag": "",
+   "sec": 33.467
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "STEP",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Almost every number in your map is below zero: it stores the covered score, not the DROP. Drop = score before − score after.",
+   "err": "",
+   "flag": "",
+   "sec": 33.459
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "base",
+    "STEP"
+   ],
+   "pass": false,
+   "msg": "Your map does not match the cover-up rule. Row r of patches must start at r × STEP pixels, like the columns (c × STEP).",
+   "err": "",
+   "flag": "",
+   "sec": 31.507
+  }
+ ],
+ "4c": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "3",
+    "w",
+    "relu"
+   ],
+   "pass": false,
+   "msg": "Your map is 8 × 8. Block 3 gives 16 × 16. Count the blocks from 0: 0, 1, 2, 3.",
+   "err": "",
+   "flag": "",
+   "sec": 70.39
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'2'",
+    "w",
+    "relu"
+   ],
+   "pass": true,
+   "msg": "Grad-CAM works: a 16 × 16 map per cell (each square covers 4 × 4 pixels). Shown for 6 real cells.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 72.908
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "2",
+    "[]",
+    "relu"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nTwo tensors do not fit together (shapes 1,16,16,64 and 0). Check the name in the gap: it must be the one with the matching shape.\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "2",
+    "w",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "w",
+    "2",
+    "relu"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “w”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 3)\n",
+   "flag": "",
+   "sec": 0.66
+  }
+ ],
+ "4d": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "10",
+    "K"
+   ],
+   "pass": false,
+   "msg": "K = 40960 pixels. 10% of 4,096 is about 410: write 10% as a fraction of 1.",
+   "err": "",
+   "flag": "",
+   "sec": 31.792
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'0.1'",
+    "K"
+   ],
+   "pass": true,
+   "msg": "Deletion test on 165 real defects: hottest 10% → score drops 0.001 on average; random 10% → 0.001.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 31.886
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "0.1",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Only 0 pixels were grayed out. Take the first K (410) of the hottest-first list.",
+   "err": "",
+   "flag": "",
+   "sec": 33.813
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "K",
+    "0.1"
+   ],
+   "pass": false,
+   "msg": "K = 1679360 pixels. 10% of 4,096 is about 410: write 10% as a fraction of 1.",
+   "err": "",
+   "flag": "",
+   "sec": 31.452
+  }
+ ],
+ "4e": [
+  {
+   "kind": "typo in text",
+   "w": [
+    "'pas'",
+    "'poly'"
+   ],
+   "pass": false,
+   "msg": "Your counts of defects passed by mistake do not match. A defect passes by mistake when its lane is the auto-pass lane: 'pass'.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "0",
+    "'poly'"
+   ],
+   "pass": false,
+   "msg": "Your counts of defects passed by mistake do not match. A defect passes by mistake when its lane is the auto-pass lane: 'pass'.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "'pass'",
+    "0"
+   ],
+   "pass": false,
+   "msg": "Your poly group is not the poly cells (0 cells; there are 291). The other cell type is written 'poly', small letters, in quotes.",
+   "err": "",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "'poly'",
+    "'pass'"
+   ],
+   "pass": false,
+   "msg": "Your poly group is not the poly cells (0 cells; there are 291). The other cell type is written 'poly', small letters, in quotes.",
+   "err": "",
+   "flag": "",
+   "sec": 0.656
+  }
+ ],
+ "5b": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "conca",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "“conca” is not something a list can do, so the second line could not be added. The list method that gives back a NEW, longer list is concat.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Concat",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "“Concat” is not something a list can do, so the second line could not be added. The list method that gives back a NEW, longer list is concat.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "[]",
+    "concat"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.659
+  }
+ ],
+ "5c": [
+  {
+   "kind": "wrong case",
+   "w": [
+    "P",
+    "'score'"
+   ],
+   "pass": false,
+   "msg": "The score is not on the card. The station must return it under the card's field name for the score: p.",
+   "err": "",
+   "flag": "",
+   "sec": 0.655
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "'score'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token ']'). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.655
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "p",
+    "0"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nNo arrow leads to the station “score”, so it can never run. Check where each arrow (and each lane of a fork) goes. (line 29)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "'score'",
+    "p"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “p”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 27)\n",
+   "flag": "",
+   "sec": 0.662
+  }
+ ],
+ "5d": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "hig",
+    "'human_check'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “hig”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 7)\n",
+   "flag": "",
+   "sec": 0.663
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "High",
+    "'human_check'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “High”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 7)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "'human_check'"
+   ],
+   "pass": false,
+   "msg": "Your fork sends 283 unsure cells straight to stop. Cells are stopped only at or above the HIGH gate: high.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "high",
+    "0"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nNo arrow leads to the station “human_check”, so it can never run. Check where each arrow (and each lane of a fork) goes. (line 28)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "'human_check'",
+    "high"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nNo arrow leads to the station “human_check”, so it can never run. Check where each arrow (and each lane of a fork) goes. (line 28)\n",
+   "flag": "",
+   "sec": 0.655
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "low",
+    "'human_check'"
+   ],
+   "pass": false,
+   "msg": "Your fork sends 283 unsure cells straight to stop. Cells are stopped only at or above the HIGH gate: high.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  }
+ ],
+ "5e": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "3",
+    "'human_check'"
+   ],
+   "pass": false,
+   "msg": "Your cap is 3 photos. The rule: after 2 photos, a person looks. Type 2.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'2'",
+    "'human_check'"
+   ],
+   "pass": false,
+   "msg": "Your cap is 2 photos. The rule: after 2 photos, a person looks. Type 2.",
+   "err": "",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "2",
+    "0"
+   ],
+   "pass": false,
+   "msg": "A fork function returned a station that is not in its list of next stations. Return one of the names in that list.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "'human_check'",
+    "2"
+   ],
+   "pass": false,
+   "msg": "Still an endless loop, even with MAX_TRIES = human_check: when the cap is reached, afterCheck must send the cell to 'human_check', not back to reshoot.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  }
+ ],
+ "5f": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "memor",
+    "resume"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “memor”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 20)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Memory",
+    "resume"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “Memory”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 20)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "resume"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\n“e.checkpointer.getTuple” is not a function here. Check the spelling.\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "memory",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token ']'). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "resume",
+    "memory"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “resume”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 20)\n",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "line",
+    "resume"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\n“e.checkpointer.getTuple” is not a function here. Check the spelling.\n",
+   "flag": "",
+   "sec": 0.663
+  }
+ ],
+ "5g": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "5",
+    "'poly'"
+   ],
+   "pass": false,
+   "msg": "lowPoly is empty: the list position is past the end. Write 5% as a fraction of 1.",
+   "err": "",
+   "flag": "",
+   "sec": 11.606
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'0.05'",
+    "'poly'"
+   ],
+   "pass": true,
+   "msg": "Shift done: 525 cells. Poly defects passed: 4 of 84 → 4 of 84 with the poly gate; cells to a person: 283 → 275.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 10.962
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "0.05",
+    "0"
+   ],
+   "pass": false,
+   "msg": "routePoly picks the wrong lane for 0 mono and 8 poly cells. The special gate is for poly cells only: 'poly'.",
+   "err": "",
+   "flag": "",
+   "sec": 10.909
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "'poly'",
+    "0.05"
+   ],
+   "pass": false,
+   "msg": "lowPoly is empty: the list position is past the end. Write 5% as a fraction of 1.",
+   "err": "",
+   "flag": "",
+   "sec": 10.687
+  }
+ ],
+ "6b": [
+  {
+   "kind": "typo in text",
+   "w": [
+    "'shift_stat'",
+    "auditLog",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "The tool is called “shift_stat”. The workers (and 6a) know it as shift_stats: type 'shift_stats' with quotes.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "0",
+    "auditLog",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA tool name is text in small letters with _ , in quotes, e.g. 'line_speed'. Got: 0. (line 5)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "'shift_stats'",
+    "[]",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "The tool counted 0 cells, but the logbook has 525 rows. Count the logbook itself: auditLog.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "'shift_stats'",
+    "auditLog",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "auditLog",
+    "'shift_stats'",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA tool name is text in small letters with _ , in quotes, e.g. 'line_speed'. Got: [object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Objec",
+   "flag": "RAW?",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "'shift_stats'",
+    "shift3",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThis needs a LIST of rows here, but it got something else (“rows” has no .forEach). Check the name you typed in the gap: it must be the list itself, not a report or a single value. (line 9)\n",
+   "flag": "",
+   "sec": 0.657
+  }
+ ],
+ "6c": [
+  {
+   "kind": "typo in text",
+   "w": [
+    "'Root-cause Analys'",
+    "worstCases",
+    "tools"
+   ],
+   "pass": false,
+   "msg": "The second worker is called “Root-cause Analys”. Type its role exactly: 'Root-cause Analyst' (the scripted model picks its sentence pattern from the role name).",
+   "err": "",
+   "flag": "",
+   "sec": 0.665
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "0",
+    "worstCases",
+    "tools"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nAgent needs role: a piece of text in quotes. (line 14)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "'Root-cause Analyst'",
+    "[]",
+    "tools"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nAgent “Root-cause Analyst”: item 2 in tools is not a tool (object). (line 14)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "'Root-cause Analyst'",
+    "worstCases",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token ']'). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "worstCases",
+    "'Root-cause Analyst'",
+    "tools"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nAgent needs role: a piece of text in quotes. (line 14)\n",
+   "flag": "",
+   "sec": 0.656
+  }
+ ],
+ "6d": [
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "inspectShift, findCauses, writeReport",
+    "[inspectShift, findCauses]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nTask has no option “findCauses”. Its options: description, expected_output, agent, context, guardrail, guardrail_max_retries, name. (line 14)\n",
+   "flag": "",
+   "sec": 0.661
+  }
+ ],
+ "6e": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "sequentia",
+    "push",
+    "kickoff"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThere is no such process: Process has only sequential (and hierarchical, not built here). (line 4)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Sequential",
+    "push",
+    "kickoff"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThere is no such process: Process has only sequential (and hierarchical, not built here). (line 4)\n",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "push",
+    "kickoff"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "sequential",
+    "[]",
+    "kickoff"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "sequential",
+    "push",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "push",
+    "sequential",
+    "kickoff"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThere is no such process: Process has only sequential (and hierarchical, not built here). (line 4)\n",
+   "flag": "",
+   "sec": 0.659
+  }
+ ],
+ "6f": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "50",
+    "0",
+    "guardrail"
+   ],
+   "pass": false,
+   "msg": "Your checker lets the planted number 2.4 and 314 through: the allowed gap is too wide. Allow only half of the last written digit: 0.5.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'0.5'",
+    "0",
+    "guardrail"
+   ],
+   "pass": true,
+   "msg": "Planted copy: both planted numbers caught (2.4, 314). Real report: every number found in the tool facts. Guardrail: the sloppy draft was sent back once (10, 526), the second draft passed.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 0.658
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "0.5",
+    "1",
+    "guardrail"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe report job failed its guardrail every time, but the list of wrong numbers was EMPTY. The check must say ok when the wrong list is empty: length 0. (line 39)\n",
+   "flag": "",
+   "sec": 0.664
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "0.5",
+    "'0'",
+    "guardrail"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe report job failed its guardrail every time, but the list of wrong numbers was EMPTY. The check must say ok when the wrong list is empty: length 0. (line 39)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "0.5",
+    "0",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token ']'). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "0",
+    "0.5",
+    "guardrail"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe report job failed its guardrail every time, but the list of wrong numbers was EMPTY. The check must say ok when the wrong list is empty: length 0. (line 39)\n",
+   "flag": "",
+   "sec": 0.659
+  }
+ ],
+ "7b": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "lan",
+    "LAMPS.none"
+   ],
+   "pass": false,
+   "msg": "Cell 2567 is in the pass lane, but the lamp showed NO VERDICT. Look the lamp up by the lane the flow wrote: out.lane (gap 1: lane).",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Lane",
+    "LAMPS.none"
+   ],
+   "pass": false,
+   "msg": "Cell 2567 is in the pass lane, but the lamp showed NO VERDICT. Look the lamp up by the lane the flow wrote: out.lane (gap 1: lane).",
+   "err": "",
+   "flag": "",
+   "sec": 0.666
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "LAMPS.none"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "LAMPS.none",
+    "lane"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nSomething is undefined just before “.none”. Usually a name is misspelled, or a list index is past the end. (line 13)\n",
+   "flag": "RAW?",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "key",
+    "LAMPS.none"
+   ],
+   "pass": false,
+   "msg": "Cell 2567 is in the pass lane, but the lamp showed NO VERDICT. Look the lamp up by the lane the flow wrote: out.lane (gap 1: lane).",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  }
+ ],
+ "7c": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "ke"
+   ],
+   "pass": false,
+   "msg": "After 5 cells the counters show PASS 0, CHECK 0, STOP 0, NO VERDICT 0 — together 0, but 5 cells arrived. The cells were counted under names that are not lamp counters (“undefined”). Each cell must go under its lamp's counter: type key.",
+   "err": "",
+   "flag": "RAW?",
+   "sec": 0.656
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Key"
+   ],
+   "pass": false,
+   "msg": "After 5 cells the counters show PASS 0, CHECK 0, STOP 0, NO VERDICT 0 — together 0, but 5 cells arrived. The cells were counted under names that are not lamp counters (“undefined”). Each cell must go under its lamp's counter: type key.",
+   "err": "",
+   "flag": "RAW?",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "lane"
+   ],
+   "pass": false,
+   "msg": "After 5 cells the counters show PASS 0, CHECK 0, STOP 0, NO VERDICT 0 — together 0, but 5 cells arrived. The cells were counted under names that are not lamp counters (“undefined”). Each cell must go under its lamp's counter: type key.",
+   "err": "",
+   "flag": "RAW?",
+   "sec": 0.662
+  }
+ ],
+ "7d": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "resum",
+    "'stop'"
+   ],
+   "pass": false,
+   "msg": "The Command was empty: nothing was handed to the paused flow. The Command option that hands the answer to the paused flow is resume.",
+   "err": "",
+   "flag": "",
+   "sec": 1.325
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Resume",
+    "'stop'"
+   ],
+   "pass": false,
+   "msg": "The Command was empty: nothing was handed to the paused flow. The Command option that hands the answer to the paused flow is resume.",
+   "err": "",
+   "flag": "",
+   "sec": 1.476
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "'stop'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token ']'). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "resume",
+    "0"
+   ],
+   "pass": false,
+   "msg": "The keys are {\"p\":\"pass\",\"s\":0}. P must mean pass and S must mean stop: type 'stop'.",
+   "err": "",
+   "flag": "",
+   "sec": 1.415
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "'stop'",
+    "resume"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “resume”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 19)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "goto",
+    "'stop'"
+   ],
+   "pass": false,
+   "msg": "The person said stop for cell 986, but the flow did not finish (no logbook row; it waits at [\"human_check\"]). Hand the answer to the paused flow: new Command({ resume: said }).",
+   "err": "",
+   "flag": "",
+   "sec": 1.173
+  }
+ ],
+ "7e": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "lan",
+    "'pass'"
+   ],
+   "pass": false,
+   "msg": "The blocks add up to pass 0 / check 0 / stop 0, but the logbook has 181 / 275 / 69. Count each row in its lane: row.lane.",
+   "err": "",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Lane",
+    "'pass'"
+   ],
+   "pass": false,
+   "msg": "The blocks add up to pass 0 / check 0 / stop 0, but the logbook has 181 / 275 / 69. Count each row in its lane: row.lane.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "'pass'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "lane",
+    "0"
+   ],
+   "pass": false,
+   "msg": "The board says 0 defects passed, the logbook says 8 of 165. A defect got out when its final decision was 'pass'.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "'pass'",
+    "lane"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected string). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.663
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "key",
+    "'pass'"
+   ],
+   "pass": false,
+   "msg": "The blocks add up to pass 0 / check 0 / stop 0, but the logbook has 181 / 275 / 69. Count each row in its lane: row.lane.",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  }
+ ],
+ "7f": [
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "facts()",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "ok",
+    "facts()"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “ok”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 12)\n",
+   "flag": "",
+   "sec": 0.662
+  }
+ ],
+ "8b": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "idx_tes",
+    "bestW",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Python does not know the name “idx_tes”. Check the spelling: it must be a name from the Python steps (Steps 1–2).",
+   "err": "",
+   "flag": "",
+   "sec": 0.655
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Idx_test",
+    "bestW",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Python does not know the name “Idx_test”. Check the spelling: it must be a name from the Python steps (Steps 1–2).",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "bestW",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Python could not do it: Found array with 0 sample(s) (shape=(0, 377)) while a minimum of 1 is required by StandardScaler.. Check the name you typed in the gap.",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "idx_test",
+    "[]",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Your blend uses CNN weight 0. The frozen 3f weight is bestW = 0.9. Picking a new weight now would tune on the test tray. Type bestW.",
+   "err": "",
+   "flag": "",
+   "sec": 27.196
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "idx_test",
+    "bestW",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript stopped with an error (Error) on the marked line. Check the gap there; the full message is under “",
+   "flag": "",
+   "sec": 23.358
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "bestW",
+    "idx_test",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Python does not know the name “bestW”. Check the spelling: it must be a name from the Python steps (Steps 1–2).",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  }
+ ],
+ "8c": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "196",
+    "kPassed",
+    "1"
+   ],
+   "pass": false,
+   "msg": "z is 196. For 95% type 1.96.",
+   "err": "",
+   "flag": "",
+   "sec": 2.073
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'1.96'",
+    "kPassed",
+    "1"
+   ],
+   "pass": false,
+   "msg": "z is 1.96. For 95% type 1.96.",
+   "err": "",
+   "flag": "",
+   "sec": 2.103
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "1.96",
+    "[]",
+    "1"
+   ],
+   "pass": false,
+   "msg": "Your interval is 0.0 to 2.3 per 100. It must be built from the defects that passed (6 of 164): type kPassed.",
+   "err": "",
+   "flag": "",
+   "sec": 1.835
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "1.96",
+    "kPassed",
+    "2"
+   ],
+   "pass": true,
+   "msg": "Between 1.7 and 7.8 defects passed per 100 (Wilson 95%; bootstrap 1.2 to 6.5). The interval reaches above the target of 5: the trial cannot promise the target.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 1.466
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "1.96",
+    "kPassed",
+    "'1'"
+   ],
+   "pass": true,
+   "msg": "Between 1.7 and 7.8 defects passed per 100 (Wilson 95%; bootstrap 1.2 to 6.5). The interval reaches above the target of 5: the trial cannot promise the target.",
+   "err": "",
+   "flag": "PASSED",
+   "sec": 1.326
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "kPassed",
+    "1.96",
+    "1"
+   ],
+   "pass": false,
+   "msg": "z is 6. For 95% type 1.96.",
+   "err": "",
+   "flag": "",
+   "sec": 1.463
+  }
+ ],
+ "8d": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "N[k]",
+    "25"
+   ],
+   "pass": false,
+   "msg": "ALARM is 25. The rule of thumb to ACT is above 0.25 (0.1 to 0.25 means watch). Type 0.25.",
+   "err": "",
+   "flag": "",
+   "sec": 43.413
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "N[k]",
+    "'0.25'"
+   ],
+   "pass": false,
+   "msg": "ALARM is 0.25. The rule of thumb to ACT is above 0.25 (0.1 to 0.25 means watch). Type 0.25.",
+   "err": "",
+   "flag": "",
+   "sec": 37.956
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "0.25",
+    "N[k]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript does not know the name “k”. Check the spelling (capital letters count). If it comes from an earlier substep, run that one again. (line 21)\n",
+   "flag": "",
+   "sec": 0.656
+  }
+ ],
+ "8e": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "par",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “par”. Check the spelling. If it comes from an earlier substep, run that one again. (line 19)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Part",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “Part”. Check the spelling. If it comes from an earlier substep, run that one again. (line 19)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value is not allowed here. Check the gap on the marked line. (line 19)\n",
+   "flag": "",
+   "sec": 0.663
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "part",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nA value is not allowed here. Check the gap on the marked line. (line 21)\n",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "idx_val",
+    "part"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nFeatures and labels have different lengths (525 vs 157). They must be the same cells, in the same order. (line 19)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "idx_train",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nFeatures and labels have different lengths (1574 vs 157). They must be the same cells, in the same order. (line 19)\n",
+   "flag": "",
+   "sec": 0.66
+  }
+ ],
+ "3c": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "2",
+    "64",
+    "1"
+   ],
+   "pass": false,
+   "msg": "The input is 64 × 64 × 2, but our photos have 1 channel (gray). Gap 1 must match the last number of xTrain’s shape.",
+   "err": "",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'1'",
+    "64",
+    "1"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript stopped: Tensor must have a shape comprised of positive integers but got shape [3,3,1,16].. Check the gap on the marked line.\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "1",
+    "65",
+    "1"
+   ],
+   "pass": false,
+   "msg": "Filters per block: 16, 32, 65, 128. Each block doubles the one before: 16, 32, …, 128.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "1",
+    "'64'",
+    "1"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript stopped: Convolution layer expected config.filters to be a 'number' > 0 but got \"64\". Check the gap on the marked line. (line 6)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "1",
+    "64",
+    "2"
+   ],
+   "pass": false,
+   "msg": "The last layer gives 2 numbers per cell. We want ONE defect score: 1 unit with a sigmoid.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "1",
+    "64",
+    "'1'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript stopped: Expected units to be a positive integer, but got \"1\".. Check the gap on the marked line. (line 14)\n",
+   "flag": "",
+   "sec": 0.659
+  }
+ ]
+}

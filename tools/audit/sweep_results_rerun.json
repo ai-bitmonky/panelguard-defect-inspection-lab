@@ -1,0 +1,523 @@
+{
+ "1d": [
+  {
+   "kind": "wrong case",
+   "w": [
+    "Y"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “Y”. Check the spelling. If it comes from an earlier substep, run that one again. (line 6)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe gap gave an EMPTY list ([]), so there is nothing to learn from or score. Type the name of the tray or array the line needs. (line 6)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "prob"
+   ],
+   "pass": false,
+   "msg": "The trays are not split by the label. Defect share per tray: 31.3% / 31.2% / 31.2%. Stratify on the label you made in 1c.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  }
+ ],
+ "2a": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "idx_trai"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “idx_trai”. Check the spelling. If it comes from an earlier substep, run that one again. (line 30)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Idx_train"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “Idx_train”. Check the spelling. If it comes from an earlier substep, run that one again. (line 30)\n",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe gap gave an EMPTY list ([]), so there is nothing to learn from or score. Type the name of the tray or array the line needs. (line 30)\n",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "PCA learned from 525 cells: that is a validation or test tray. Use the train tray.",
+   "err": "",
+   "flag": "",
+   "sec": 2.273
+  }
+ ],
+ "6b": [
+  {
+   "kind": "typo in text",
+   "w": [
+    "'shift_stat'",
+    "auditLog",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "The tool is called “shift_stat”. The workers (and 6a) know it as shift_stats: type 'shift_stats' with quotes.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (number)",
+   "w": [
+    "0",
+    "auditLog",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA tool name is text in small letters with _ , in quotes, e.g. 'line_speed'. Got: 0. (line 5)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "'shift_stats'",
+    "[]",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "The tool counted 0 cells, but the logbook has 525 rows. Count the logbook itself: auditLog.",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "'shift_stats'",
+    "auditLog",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "auditLog",
+    "'shift_stats'",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA tool name is text in small letters with _ , in quotes, e.g. 'line_speed'. Got: a list, not text. (line 5)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "'shift_stats'",
+    "shift3",
+    "defPassed"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nThis needs a LIST of rows here, but it got something else (“rows” has no .forEach). Check the name you typed in the gap: it must be the list itself, not a report or a single value. (line 9)\n",
+   "flag": "",
+   "sec": 0.672
+  }
+ ],
+ "7c": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "ke"
+   ],
+   "pass": false,
+   "msg": "After 5 cells the counters show PASS 0, CHECK 0, STOP 0, NO VERDICT 0 — together 0, but 5 cells arrived. The cells were counted under a name the lamp does not have (the lamp field you typed does not exist). Each cell must go under its lamp's counter: type key.",
+   "err": "",
+   "flag": "",
+   "sec": 0.66
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Key"
+   ],
+   "pass": false,
+   "msg": "After 5 cells the counters show PASS 0, CHECK 0, STOP 0, NO VERDICT 0 — together 0, but 5 cells arrived. The cells were counted under a name the lamp does not have (the lamp field you typed does not exist). Each cell must go under its lamp's counter: type key.",
+   "err": "",
+   "flag": "",
+   "sec": 0.661
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript could not read this code (Unexpected token '['). Check brackets ( ) [ ] { }, quotes and commas.",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "lane"
+   ],
+   "pass": false,
+   "msg": "After 5 cells the counters show PASS 0, CHECK 0, STOP 0, NO VERDICT 0 — together 0, but 5 cells arrived. The cells were counted under a name the lamp does not have (the lamp field you typed does not exist). Each cell must go under its lamp's counter: type key.",
+   "err": "",
+   "flag": "",
+   "sec": 0.657
+  }
+ ],
+ "8b": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "idx_tes",
+    "bestW",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Python does not know the name “idx_tes”. Check the spelling: it must be a name from the Python steps (Steps 1–2).",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Idx_test",
+    "bestW",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Python does not know the name “Idx_test”. Check the spelling: it must be a name from the Python steps (Steps 1–2).",
+   "err": "",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "bestW",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "The gap gave an EMPTY list of cells, so there is nothing to score. Type the name of the tray (its list of cell positions).",
+   "err": "",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "idx_test",
+    "[]",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Your blend uses CNN weight 0. The frozen 3f weight is bestW = 0.9. Picking a new weight now would tune on the test tray. Type bestW.",
+   "err": "",
+   "flag": "",
+   "sec": 19.069
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "idx_test",
+    "bestW",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nJavaScript stopped with an error (Error) on the marked line. Check the gap there; the full message is under “",
+   "flag": "",
+   "sec": 16.441
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "bestW",
+    "idx_test",
+    "routePoly"
+   ],
+   "pass": false,
+   "msg": "Python does not know the name “bestW”. Check the spelling: it must be a name from the Python steps (Steps 1–2).",
+   "err": "",
+   "flag": "",
+   "sec": 0.659
+  }
+ ],
+ "8c": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "196",
+    "kPassed",
+    "1"
+   ],
+   "pass": false,
+   "msg": "z is 196. For 95% type 1.96.",
+   "err": "",
+   "flag": "",
+   "sec": 1.396
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'1.96'",
+    "kPassed",
+    "1"
+   ],
+   "pass": false,
+   "msg": "z is 1.96. For 95% type 1.96.",
+   "err": "",
+   "flag": "",
+   "sec": 1.421
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "1.96",
+    "[]",
+    "1"
+   ],
+   "pass": false,
+   "msg": "Your interval is 0.0 to 2.3 per 100. It must be built from the defects that passed (5 of 164): type kPassed.",
+   "err": "",
+   "flag": "",
+   "sec": 1.362
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "1.96",
+    "kPassed",
+    "2"
+   ],
+   "pass": false,
+   "msg": "underTarget reads interval[2]. The interval has 2 ends: position 0 (bottom) and position 1 (top). A promise needs the TOP end under the target: position 1.",
+   "err": "",
+   "flag": "",
+   "sec": 1.418
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "1.96",
+    "kPassed",
+    "'1'"
+   ],
+   "pass": false,
+   "msg": "underTarget reads interval['1']. The interval has 2 ends: position 0 (bottom) and position 1 (top). A promise needs the TOP end under the target: position 1.",
+   "err": "",
+   "flag": "",
+   "sec": 1.327
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "kPassed",
+    "1.96",
+    "1"
+   ],
+   "pass": false,
+   "msg": "z is 5. For 95% type 1.96.",
+   "err": "",
+   "flag": "",
+   "sec": 1.36
+  }
+ ],
+ "8e": [
+  {
+   "kind": "typo (letter dropped)",
+   "w": [
+    "par",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “par”. Check the spelling. If it comes from an earlier substep, run that one again. (line 19)\n",
+   "flag": "",
+   "sec": 0.662
+  },
+  {
+   "kind": "wrong case",
+   "w": [
+    "Part",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nPython does not know the name “Part”. Check the spelling. If it comes from an earlier substep, run that one again. (line 19)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "[]",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe gap gave an EMPTY list ([]), so there is nothing to learn from or score. Type the name of the tray or array the line needs. (line 19)\n",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (empty list)",
+   "w": [
+    "part",
+    "[]"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nThe gap gave an EMPTY list ([]), so there is nothing to learn from or score. Type the name of the tray or array the line needs. (line 21)\n",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "swapped gaps",
+   "w": [
+    "idx_val",
+    "part"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nFeatures and labels have different lengths (525 vs 157). They must be the same cells, in the same order. (line 19)\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "wrong variable",
+   "w": [
+    "idx_train",
+    "idx_val"
+   ],
+   "pass": false,
+   "msg": "Python stopped with an error. Read the red box below.",
+   "err": "ERROR\nFeatures and labels have different lengths (1574 vs 157). They must be the same cells, in the same order. (line 19)\n",
+   "flag": "",
+   "sec": 0.656
+  }
+ ],
+ "3c": [
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "2",
+    "64",
+    "1"
+   ],
+   "pass": false,
+   "msg": "The input is 64 × 64 × 2, but our photos have 1 channel (gray). Gap 1 must match the last number of xTrain’s shape.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "'1'",
+    "64",
+    "1"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA number is needed here, but the gap holds text (something in quotes). Type the number without quotes.\n",
+   "flag": "",
+   "sec": 0.659
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "1",
+    "65",
+    "1"
+   ],
+   "pass": false,
+   "msg": "Filters per block: 16, 32, 65, 128. Each block doubles the one before: 16, 32, …, 128.",
+   "err": "",
+   "flag": "",
+   "sec": 0.657
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "1",
+    "'64'",
+    "1"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA number is needed here, but the gap holds text (something in quotes). Type the number without quotes. (line 6)\n",
+   "flag": "",
+   "sec": 0.656
+  },
+  {
+   "kind": "off by one / scale",
+   "w": [
+    "1",
+    "64",
+    "2"
+   ],
+   "pass": false,
+   "msg": "The last layer gives 2 numbers per cell. We want ONE defect score: 1 unit with a sigmoid.",
+   "err": "",
+   "flag": "",
+   "sec": 0.658
+  },
+  {
+   "kind": "wrong type (text)",
+   "w": [
+    "1",
+    "64",
+    "'1'"
+   ],
+   "pass": false,
+   "msg": "JavaScript stopped with an error. Read the red box below.",
+   "err": "ERROR\nA number is needed here, but the gap holds text (something in quotes). Type the number without quotes. (line 14)\n",
+   "flag": "",
+   "sec": 0.658
+  }
+ ]
+}
