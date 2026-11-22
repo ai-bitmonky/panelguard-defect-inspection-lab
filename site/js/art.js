@@ -114,7 +114,8 @@ var MON = {
   3: { monitor: 'CNN', monitorSub: 'learns filters', monitorTitle: 'NETWORK', monitorColor: '#a98bff' },
   5: { monitor: 'ROUTE', monitorSub: 'pass · person · stop', monitorTitle: 'FLOW', monitorColor: '#3dffa0' },
   6: { monitor: 'REPORT', monitorSub: 'crew · tools · check', monitorTitle: 'CREW', monitorColor: '#a98bff' },
-  7: { monitor: 'PASS', monitorSub: 'word · shape · colour', monitorTitle: 'CONSOLE', monitorColor: '#2ee07a' }
+  7: { monitor: 'PASS', monitorSub: 'word · shape · colour', monitorTitle: 'CONSOLE', monitorColor: '#2ee07a' },
+  8: { monitor: 'TRIAL', monitorSub: 'sealed cells · once', monitorTitle: 'TEST', monitorColor: '#ffb547' }
 };
 function banner(el, stepId, api) {
   var o = Object.assign({ vb: '290 20 510 210' }, MON[stepId] || MON[0]);

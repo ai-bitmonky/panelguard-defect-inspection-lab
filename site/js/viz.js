@@ -209,7 +209,7 @@ function sceneGame(s, stage, out, api) {
   draw(); side();
 }
 function scene(s, stage, out, api) {
-  var f = ({ station: sceneStation, defects: sceneDefects, mistakes: sceneMistakes, game: sceneGame })[s.scene] || (window.PGViz3 && window.PGViz3[s.scene]) || (window.PGViz4 && window.PGViz4[s.scene]) || (window.PGViz5 && window.PGViz5[s.scene]) || (window.PGViz6 && window.PGViz6[s.scene]) || (window.PGViz7 && window.PGViz7[s.scene]);
+  var f = ({ station: sceneStation, defects: sceneDefects, mistakes: sceneMistakes, game: sceneGame })[s.scene] || (window.PGViz3 && window.PGViz3[s.scene]) || (window.PGViz4 && window.PGViz4[s.scene]) || (window.PGViz5 && window.PGViz5[s.scene]) || (window.PGViz6 && window.PGViz6[s.scene]) || (window.PGViz7 && window.PGViz7[s.scene]) || (window.PGViz8 && window.PGViz8[s.scene]);
   return f(s, stage, out, api);
 }
 
