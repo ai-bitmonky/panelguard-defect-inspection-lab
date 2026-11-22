@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>PanelGuard — Solar Panel Defect Inspection Lab v0.3</title>
+<title>PanelGuard — Solar Panel Defect Inspection Lab v0.4</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root{
@@ -21,8 +21,8 @@ button{font-family:var(--fb);font-size:15px;font-weight:600;cursor:pointer}
 code,pre,.mono{font-family:var(--fm)}
 code{background:#0f1a26;border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:.86em;color:#bfe9ff}
 h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
-.app{position:absolute;inset:0;display:grid;grid-template-rows:54px auto minmax(0,1fr) 22px;}
-.top{grid-row:1}.loader{grid-row:2}.main{grid-row:3}.foot{grid-row:4}
+.app{position:absolute;inset:0;display:grid;grid-template-rows:54px auto auto minmax(0,1fr) 22px;}
+.top{grid-row:1}.loader{grid-row:2}.revbar{grid-row:3}.main{grid-row:4}.foot{grid-row:5}
 /* top bar */
 .top{display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0b111a,#070a10)}
 .brand{display:flex;align-items:center;gap:10px}
@@ -170,8 +170,25 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
 .endc{border:1px solid #2f5d86;background:linear-gradient(135deg,#0b1a2a,#0d0f22);border-radius:14px;padding:14px}
 .endc h3{margin:0 0 6px;font-size:15px;color:#fff}
 .endc ul{margin:6px 0;padding-left:20px}
+.app{grid-template-columns:minmax(0,1fr)}
+.top{min-width:0}.goal{min-width:0;overflow:hidden;flex:0 1 auto}.kstat{flex:0 1 auto;min-width:0;overflow:hidden}
+@media (max-width:1500px){.goal{font-size:13px;padding:5px 10px}.kstat{font-size:12px;gap:5px}#ktext{overflow:hidden;text-overflow:ellipsis;max-width:190px}}
+/* foldable output panel */
+.ohead .ib{margin-left:6px;flex:none}
+.orail{display:none;grid-column:5;grid-row:1;flex-direction:column;align-items:center;gap:10px;padding:10px 0;background:rgba(6,9,14,.75);min-width:0}
+.main.outc .out{display:none}.main.outc .orail{display:flex}
+.orl{writing-mode:vertical-rl;font-family:var(--fh);font-size:11px;letter-spacing:.22em;color:var(--dim)}
+.obadge{border:0;border-radius:6px;font-family:var(--fh);font-size:9px;font-weight:900;padding:6px 3px;writing-mode:vertical-rl;letter-spacing:.12em;animation:pulse 1.2s infinite}
+.obadge.ok{background:var(--gr);color:#002010}.obadge.chk{background:var(--am);color:#201400}.obadge.err{background:var(--rd);color:#200008}
+/* review mode (generic) */
+#revbtn{white-space:nowrap;flex:none}
+body.review #revbtn{background:#3a2a05;border-color:var(--am);color:var(--am)}
+.revbar{display:none;padding:5px 14px;background:repeating-linear-gradient(135deg,#2a1d03 0 14px,#1f1602 14px 28px);border-bottom:1px solid #5c4610;color:#ffd58a;font-size:14px}
+.revbar b{font-family:var(--fh);font-size:12px;letter-spacing:.14em;color:var(--am);margin-right:8px}
+body.review .revbar{display:block}
+body.review .main{box-shadow:inset 0 0 0 2px rgba(255,181,71,.35)}
 /* step 3: twin code, training length, two-gate target */
-.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:10px;margin-bottom:10px;align-items:start}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(560px,1fr));gap:10px;margin-bottom:10px;align-items:start}
 .pair .edbox{margin-bottom:0}
 .twin{border:1px solid #4a3d16;border-radius:12px;overflow:hidden;background:#0b0a06}
 .twin .edbar{background:#14110a;border-bottom-color:#3a3010}
@@ -187,9 +204,10 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
   <header class="top">
     <div class="brand">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#46e3ff"/><stop offset="1" stop-color="#3dffa0"/></linearGradient></defs><path d="M15 2 27 8v8c0 6-5 10-12 12C8 26 3 22 3 16V8z" fill="none" stroke="url(#lg)" stroke-width="2"/><rect x="9" y="9" width="12" height="12" rx="1.5" fill="#0d2233" stroke="#46e3ff"/><path d="M9 13h12M9 17h12" stroke="#46e3ff" stroke-width=".8"/></svg>
-      <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v0.3 preview</span>
+      <b>PANELGUARD</b><span>DEFECT INSPECTION LAB · v0.4 preview</span>
     </div>
     <div class="goal" title="The business target for every model in this course"><i>TARGET</i> catch at least&nbsp;<b>95 of every 100</b>&nbsp;defective cells, and count the good cells stopped</div>
+    <button class="btn small" id="revbtn" aria-pressed="false" title="For reviewers: open every page without answering anything. Nothing done here is saved as progress.">Review mode: OFF</button>
     <div class="kstat"><span class="kdot" id="kdot"></span><span id="ktext">Python loading…</span></div>
     <div class="kstat" id="tstat" style="min-width:0"><span class="kdot"></span>TensorFlow.js loading…</div>
   </header>
@@ -199,14 +217,16 @@ h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:.06em}
     <div class="mono" id="lnum" style="font-size:12px;color:var(--dim);min-width:120px;text-align:right">0 / 45 MB</div>
     <div class="lerr" id="lerr"></div>
   </div>
+  <div class="revbar" id="revbar"><b>REVIEW MODE — locks are off</b>Every page is open. Nothing you do here is saved as progress. “Run up to here” runs earlier cells with reference answers. Turn it OFF to go back to the real progress.</div>
   <div class="main" id="main">
     <nav class="nav" id="nav"></nav>
     <div class="rz" id="rz1" title="Drag to resize"></div>
     <section class="work" id="work"></section>
     <div class="rz" id="rz2" title="Drag to resize"></div>
     <section class="out" id="out"></section>
+    <div class="orail" id="orail"></div>
   </div>
-  <footer class="foot" title="Data licence: CC BY-NC-SA 4.0. Full text in data/LICENSE.md">Data: ELPV dataset (Buerhop-Lutz et al. 2018, EU PVSEC; Deitsch et al. 2019, Solar Energy; Deitsch et al. 2021, Machine Vision and Applications) · licence CC BY-NC-SA 4.0 · photos downscaled to 64×64 · <a id="lic" href="#" onclick="return false" style="color:#8d9bb0">full licence text</a> · Python: Pyodide + scikit-learn · TensorFlow.js — all in your browser · PanelGuard v0.3</footer>
+  <footer class="foot" title="Data licence: CC BY-NC-SA 4.0. Full text in data/LICENSE.md">Data: ELPV dataset (Buerhop-Lutz et al. 2018, EU PVSEC; Deitsch et al. 2019, Solar Energy; Deitsch et al. 2021, Machine Vision and Applications) · licence CC BY-NC-SA 4.0 · photos downscaled to 64×64 · <a id="lic" href="#" onclick="return false" style="color:#8d9bb0">full licence text</a> · Python: Pyodide + scikit-learn · TensorFlow.js — all in your browser · PanelGuard v0.4</footer>
 </div>
 <div class="tip" id="tip"></div>
 <script src="js/tf.min.js"></script>

@@ -592,6 +592,11 @@ var LOCKED = [
   { id: 8, title: 'Line trial on the sealed test set, drift watch, and retrain on your own factory photos' }
 ];
 
+/* Reference answers (review mode only: "Fill reference answer" / "Run up to here") */
+var REF = { '1a': ['uint8', '2624'], '1b': ['mono', '0.67'], '1c': ['0.5'], '1d': ['y'], '1e': ['255', '4096'],
+  '2a': ['idx_train'], '2b': ['5', 'idx_train'], '2c': ['1'], '2d': ['0.95'], '2e': ['cut', 'tn'] };
+[step1, step2].forEach(function (st) { st.substeps.forEach(function (s) { if (REF[s.id]) s.ref = REF[s.id]; }); });
+
 G.PG_STEPS = [step0, step1, step2].concat(LOCKED.map(function (s) {
   return { id: s.id, title: s.title, locked: true, substeps: [] };
 }));

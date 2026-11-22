@@ -447,7 +447,7 @@ function curves(r, host, api) {
   tiles(c, [[r.best.epoch + ' / ' + r.epochs, 'best epoch (kept)', 'g'], [f3(r.best.valAuc), 'best validation score', 'c'], [f3(last.valAuc), 'last epoch score', 'a']]);
   tiles(c, [[per.toFixed(1) + ' s', 'per epoch', 'c'], [(r.sec / 60).toFixed(1) + ' min', 'total', 'c'], [r.backend.toUpperCase(), 'TensorFlow.js backend', r.backend === 'webgl' ? 'g' : 'r']]);
   c.appendChild(el('p', 'hint', 'Ran on: ' + gpuText(r) + '. ' + (r.saved ? 'Weights saved in this browser: a reload brings this model back.' : r.restoredFrom ? '' : 'Could not save the weights in this browser (storage is blocked here). After a reload you will need to train again.')));
-  if (r.epochs < 30) c.appendChild(el('p', 'hint', 'Trained for ' + r.epochs + (r.epochs === 1 ? ' epoch (' : ' epochs (') + (r.epochs === 10 ? 'Quick' : 'test') + ' setting). Full is 30 epochs; it usually scores a little better.'));
+  if (r.epochs < 30) c.appendChild(el('p', 'hint', 'Trained for ' + r.epochs + (r.epochs === 1 ? ' epoch (' : ' epochs (') + (r.quick === 'review' ? 'review' : r.epochs === 10 ? 'Quick' : 'test') + ' setting). Full is 30 epochs; it usually scores a little better.'));
 }
 function curvesLive(host, api) {
   var box = el('div'); host.appendChild(box);
@@ -567,7 +567,7 @@ function twoGate(host, y, s, ids, st, onChange, opt) {
 function twoGatePlay(box, api) {
   var r3f = api.res('3f'), m = api.mech;
   var c = card(box, 'TRY IT: TWO GATES ON THE REAL SCORES', 'Every real validation cell is stacked at its blend score from 3f: defects above the line, good cells below. Drag the green LOW gate and the red HIGH gate. Rule: at most 5 of every 100 defects may land left of the low gate (bright red).');
-  if (!r3f || !r3f.blendScores) { c.appendChild(el('p', 'hint', 'Waiting for your 3f scores… (if this stays, run 3f again)')); return; }
+  if (!r3f || !r3f.blendScores) { c.appendChild(el('p', 'hint', document.body.classList.contains('review') ? 'Review mode: press “Run up to here” (below the code) to load real data for this page.' : 'Waiting for your 3f scores… (if this stays, run 3f again)')); return; }
   var st = m.play ? { low: m.play.low, high: m.play.high == null ? Infinity : m.play.high, moved: m.play.moved } : { low: null, high: null };
   twoGate(c, r3f.y, r3f.blendScores, null, st, function (g) {
     var done = g.passRate <= 0.05 + 1e-12 && st.moved && st.moved.low && st.moved.high;

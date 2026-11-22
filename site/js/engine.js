@@ -32,10 +32,33 @@ var PYODIDE_BASE = 'https://cdn.jsdelivr.net/pyodide/v314.0.8/full/';
 
 /* ---------- storage (optional) ---------- */
 var KEY = 'panelguard.v0.1';
-var S = { cur: null, subs: {}, navW: 250, outW: 470, navC: false };
+var S = { cur: null, subs: {}, navW: 250, outW: 470, navC: false, outC: false };
 try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved && saved.subs) S = Object.assign(S, saved); } catch (e) {}
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
-function SS(id) { return S.subs[id] || (S.subs[id] = { mech: {}, pred: {} }); }
+/* Review mode (generic): every built page open, nothing required, nothing saved as progress.
+   The student's state S is never changed by work done in review mode: review work lives in RV (memory only). */
+var RKEY = 'panelguard.review';
+var REVIEW = (function () { try { if (/(^|[#&])review($|&)/.test(location.hash.slice(1)) || /[?&]review=1/.test(location.search)) return true; return localStorage.getItem(RKEY) === '1'; } catch (e) { return false; } })();
+var RV = { subs: {}, studentCur: S.cur };
+var REVIEW_MSG = 'Review mode: press “Run up to here” to load real data for this page.';
+function applyReviewUI() {
+  document.body.classList.toggle('review', REVIEW);
+  var b = document.getElementById('revbtn'); if (b) { b.textContent = 'Review mode: ' + (REVIEW ? 'ON' : 'OFF'); b.setAttribute('aria-pressed', REVIEW ? 'true' : 'false'); }
+}
+function setReview(on) {
+  try { localStorage.setItem(RKEY, on ? '1' : '0'); } catch (e) {}
+  if (on) { if (REVIEW) return; REVIEW = true; RV.studentCur = S.cur; applyReviewUI(); updateGoal(); renderNav(); renderWork(); renderOut(); return; }
+  if (!REVIEW) return;
+  /* OFF: reload, so the student's real progress, kernel state and locks come back exactly as they were */
+  save();
+  var cur0 = RV.studentCur || '0a', qs = location.search.replace(/([?&])review=1(&|$)/, '$1').replace(/[?&]$/, '');
+  try {
+    if (qs !== location.search) { location.replace(location.pathname + qs + '#sub-' + cur0); return; }
+    location.hash = '#sub-' + cur0; location.reload();
+  } catch (e) { location.reload(); }
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(REVIEW ? Object.assign({}, S, { cur: RV.studentCur }) : S)); } catch (e) {} }
+function SSs(id) { return S.subs[id] || (S.subs[id] = { mech: {}, pred: {} }); }           // the student's real progress
+function SS(id) { return REVIEW ? (RV.subs[id] || (RV.subs[id] = { mech: {}, pred: {} })) : SSs(id); }
 
 /* ---------- index of substeps ---------- */
 var ORDER = [], SUB = {}, STEP_OF = {};
@@ -57,8 +80,8 @@ function pendingOf(id) {
   return null;
 }
 function passed(id) { return pendingOf(id) === null; }
-function openable(id) { var i = ORDER.indexOf(id); for (var k = 0; k < i; k++) if (!passed(ORDER[k])) return false; return true; }
-function firstBlock(id) { var i = ORDER.indexOf(id); for (var k = 0; k < i; k++) if (!passed(ORDER[k])) return ORDER[k]; return null; }
+function openable(id) { if (REVIEW) return true; var i = ORDER.indexOf(id); for (var k = 0; k < i; k++) if (!passed(ORDER[k])) return false; return true; }
+function firstBlock(id) { if (REVIEW) return null; var i = ORDER.indexOf(id); for (var k = 0; k < i; k++) if (!passed(ORDER[k])) return ORDER[k]; return null; }
 function lockText(id) { var b = firstBlock(id); return b ? 'Locked. First finish ' + b + ' “' + SUB[b].name + '”: ' + pendingOf(b) + '.' : ''; }
 function stepDone(st) { return st.substeps.length && st.substeps.every(function (s) { return passed(s.id); }); }
 
@@ -216,8 +239,8 @@ var JSR = { k: null, T: null, ready: false, err: null, backend: null, gpu: null,
 var EPOCHS = { quick: 10, full: 30 };
 /* Test setting only (shown plainly in the app): ?pgEpochs=N in the address, or window.PG_TEST_EPOCHS for srcdoc frames that have no address. */
 var TEST_EPOCHS = (function () { try { if (window.PG_TEST_EPOCHS) return Math.max(1, +window.PG_TEST_EPOCHS); var m = location.search.match(/[?&]pgEpochs=(\d+)/); return m ? Math.max(1, +m[1]) : null; } catch (e) { return null; } })();
-function epochsMode() { return TEST_EPOCHS ? 'test' : (S.epochsMode === 'quick' ? 'quick' : 'full'); }
-function epochsNow() { return TEST_EPOCHS || EPOCHS[epochsMode()]; }
+function epochsMode() { return TEST_EPOCHS ? 'test' : REVIEW ? 'review' : (S.epochsMode === 'quick' ? 'quick' : 'full'); }
+function epochsNow() { return TEST_EPOCHS || (REVIEW ? 1 : EPOCHS[epochsMode()]); }
 function gpuInfo() {
   try {
     var c = document.createElement('canvas'), gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return { name: 'none', soft: true };
@@ -268,7 +291,8 @@ function refreshBridge() {
   });
 }
 function saveModel(model) {
-  var ss = SS('3e'), key = window.PG_STEP3_MODEL_KEY + Date.now().toString(36);
+  if (REVIEW) return Promise.resolve(false);           // review runs never touch the student's saved model
+  var ss = SSs('3e'), key = window.PG_STEP3_MODEL_KEY + Date.now().toString(36);
   try {
     if (typeof indexedDB === 'undefined' || !indexedDB) return Promise.resolve(false);
     return model.save(key).then(function () {
@@ -279,7 +303,7 @@ function saveModel(model) {
   } catch (e) { return Promise.resolve(false); }
 }
 function restoreModel() {
-  var ss = SS('3e'), key = ss.mech && ss.mech.modelKey;
+  var ss = SSs('3e'), key = ss.mech && ss.mech.modelKey;
   if (!key || !ss.mech.lastRes) return Promise.resolve(false);
   try {
     return window.tf.loadLayersModel(key).then(function (m) {
@@ -296,14 +320,14 @@ function jsRun(code, probe, out) {
   }).catch(function (e) { return { error: { type: 'Setup', msg: e.message || String(e), line: null, tb: '' } }; });
 }
 function jsEval(fn) { return jsReady().then(function () { return JSR.k.eval(fn); }).catch(function (e) { console.warn(e); return null; }); }
-function lose(id, why) { var ss = SS(id); ss.codePass = false; ss.mech.lost = why || 1; delete RES[id]; VERD[id] = null; save(); }
+function lose(id, why) { var ss = SSs(id); ss.codePass = false; ss.mech.lost = why || 1; delete RES[id]; VERD[id] = null; save(); }
 function invalidateAfter(id) {
   var later = { '3c': ['3e', '3f', '3g'], '3e': ['3f', '3g'], '3f': ['3g'] }[id] || [];
   later.forEach(function (x) { if (SS(x).codePass) { SS(x).codePass = false; delete RES[x]; VERD[x] = null; SS(x).mech.stale = id; } });
   if (later.length) save();
 }
 function replayJS() {
-  var ids = ORDER.filter(function (id) { return SUB[id].lang === 'js' && SS(id).codePass && SS(id).code; });
+  var ids = ORDER.filter(function (id) { return SUB[id].lang === 'js' && SSs(id).codePass && SSs(id).code; });
   if (!ids.length) return Promise.resolve();
   replaying = true;
   var chain = jsReady().then(refreshBridge), modelLost = false;
@@ -312,7 +336,7 @@ function replayJS() {
       $('#ktext').textContent = 'Rebuilding your work: ' + id + ' (' + (n + 1) + ' of ' + ids.length + ')…'; $('#kdot').className = 'kdot busy';
       if (modelLost && (id === '3f' || id === '3g')) { lose(id, 'model'); return; }
       if (SUB[id].restore) return restoreModel().then(function (ok) { if (!ok) { modelLost = true; lose(id, 'restore'); } });
-      return JSR.k.run(SS(id).code, SUB[id].probe, null).then(function (m) {
+      return JSR.k.run(SSs(id).code, SUB[id].probe, null).then(function (m) {
         if (!m.error && m.probe && !m.probe.probe_error) { RES[id] = m.probe; VERD[id] = SUB[id].check(m.probe); if (!VERD[id].pass) lose(id); }
         else lose(id);
       });
@@ -329,7 +353,7 @@ function liveHook(id) { var s = SUB[id]; if (!s || !s.live) return; var vb = $('
 /* replay passed code so the notebook state comes back (after reload or Stop) */
 var replaying = false;
 function replay() {
-  var ids = ORDER.filter(function (id) { return SUB[id].kind === 'code' && SUB[id].lang !== 'js' && SS(id).codePass && SS(id).code; });
+  var ids = ORDER.filter(function (id) { return SUB[id].kind === 'code' && SUB[id].lang !== 'js' && SSs(id).codePass && SSs(id).code; });
   if (!ids.length) return replayJS();
   replaying = true;
   var chain = Promise.resolve();
@@ -337,9 +361,9 @@ function replay() {
     chain = chain.then(function () {
       $('#ktext').textContent = 'Rebuilding your work: ' + id + ' (' + (n + 1) + ' of ' + ids.length + ')…';
       $('#kdot').className = 'kdot busy';
-      return kRun(SS(id).code, SUB[id].probe).then(function (m) {
+      return kRun(SSs(id).code, SUB[id].probe).then(function (m) {
         if (!m.error && m.probe && !m.probe.probe_error) { RES[id] = m.probe; VERD[id] = SUB[id].check(m.probe); }
-        var mk = SS(id).mech && SS(id).mech.keptCmd;
+        var mk = SSs(id).mech && SSs(id).mech.keptCmd;
         if (mk) return kRun(mk, null);
       });
     });
@@ -492,7 +516,11 @@ function Editor(box, code, onRun, onChange, lang) {
     get: function () { return ta.value; },
     set: function (c) { ta.value = c; errLine = null; paint(); ed.scrollTop = 0; ed.scrollLeft = 0; },
     mark: function (n) { errLine = n; paint(); },
-    focusGap: function () { var i = ta.value.indexOf('____'); if (i >= 0) { ta.focus(); ta.setSelectionRange(i, i + 4); } },
+    focusGap: function (line) {
+      var v = ta.value, i = -1, m;
+      if (line) { var st = 0, L = v.split('\n'); for (var k = 0; k < line - 1; k++) st += L[k].length + 1; m = L[line - 1].match(/(?<![A-Za-z])_{2,}(?![A-Za-z])/); if (m) { i = st + m.index; ta.focus(); ta.setSelectionRange(i, i + m[0].length); return; } }
+      i = v.indexOf('____'); if (i >= 0) { ta.focus(); ta.setSelectionRange(i, i + 4); }
+    },
     ta: ta
   };
 }
@@ -502,7 +530,8 @@ function layout() {
   var m = $('#main');
   m.classList.toggle('navc', !!S.navC);
   m.style.setProperty('--navw', (S.navC ? 58 : S.navW) + 'px');
-  m.style.setProperty('--outw', S.outW + 'px');
+  m.classList.toggle('outc', !!S.outC);
+  m.style.setProperty('--outw', (S.outC ? 44 : S.outW) + 'px');
 }
 function resizer(el, which) {
   el.addEventListener('pointerdown', function (ev) {
@@ -510,6 +539,7 @@ function resizer(el, which) {
     var x0 = ev.clientX, w0 = which === 'nav' ? S.navW : S.outW;
     function mv(e) {
       var dx = e.clientX - x0;
+      if (which !== 'nav') S.outC = false;
       if (which === 'nav') { S.navC = false; S.navW = Math.max(170, Math.min(420, w0 + dx)); }
       else S.outW = Math.max(320, Math.min(innerWidth - (S.navC ? 58 : S.navW) - 380, w0 - dx));
       layout();
@@ -549,6 +579,18 @@ function openSub(id) {
   if (!same) { $('#work').scrollTop = 0; $('#out').scrollTop = 0; }
 }
 var GOAL1 = null;
+/* Output panel fold (same idea as the step list): a slim rail with an open button and a result badge. */
+var OB = null;
+function setOutC(c) { S.outC = !!c; if (!c) OB = null; save(); layout(); showRail(); if (!c && cur.viz && cur.viz.resize) cur.viz.resize(); }
+function outBadge(kind) { if (!S.outC) return; OB = kind; showRail(); }
+function showRail() {
+  var r = $('#orail'); if (!r) return;
+  var b = { pass: ['PASS', 'ok'], check: ['CHECK', 'chk'], error: ['ERROR', 'err'] }[OB];
+  r.innerHTML = '';
+  r.appendChild(h('button', { class: 'ib', id: 'oopen', title: 'Open the output panel', html: '«', onclick: function () { setOutC(false); } }));
+  r.appendChild(h('div', { class: 'orl', text: 'OUTPUT' }));
+  if (b) r.appendChild(h('button', { class: 'obadge ' + b[1], id: 'obadge', title: 'A run finished: open the output panel to see it', text: b[0], onclick: function () { setOutC(false); } }));
+}
 function updateGoal() {
   var g = $('.goal'); if (!g) return; if (GOAL1 == null) GOAL1 = g.innerHTML;
   var i3 = ORDER.indexOf('3g'), two = i3 >= 0 && ORDER.indexOf(S.cur) >= i3 && window.PG_STEP3_GOAL2;
@@ -584,7 +626,9 @@ function renderWork() {
     cur.ed = Editor(box, ss.code || s.code, doRun, function (v) { ss.draft = v; save(); }, s.lang);
     if (ss.draft && ss.draft !== (ss.code || s.code)) cur.ed.set(ss.draft);
     var note = h('span', { class: 'note' });
-    box.appendChild(h('div', { class: 'runrow' }, [runB, stopB, note, h('span', { class: 'note', style: 'margin-left:auto', text: 'Ctrl+Enter runs · Tab indents' })]));
+    var rvBtns = REVIEW && s.ref ? [h('button', { class: 'btn small rvb', id: 'reffill', text: 'Fill reference answer', onclick: function () { cur.ed.set(fillRef(s.code, s.ref)); } }),
+      h('button', { class: 'btn small rvb', id: 'runupto', text: 'Run up to here', onclick: function () { runUpTo(id); } }), h('span', { class: 'note', id: 'rvstat' })] : [];
+    box.appendChild(h('div', { class: 'runrow' }, [runB, stopB].concat(rvBtns, [note, h('span', { class: 'note', style: 'margin-left:auto', text: 'Ctrl+Enter runs · Tab indents' })])));
     if (s.twin) { var pair = h('div', { class: 'pair' }, [box, twinPanel(s)]); w.appendChild(pair); } else w.appendChild(box);
     runB.onclick = doRun;
     stopB.onclick = function () { if (js) { JSR.k && JSR.k.stop(); stopB.textContent = '■ Stopping…'; } else restartKernel(); };
@@ -606,7 +650,7 @@ function twinPanel(s) {
 function renderEpochs() {
   var box = h('div', { class: 'card epochs' });
   var mode = epochsMode();
-  box.appendChild(h('div', { class: 'row' }, [h('b', { text: 'Training length:' })].concat(TEST_EPOCHS ? [h('span', { class: 'tagpill', text: 'test setting: ' + TEST_EPOCHS + ' epoch' + (TEST_EPOCHS > 1 ? 's' : '') + ' (from the page address)' })] :
+  box.appendChild(h('div', { class: 'row' }, [h('b', { text: 'Training length:' })].concat(REVIEW && !TEST_EPOCHS ? [h('span', { class: 'tagpill', style: 'border-color:#ffb547;color:#ffb547', text: 'review setting: 1 epoch — numbers are rough' })] : TEST_EPOCHS ? [h('span', { class: 'tagpill', text: 'test setting: ' + TEST_EPOCHS + ' epoch' + (TEST_EPOCHS > 1 ? 's' : '') + ' (from the page address)' })] :
     [['quick', 'Quick · ' + EPOCHS.quick + ' epochs'], ['full', 'Full · ' + EPOCHS.full + ' epochs']].map(function (o) {
       return h('button', { class: 'btn small' + (mode === o[0] ? ' on' : ''), text: o[1], onclick: function () { if (running) return; S.epochsMode = o[0]; save(); renderWork(); } });
     }))));
@@ -628,10 +672,11 @@ function updateRunBtn() {
   else if (replaying) why = 'Python is rebuilding your earlier cells. Wait a moment.';
   else if (s.lang === 'js' && JSR.err) why = JSR.err;
   else if (s.lang === 'js' && !JSR.ready) why = 'TensorFlow.js is still starting. Wait a moment.';
-  else if (s.pre && s.pre.need(ss.mech || {})) why = 'First do the hands-on part above: ' + s.pre.need(ss.mech || {}) + '.';
-  else if (s.predict && !(ss.pred && ss.pred.locked)) why = 'Answer the prediction question above first.';
+  else if (!REVIEW && s.pre && s.pre.need(ss.mech || {})) why = 'First do the hands-on part above: ' + s.pre.need(ss.mech || {}) + '.';
+  else if (!REVIEW && s.predict && !(ss.pred && ss.pred.locked)) why = 'Answer the prediction question above first.';
   else if (running) why = 'Code is running.';
   cur.runB.disabled = !!why; cur.runB.dataset.why = why;
+  [].forEach.call(document.querySelectorAll('.rvb'), function (b) { b.disabled = !!running || replaying || runningUpTo; });
   cur.note.textContent = why;
 }
 setInterval(updateRunBtn, 700);
@@ -699,7 +744,7 @@ function renderPredict(id) {
     if (PRE[id] || (RES[id] && SS(id).codePass)) draw();
     else {
       holder.innerHTML = '<div class="hint">Getting the real curve from Python…</div>';
-      whenReady().then(function () { return replayDone(); }).then(function () { return kEval(s.preProbe); }).then(function (r) { if (r && r.curve) { PRE[id] = r; if (S.cur === id) draw(); } else holder.innerHTML = '<div class="hint">Could not read p_val yet. Finish 2c first.</div>'; });
+      whenReady().then(function () { return replayDone(); }).then(function () { return kEval(s.preProbe); }).then(function (r) { if (r && r.curve) { PRE[id] = r; if (S.cur === id) draw(); } else holder.innerHTML = '<div class="hint">' + (REVIEW ? REVIEW_MSG : 'Could not read p_val yet. Finish 2c first.') + '</div>'; });
     }
   }
   return box;
@@ -722,7 +767,7 @@ function renderOut() {
   var id = S.cur, s = SUB[id], o = $('#out'), ss = SS(id);
   o.innerHTML = '';
   cur.viz = null;
-  o.appendChild(h('div', { class: 'ohead' }, [h('h3', { text: s.kind === 'code' ? 'LIVE OUTPUT' : 'RESULT' }), h('span', { class: 't', id: 'otime' })]));
+  o.appendChild(h('div', { class: 'ohead' }, [h('h3', { text: s.kind === 'code' ? 'LIVE OUTPUT' : 'RESULT' }), h('span', { class: 't', id: 'otime' }), h('button', { class: 'ib', id: 'ofold', title: 'Fold the output panel', html: '»', onclick: function () { setOutC(true); } })]));
   o.appendChild(h('div', { id: 'chkbox' }));
   if (s.kind === 'scene') {
     var vz = h('div', { id: 'vizbox' }); o.appendChild(vz);
@@ -738,6 +783,7 @@ function renderOut() {
   o.appendChild(h('div', { id: 'endbox' }));
   if (ERR[id]) showErr(ERR[id]);
   if (RES[id]) drawViz(id);
+  else if (REVIEW) $('#vizbox').appendChild(h('div', { class: 'verdict', style: 'background:#151109;border:1px solid #5c4610', text: REVIEW_MSG }));
   refreshStatus();
 }
 function showErr(e) {
@@ -769,9 +815,9 @@ function refreshStatus() {
     else cb.appendChild(h('div', { class: 'chk todo' }, [h('span', { class: 'ic', text: 'TO DO' }), h('div', { text: pend ? 'Now: ' + pend + '.' : '' })]));
   }
   var wb = $('#whybox');
-  if (wb) { wb.innerHTML = ''; if (passed(id) && RES[id] && s.explain) wb.appendChild(whyBox(s.explain(RES[id], ss.mech || {}))); }
+  if (wb) { wb.innerHTML = ''; if ((passed(id) || (REVIEW && VERD[id] && VERD[id].pass)) && RES[id] && s.explain) wb.appendChild(whyBox(s.explain(RES[id], ss.mech || {}))); }
   var eb = $('#endbox');
-  if (eb) { eb.innerHTML = ''; if (id === '2e' && passed('2e')) V.endCard(eb, RES, makeApi(id)); }
+  if (eb) { eb.innerHTML = ''; if (id === '2e' && (passed('2e') || (REVIEW && RES['2e']))) V.endCard(eb, RES, makeApi(id)); }
   var strip = $('.strip'); if (strip) renderStrip(STEP_OF[id], strip);
   renderNav();
 }
@@ -783,18 +829,22 @@ function nextHint(id) {
 
 /* ---------- run ---------- */
 function doRun() {
-  var id = S.cur, s = SUB[id], ss = SS(id), js = s.lang === 'js';
+  var id = S.cur;
   if (!cur.ed || cur.runB.disabled) return;
-  var code = cur.ed.get(), gaps = (code.match(/____/g) || []).length;
-  if (gaps) { VERD[id] = { pass: false, msg: 'Fill every gap marked ____ first (' + gaps + ' left). Type your answer in place of the underscores.' }; ERR[id] = null; showErr(null); refreshStatus(); cur.ed.focusGap(); return; }
+  var code = cur.ed.get(), bl = blankLine(code);
+  if (bl) { VERD[id] = { pass: false, msg: 'Line ' + bl + ' still has a blank ____ . Type your answer there, then press Run.' }; ERR[id] = null; showErr(null); refreshStatus(); cur.ed.mark(bl); cur.ed.focusGap(bl); outBadge('check'); return; }
+  return execCell(id, code);
+}
+function execCell(id, code) {
+  var s = SUB[id], ss = SS(id), js = s.lang === 'js';
   running = id; ERR[id] = null; showErr(null); VERD[id] = null; OUTTXT[id] = '';
   if (conEl) conEl.textContent = '';
   updateRunBtn(); refreshStatus(); setBusy(true);
-  if (K.mode !== 'page' || js) { cur.stopB.style.display = ''; cur.stopB.textContent = '■ Stop'; }
+  if (cur.stopB && S.cur === id && (K.mode !== 'page' || js)) { cur.stopB.style.display = ''; cur.stopB.textContent = '■ Stop'; }
   if (js && s.live) liveHook(id);
   var t0 = performance.now(), tick = setInterval(function () { var t = $('#otime'); if (t && running === id) t.textContent = ((performance.now() - t0) / 1000).toFixed(1) + ' s'; }, 100);
   var outFn = function (t, e) { OUTTXT[id] += t + '\n'; if (S.cur === id) conAdd(t + '\n', e); };
-  (js ? jsRun(code, s.probe, outFn) : kRun(code, s.probe, outFn)).then(function (m) {
+  return (js ? jsRun(code, s.probe, outFn) : kRun(code, s.probe, outFn)).then(function (m) {
     clearInterval(tick); running = null; setBusy(false); JSR.live = null;
     if (cur.stopB) cur.stopB.style.display = 'none';
     var t = $('#otime'); if (t) t.textContent = ((performance.now() - t0) / 1000).toFixed(1) + ' s';
@@ -817,6 +867,35 @@ function doRun() {
       if (!OUTTXT[id] && conEl) conAdd('(no printed output)');
     }
     if (S.cur === id) refreshStatus();
+    updateRunBtn();
+    outBadge(m.error && m.error.type !== 'Check' ? (m.error.type === 'Stopped' ? 'check' : 'error') : VERD[id] && VERD[id].pass ? 'pass' : 'check');
+    return VERD[id];
+  });
+}
+/* A blank = 2 or more underscores not touching a letter (so idx_train or __name__ are fine, but ____, ___ , 0.____ and ____5 are blanks). Returns its 1-based line, or 0. */
+var BLANK = /(?<![A-Za-z])_{2,}(?![A-Za-z])/;
+function blankLine(code) { var L = code.split('\n'); for (var i = 0; i < L.length; i++) { var t = L[i].replace(/(#|\/\/).*$/, ''); if (BLANK.test(t)) return i + 1; } return 0; }
+function fillRef(code, vals) { var i = 0; return code.replace(/____/g, function () { return vals[i++]; }); }
+/* Review mode: run every earlier code cell (reference answers) whose result is not here yet, then this one. Real computation, nothing faked. */
+var runningUpTo = false;
+function runUpTo(id) {
+  if (runningUpTo || running) return;
+  var upto = ORDER.indexOf(id), list = ORDER.filter(function (x, i) { return i <= upto && SUB[x].kind === 'code' && SUB[x].ref && (x === id || !(RES[x] && VERD[x] && VERD[x].pass)); });
+  runningUpTo = true; updateRunBtn();
+  var stat = function (t) { var n = $('#rvstat'); if (n) n.textContent = t; };
+  var chain = (SUB[id].lang === 'js' || list.some(function (x) { return SUB[x].lang === 'js'; }) ? Promise.all([whenReady(), jsReady()]) : whenReady()).then(replayDone);
+  list.forEach(function (x, n) {
+    chain = chain.then(function (prev) {
+      if (prev && prev.stop) return prev;
+      stat('Run up to here: ' + x + ' “' + SUB[x].name + '” (' + (n + 1) + ' of ' + list.length + ')' + (x === '3e' ? ' — review setting: 1 epoch, numbers are rough' : '') + '…');
+      if (x === id && cur.ed) cur.ed.set(fillRef(SUB[x].code, SUB[x].ref));
+      return execCell(x, fillRef(SUB[x].code, SUB[x].ref)).then(function (v) { if (!v || !v.pass) { stat('Run up to here stopped at ' + x + ': ' + (v ? v.msg : 'no result')); return { stop: 1 }; } });
+    });
+  });
+  return chain.then(function (r) {
+    runningUpTo = false;
+    if (!(r && r.stop)) stat('Run up to here: done (' + list.length + ' cell' + (list.length === 1 ? '' : 's') + ' run with reference answers).');
+    if (S.cur === id) { renderWork(); renderOut(); stat(r && r.stop ? 'Run up to here stopped early.' : 'Run up to here: done.'); }
     updateRunBtn();
   });
 }
@@ -852,8 +931,10 @@ if (licEl) licEl.addEventListener('click', function () {
     document.body.appendChild(z);
   });
 });
+applyReviewUI(); showRail();
+(function () { var b = document.getElementById('revbtn'); if (b) b.addEventListener('click', function () { setReview(!REVIEW); }); })();
 initJS();
 route();
 window.PG = { PYODIDE_BASE: PYODIDE_BASE, pack: function () { return PACK; }, S: S, RES: RES, VERD: VERD, K: K, JSR: JSR, openSub: openSub, passed: passed, pendingOf: pendingOf, ORDER: ORDER, kEval: kEval, epochs: epochsNow,
-  ready: function () { return K.ready && !replaying; }, running: function () { return running; } };
+  ready: function () { return K.ready && !replaying; }, running: function () { return running; }, review: function () { return REVIEW; }, runningUpTo: function () { return runningUpTo; }, SSs: SSs, RV: RV };
 })();

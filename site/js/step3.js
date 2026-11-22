@@ -525,6 +525,8 @@ function gatesFor(y, s) {
   return { low: low, high: high, nDef: d.length };
 }
 
+var REF3 = { '3a': ['[2624, 64, 64, 1]', '255'], '3c': ['1', '64', '1'], '3d': ['2'], '3e': ['binaryCrossentropy', 'nDef'], '3f': ['i', 'bestFar'], '3g': ['0.05', '0.95'] };
+step3.substeps.forEach(function (s) { if (REF3[s.id]) s.ref = REF3[s.id]; });
 G.PG_STEP3 = step3;
 G.PG_STEP3_BRIDGE = BRIDGE;
 G.PG_STEP3_GOAL2 = GOAL2;
