@@ -94,10 +94,20 @@ function stepDone(st) { return st.substeps.length && st.substeps.every(function 
 var PACK = null, LAB = null, ID2I = {}, FULL = {}, D = null;
 var prog = { dataMB: 0, dataTotal: 5.36, pyMB: 0, pyTotal: 33.8, text: '' };
 function showProg() {
+  if (K.blocked) { $('#ltext').innerHTML = '<b>PYTHON BLOCKED</b>' + (prog.dataMB >= prog.dataTotal ? 'Photos ready.' : 'Loading the photos…'); return; }
   var done = prog.dataMB + prog.pyMB, tot = prog.dataTotal + prog.pyTotal;
   $('#lbar').style.width = Math.min(100, 100 * done / tot).toFixed(1) + '%';
   $('#lnum').textContent = done.toFixed(1) + ' / ' + tot.toFixed(0) + ' MB';
   $('#ltext').innerHTML = '<b>LOADING ' + Math.round(100 * done / tot) + '%</b>' + esc(prog.text);
+}
+var WASM_MSG = 'This viewer blocks WebAssembly, so Python cannot start here. Download the HTML file and open it in Chrome.';
+function wasmProbe() { try { if (typeof WebAssembly === 'undefined') return Promise.resolve(false); return WebAssembly.instantiate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0])).then(function () { return true; }, function () { return false; }); } catch (e) { return Promise.resolve(false); } }
+function wasmBlocked() {
+  if (K.blocked) return; K.blocked = true;
+  var e = $('#lerr'); e.classList.add('show'); e.innerHTML = '<b>Python is off in this viewer.</b> ' + esc(WASM_MSG) + '<br>Step 0 and every page without code still work here.';
+  $('#lbar').parentNode.style.display = 'none'; $('#lnum').style.display = 'none'; showProg();
+  $('#kdot').className = 'kdot bad'; $('#ktext').textContent = 'Python blocked here (no WebAssembly)'; $('#ktext').parentNode.title = WASM_MSG;
+  updateRunBtn();
 }
 function fatal(msg) {
   var e = $('#lerr'); e.classList.add('show');
@@ -176,7 +186,7 @@ function konmsg(m) {
     $('#loader').classList.add('gone');
     var f = K.onReady; K.onReady = []; f.forEach(function (fn) { fn(); });
   }
-  else if (m.type === 'fatal') fatal(m.text);
+  else if (m.type === 'fatal') { if (m.wasmBlocked) wasmBlocked(); else fatal(m.text); }
   else if (m.type === 'stdout') { var c = K.cb[m.id]; if (c && c.out) c.out(m.text, m.err); }
   else if (m.type === 'result') { var c2 = K.cb[m.id]; delete K.cb[m.id]; if (c2) c2.done(m); }
 }
@@ -207,6 +217,7 @@ function spawn(mode, dataP) {
     K.w = w;
     var live = false;
     w.onmessage = function (ev) {
+      if (ev.data && ev.data.wasmBlocked) { got = true; try { w.terminate(); } catch (e) {} return wasmBlocked(); }
       if (ev.data && ev.data.type === 'fatal' && !K.ready && !got) { console.warn('kernel mode ' + mode + ' failed: ' + ev.data.text); K.lastFatal = ev.data.text; live = false; return fail(); }
       live = true; konmsg(ev.data);
     };
@@ -326,7 +337,7 @@ function jsRun(code, probe, out) {
     return JSR.k.run(code, probe, function (t, e) { if (out) out(t, e); }).then(function (r) { console.log = lg; return r; }, function (e) { console.log = lg; throw e; });
   }).catch(function (e) { return { error: { type: 'Setup', msg: e.message || String(e), line: null, tb: '' } }; });
 }
-function jsEval(fn) { return jsReady().then(function () { return JSR.k.eval(fn); }).catch(function (e) { console.warn(e); return null; }); }
+function jsEval(fn) { return jsReady().then(function () { return JSR.k.eval(fn); }).catch(function (e) { console.warn('jsEval: ' + String(e && e.message || e)); return null; }); }
 function lose(id, why) { var ss = SSs(id); ss.codePass = false; ss.mech.lost = why || 1; delete RES[id]; VERD[id] = null; save(); }
 function invalidateAfter(id) {
   var later = { '3c': ['3e', '3f', '3g'], '3e': ['3f', '3g'], '3f': ['3g'] }[id] || [];
@@ -334,7 +345,7 @@ function invalidateAfter(id) {
   if (later.length) save();
 }
 function replayJS() {
-  var ids = ORDER.filter(function (id) { return SUB[id].lang === 'js' && SSs(id).codePass && SSs(id).code; });
+  var ids = ORDER.filter(function (id) { var x = S.subs[id]; return SUB[id].lang === 'js' && x && x.codePass && x.code; });
   if (!ids.length) return Promise.resolve();
   replaying = true;
   var chain = jsReady().then(refreshBridge), modelLost = false;
@@ -360,7 +371,7 @@ function liveHook(id) { var s = SUB[id]; if (!s || !s.live) return; var vb = $('
 /* replay passed code so the notebook state comes back (after reload or Stop) */
 var replaying = false;
 function replay() {
-  var ids = ORDER.filter(function (id) { return SUB[id].kind === 'code' && SUB[id].lang !== 'js' && SSs(id).codePass && SSs(id).code; });
+  var ids = ORDER.filter(function (id) { var x = S.subs[id]; return SUB[id].kind === 'code' && SUB[id].lang !== 'js' && x && x.codePass && x.code; });
   if (!ids.length) return replayJS();
   replaying = true;
   var chain = Promise.resolve();
@@ -675,7 +686,8 @@ function makePreApi(id) {
 function updateRunBtn() {
   if (!cur.runB) return;
   var s = SUB[S.cur], ss = SS(S.cur), why = '';
-  if (!K.ready) why = 'Python is still loading (' + Math.round(100 * (prog.dataMB + prog.pyMB) / (prog.dataTotal + prog.pyTotal)) + '%). Wait a moment.';
+  if (K.blocked) why = WASM_MSG;
+  else if (!K.ready) why = 'Python is still loading (' + Math.round(100 * (prog.dataMB + prog.pyMB) / (prog.dataTotal + prog.pyTotal)) + '%). Wait a moment.';
   else if (replaying) why = 'Python is rebuilding your earlier cells. Wait a moment.';
   else if (s.lang === 'js' && JSR.err) why = JSR.err;
   else if (s.lang === 'js' && !JSR.ready) why = 'TensorFlow.js is still starting. Wait a moment.';
@@ -827,7 +839,7 @@ function showErr(e) {
 function drawViz(id) {
   var vb = $('#vizbox'); if (!vb) return;
   vb.innerHTML = '';
-  try { cur.viz = SUB[id].render(RES[id], vb, makeApi(id)) || null; } catch (e) { console.error(e); vb.appendChild(h('div', { class: 'hint', text: 'Could not draw this card: ' + e.message })); }
+  try { cur.viz = SUB[id].render(RES[id], vb, makeApi(id)) || null; } catch (e) { console.error('render ' + id + ': ' + String(e && e.message || e)); vb.appendChild(h('div', { class: 'hint', text: 'Could not draw this card: ' + e.message })); }
 }
 function refreshStatus() {
   var id = S.cur, s = SUB[id], ss = SS(id), cb = $('#chkbox');
@@ -950,8 +962,11 @@ showProg();
 prog.text = 'Downloading 2,624 real cell photos (5.4 MB)…';
 var dataP = loadData();
 dataP.then(function () { if (S.cur) { if (SUB[S.cur].kind === 'scene') renderOut(); } }).catch(function (e) { fatal('The photo pack could not be loaded: ' + e.message); });
-if (typeof WebAssembly === 'undefined') fatal('This browser has no WebAssembly, so Python cannot run here.');
-else spawn(typeof Worker === 'undefined' ? 'page' : (EMB ? 'blob' : 'file'), dataP);
+/* WebAssembly probe first: some viewers (host frames with a strict CSP) block it. Then Python never starts; pages without Python still work. */
+(window.PGWasmWorks ? window.PGWasmWorks() : wasmProbe()).then(function (ok) {
+  if (!ok) return wasmBlocked();
+  spawn(typeof Worker === 'undefined' ? 'page' : (EMB ? 'blob' : 'file'), dataP);
+});
 whenReady().then(replay).then(function () { refreshStatus(); });
 var licEl = document.getElementById('lic');
 if (licEl) licEl.addEventListener('click', function () {

@@ -93,12 +93,15 @@ LangGraph bundle: `cd tools/lg && npm ci && sh build.sh`. `entry.mjs` exports on
 - Node cell checks (real kernel/probes/checks, TF.js CPU, fixture model): `cd tools && node tests/js_cells4.test.mjs` / `node tests/js_cells5.test.mjs [5b,5e]` (arg = only those substeps get wrong-answer runs). Right + wrong answers per gap live in `tests/fills.mjs` (`FILLS[id] = {right, wrong:[…]}`; `right` must equal `ref`). js_cells5 also writes `tools/research/step5_inputs.json`.
 - Browser e2e: `TARGET=site|file|srcdoc node tests/s5_e2e.mjs` (env `RELOAD=0`, `REVIEW=0` skip those parts). ~4–9 min each: start state = Steps 0–4 passed (`seed.mjs` + the `M3/M4` mech in the test), Step 3 model = the **fixture** (`fixture.mjs` + `fixture_cnn.json`: Step 3 architecture trained in real Keras) saved into IndexedDB so the app restores it like a student's model; everything else replays for real. Screenshots → `tools/shots/` (1366×768; look at them).
 - `node tests/s5_review_fresh.mjs` — fresh browser, review mode, Run up to here on 5g from nothing (trains 3e for 1 epoch; slow).
+- `node tests/wasm_block.mjs` — site + single file served with a CSP that blocks WebAssembly (`CSP` env of `serve.mjs`): plain message, no Pyodide request, Step 0 / no-Python pages work, zero uncaught errors.
 - `node srcdoc_test.mjs` — single file in 3 sandbox variants: Python + TF.js ready, LangGraph pause/resume + recursion limit, zero console errors.
 - Python twin: `python3 tools/research/step5_twin.py [inputs.json]` (needs `pip install langgraph`); must print `TWIN MATCHES`.
 - **CDN mirror**: jsdelivr is NOT reachable here. `tests/cdn.mjs` `mirrorCDN(ctx)` answers the exact `PYODIDE_BASE` URL from `tools/cdn-mirror` with CORS headers. Keep it; never change the constant. Chrome's own background calls to google.com show as proxy refusals in the Bash output — harmless.
 - Local server for site mode: `node tools/serve.mjs <site dir> <port>` (each test uses its own port: s4 8769, s5 8771, fresh review 8772).
 
 ## 10. Known traps
+- Boot runs a tiny WebAssembly probe (page: `wasmProbe`, worker: `PGWasmWorks` in pyworker.js) before Pyodide. If blocked: `K.blocked`, message in `#lerr`, RUN disabled with the reason; Python never starts. Never `console.warn/error` raw Error/URL objects (host console relays fail to clone them) — log strings only.
+- Replay filters must not create `S.subs[id]` entries (read `S.subs[id]` directly, not `SSs(id)`).
 - **LangGraph in the browser**: the web entry has no AsyncLocalStorage, so `interrupt()` and `getConfig()` cannot find the running node. `tools/lg/entry.mjs` installs a tiny synchronous stand-in: `interrupt()` works only if called at the top of a node, BEFORE any `await`. Pass `config` (2nd node argument) explicitly for anything else.
 - A node name may not equal a state key (`score` node vs `score` field → error). That is why the score field is `p`.
 - Conditional edges with a list (`['score','reshoot','human_check']`) throw “Branch condition returned unknown or null destination” for any other return value; an unreachable node fails at `compile()`.

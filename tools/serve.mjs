@@ -5,5 +5,5 @@ http.createServer((q, s) => {
   const p = path.join(root, decodeURIComponent(q.url.split('?')[0]).replace(/\/$/, '/index.html'));
   if (!p.startsWith(root)) { s.writeHead(403); return s.end(); }
   fs.stat(p, (e, st) => { if (e) { s.writeHead(404); return s.end('nf'); }
-    s.writeHead(200, { ...(process.env.CORS ? { 'access-control-allow-origin': '*' } : {}), 'content-type': T[path.extname(p)] || 'application/octet-stream', 'content-length': st.size }); fs.createReadStream(p).pipe(s); });
+    s.writeHead(200, { ...(process.env.CORS ? { 'access-control-allow-origin': '*' } : {}), ...(process.env.CSP && p.endsWith('.html') ? { 'content-security-policy': process.env.CSP } : {}), 'content-type': T[path.extname(p)] || 'application/octet-stream', 'content-length': st.size }); fs.createReadStream(p).pipe(s); });
 }).listen(port, () => console.log('serving', root, port));

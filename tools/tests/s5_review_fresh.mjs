@@ -20,7 +20,7 @@ await page.waitForTimeout(800);
 const v = await page.evaluate(() => window.PG.VERD['5g']);
 expect(v && v.pass, 'Run up to here on 5g from nothing: ' + (v && v.msg) + ' (' + ((Date.now() - t0) / 1000).toFixed(0) + 's)');
 await page.screenshot({ path: shots + '/s5_review_fresh_5g.png' });
-expect(await page.evaluate(() => { try { return !localStorage.getItem('panelguard.v0.1') || !JSON.parse(localStorage.getItem('panelguard.v0.1')).subs['5g']; } catch (e) { return true; } }), 'nothing saved as student progress');
+expect(await page.evaluate(() => { try { const x = JSON.parse(localStorage.getItem('panelguard.v0.1') || '{"subs":{}}').subs || {}; return Object.keys(x).every((k) => !x[k].codePass && !Object.keys(x[k].mech || {}).length && !(x[k].pred || {}).locked); } catch (e) { return true; } }), 'nothing saved as student progress');
 log('hosts contacted:', [...hosts].join(', '));
 expect([...hosts].every((h) => /^localhost|^cdn\.jsdelivr\.net$|^fonts\.(googleapis|gstatic)\.com$|^data:|^blob:/.test(h) || h === ''), 'no requests to other hosts (LangGraph/langsmith make no calls)');
 expect(errors.length === 0, 'zero console errors' + (errors.length ? ': ' + JSON.stringify(errors.slice(0, 5)) : ''));

@@ -35,6 +35,15 @@ var BOOT = [
 '        return json.dumps({"probe_error": type(e).__name__ + ": " + str(e)})'
 ].join('\n');
 
+/* Tiny WebAssembly probe (8-byte empty module): compile + instantiate. False when a viewer's CSP blocks WebAssembly. */
+function wasmWorks() {
+  try {
+    if (typeof WebAssembly === 'undefined') return Promise.resolve(false);
+    return WebAssembly.instantiate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0])).then(function (r) { return !!(r && r.instance); }, function () { return false; });
+  } catch (e) { return Promise.resolve(false); }
+}
+G.PGWasmWorks = wasmWorks;
+
 function Core(post, loadPyodideFn, helpCode) {
   var py = null, dataIn = false, pyIn = false, curId = null;
   var WEIGHTS = { core: 12.1, numpy: 3.0, scipy: 14.0, sklearn: 4.7 };   // MB, real file sizes
@@ -48,6 +57,7 @@ function Core(post, loadPyodideFn, helpCode) {
   }
   var stageURL = '';
   async function init(pyBase) {
+    if (!(await wasmWorks())) { post({ type: 'fatal', wasmBlocked: true, text: 'WebAssembly is blocked here' }); return; }
     try {
       prog(0, 'Starting Python (Pyodide core, 12 MB)…');
       stageURL = pyBase + 'pyodide.asm.wasm';
@@ -118,13 +128,14 @@ if (typeof WorkerGlobalScope !== 'undefined' && G instanceof WorkerGlobalScope) 
   G.onmessage = function (ev) {
     var m = ev.data;
     if (m.cmd === 'init') {
+      if (!handle && !G._pgProbed) { G._pgProbed = 1; wasmWorks().then(function (ok) { if (!ok) postMessage({ type: 'fatal', wasmBlocked: true, text: 'WebAssembly is blocked in this worker' }); else G.onmessage(ev); }); return; }
       // Classic worker (used inside opaque-origin sandboxes, where module blob workers fail):
       // Pyodide 314 probes importScripts() to refuse classic workers, so hide it; Pyodide itself only uses import().
       if (typeof G.importScripts === 'function') G.importScripts = function () { throw new Error('importScripts is disabled in the PanelGuard kernel'); };
       import(m.pyBase + 'pyodide.mjs').then(function (mod) {
         handle = Core(function (x) { postMessage(x); }, mod.loadPyodide, m.help);
         handle(m); queue.forEach(handle); queue = [];
-      }, function (e) { postMessage({ type: 'fatal', text: 'Could not load ' + m.pyBase + 'pyodide.mjs — ' + (e && e.message || e) }); });
+      }, function (e) { postMessage({ type: 'fatal', text: 'Could not load ' + m.pyBase + 'pyodide.mjs — ' + String(e && e.message || e) }); });
     } else if (handle) handle(m); else queue.push(m);
   };
 }
