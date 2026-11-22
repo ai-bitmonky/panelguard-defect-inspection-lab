@@ -621,5 +621,5 @@ function endCard(host, r, api) {
   host.appendChild(c);
 }
 
-window.PGViz3 = { tiles: tiles3a, stack: stack, filter: sceneFilter, layers: layers3c, sortAug: sortAug, flips: flips, drawGuess: drawGuess, fillGaps: fillGaps, curves: curves, curvesLive: curvesLive, blend: blend, twoGatePlay: twoGatePlay, twoGateResult: twoGateResult, _conv3: conv3, _masks: masks };
+window.PGViz3 = { _dragTok: dragTok, tiles: tiles3a, stack: stack, filter: sceneFilter, layers: layers3c, sortAug: sortAug, flips: flips, drawGuess: drawGuess, fillGaps: fillGaps, curves: curves, curvesLive: curvesLive, blend: blend, twoGatePlay: twoGatePlay, twoGateResult: twoGateResult, _conv3: conv3, _masks: masks };
 })();

@@ -5,7 +5,7 @@ import { FILLS, fill } from './fills.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url)); const site = path.resolve(here, '../../site');
 export function loadSteps() {
   const ctx = {}; ctx.globalThis = ctx; vm.createContext(ctx);
-  for (const f of ['steps.js', 'step3.js', 'jskernel.js']) vm.runInContext(fs.readFileSync(site + '/js/' + f, 'utf8'), ctx);
+  for (const f of ['steps.js', 'step3.js', 'step4.js', 'jskernel.js']) vm.runInContext(fs.readFileSync(site + '/js/' + f, 'utf8'), ctx);
   return { ctx, SUBS: Object.fromEntries(ctx.PG_STEPS.flatMap((s) => s.substeps).map((s) => [s.id, s])) };
 }
 export const KEY = 'panelguard.v0.1';

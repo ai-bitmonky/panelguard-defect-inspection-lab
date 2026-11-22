@@ -21,3 +21,10 @@ Object.assign(FILLS, {
   '3f': { right: ['i', 'bestFar'], wrong: [['0', 'bestFar'], ['i', '1'], ['i', 'far']] },
   '3g': { right: ['0.05', '0.95'], wrong: [['5', '0.95'], ['0.95', '0.95'], ['0.05', '0.5']] },
 });
+// Step 4 (JavaScript cells)
+Object.assign(FILLS, {
+  '4b': { right: ['STEP', 'base'], wrong: [['SIZE', 'base'], ['STEP', '0'], ['1', 'base']] },
+  '4c': { right: ['2', 'w', 'relu'], wrong: [['3', 'w', 'relu'], ['2', 'g', 'relu'], ['2', 'w', 'abs']] },
+  '4d': { right: ['0.1', 'K'], wrong: [['10', 'K'], ['0.01', 'K'], ['0.1', '4096']] },
+  '4e': { right: ["'pass'", "'poly'"], wrong: [["'stop'", "'poly'"], ["'pass'", "'mono'"], ["'person'", "'poly'"]] },
+});

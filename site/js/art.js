@@ -110,6 +110,7 @@ var MON = {
   0: { monitor: 'STOP?', monitorSub: 'you decide', monitorTitle: 'CELL 0006' },
   1: { monitor: '2,624', monitorSub: 'real photos', monitorTitle: 'DATA', monitorColor: '#46e3ff' },
   2: { monitor: 'SCORE', monitorSub: 'model decides', monitorTitle: 'MODEL', monitorColor: '#ffb547' },
+  4: { monitor: 'WHY?', monitorSub: 'heat maps', monitorTitle: 'EXPLAIN', monitorColor: '#ff8a5c' },
   3: { monitor: 'CNN', monitorSub: 'learns filters', monitorTitle: 'NETWORK', monitorColor: '#a98bff' }
 };
 function banner(el, stepId, api) {

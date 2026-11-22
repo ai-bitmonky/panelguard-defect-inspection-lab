@@ -40,12 +40,17 @@ var RKEY = 'panelguard.review';
 var REVIEW = (function () { try { if (/(^|[#&])review($|&)/.test(location.hash.slice(1)) || /[?&]review=1/.test(location.search)) return true; return localStorage.getItem(RKEY) === '1'; } catch (e) { return false; } })();
 var RV = { subs: {}, studentCur: S.cur };
 var REVIEW_MSG = 'Review mode: press “Run up to here” to load real data for this page.';
+var RBKEY = 'panelguard.reviewBannerClosed';
+function bannerClosed() { try { return localStorage.getItem(RBKEY) === '1'; } catch (e) { return !!RV.bannerClosed; } }
+function setBannerClosed(c) { RV.bannerClosed = c; try { if (c) localStorage.setItem(RBKEY, '1'); else localStorage.removeItem(RBKEY); } catch (e) {} applyReviewUI(); }
 function applyReviewUI() {
   document.body.classList.toggle('review', REVIEW);
+  document.body.classList.toggle('rvclosed', REVIEW && bannerClosed());
   var b = document.getElementById('revbtn'); if (b) { b.textContent = 'Review mode: ' + (REVIEW ? 'ON' : 'OFF'); b.setAttribute('aria-pressed', REVIEW ? 'true' : 'false'); }
 }
 function setReview(on) {
   try { localStorage.setItem(RKEY, on ? '1' : '0'); } catch (e) {}
+  if (on !== REVIEW) setBannerClosed(false);           // the banner comes back each time review mode is turned on again
   if (on) { if (REVIEW) return; REVIEW = true; RV.studentCur = S.cur; applyReviewUI(); updateGoal(); renderNav(); renderWork(); renderOut(); return; }
   if (!REVIEW) return;
   /* OFF: reload, so the student's real progress, kernel state and locks come back exactly as they were */
@@ -287,6 +292,8 @@ function refreshBridge() {
       falseAlarmAt95: J.falseAlarmAt95, twoGates: J.twoGates, gatesFor: window.PG_STEP3_gatesFor, auc: J.auc,
       saveModel: saveModel
     };
+    pg.rough = !!(REVIEW && RES['3e'] && RES['3e'].quick === 'review');
+    if (window.PG_PG_EXTRA) Object.assign(pg, window.PG_PG_EXTRA(pg));
     JSR.k.setPg(pg); return pg;
   });
 }
@@ -564,7 +571,7 @@ function makeApi(id) {
     },
     res: function (k) { return RES[k]; },
     out: $('#out'), work: $('#work'), art: ART, getMech: function (k) { return SS(k).mech || {}; },
-    jsEval: jsEval, gpu: function () { return JSR.gpu; }
+    jsEval: jsEval, gpu: function () { return JSR.gpu; }, review: REVIEW
   };
 }
 function setBusy(b) { $('#kdot').className = 'kdot ' + (b ? 'busy' : 'ok'); }
@@ -714,6 +721,26 @@ function renderPredict(id) {
       var r = RES[id];
       if (r && SS(id).codePass) { var ok = r.best === pr.val; body.appendChild(h('div', { class: 'verdict ' + (ok ? 'good' : 'bad'), html: (ok ? '✓ Good bet. ' : '✗ Not this time. ') + 'You bet on <b>' + esc(pr.val) + '</b>. Winner: <b>' + esc(r.best) + '</b>. See the cards on the right.' })); }
       else body.appendChild(h('div', { class: 'verdict', style: 'background:#141028;border:1px solid #3d3368', html: 'Bet locked: <b>' + esc(pr.val) + '</b>. Now fill the gaps and run.' }));
+    }
+  } else if (P.format === 'tokens') {
+    var tk = pr.tokens || (pr.tokens = P.options.map(function () { return 0; }));
+    var used = tk.reduce(function (a, b) { return a + b; }, 0), trow = h('div', { class: 'betrow' });
+    P.options.forEach(function (o, k) {
+      var have = pr.locked ? pr.val[k] : tk[k];
+      var dots = h('div', { class: 'tokdots', html: new Array(have + 1).join('<i></i>') || '<span class="hint">no tokens</span>' });
+      var kids = [h('div', { class: 'bi', text: String.fromCharCode(65 + k) }), h('div', { text: o.replace(/^[A-C]: /, '') }), dots];
+      if (!pr.locked) kids.push(h('div', { class: 'row', style: 'margin-top:6px' }, [
+        h('button', { class: 'btn small', id: 'tokm' + k, text: '−', disabled: tk[k] ? null : 'disabled', onclick: function () { tk[k]--; save(); renderWork(); } }),
+        h('button', { class: 'btn small', id: 'tokp' + k, text: '+ token', disabled: used < 10 ? null : 'disabled', onclick: function () { tk[k]++; save(); renderWork(); } })]));
+      trow.appendChild(h('div', { class: 'bet' + (pr.locked && k === P.right ? ' sel' : '') }, kids));
+    });
+    body.appendChild(trow);
+    if (!pr.locked) {
+      body.appendChild(h('div', { class: 'row', style: 'margin-top:8px' }, [h('button', { class: 'btn', id: 'tokcheck', text: 'Check', disabled: used === 10 ? null : 'disabled', onclick: function () { pr.good = tk[P.right] >= 6 ? 1 : 0; lock(tk.slice()); } }),
+        h('span', { class: 'hint', text: (10 - used) + ' of 10 tokens left to place. One try.' })]));
+    } else {
+      body.appendChild(h('div', { class: 'verdict ' + (pr.good ? 'good' : 'bad'), html: (pr.good ? '✓ Right. ' : '✗ Not quite. ') + 'You put <b>' + pr.val[P.right] + ' of 10</b> tokens on “' + esc(P.options[P.right]) + '”. If the map is honest, removing its hottest pixels hurts the score most. Your run below shows how strong that really is here.' }));
+      body.appendChild(whyBox(P.reveal, 'Why (tap to open)'));
     }
   } else if (P.format === 'draw') {
     var holder2 = h('div'); body.appendChild(holder2);
@@ -932,7 +959,7 @@ if (licEl) licEl.addEventListener('click', function () {
   });
 });
 applyReviewUI(); showRail();
-(function () { var b = document.getElementById('revbtn'); if (b) b.addEventListener('click', function () { setReview(!REVIEW); }); })();
+(function () { var b = document.getElementById('revbtn'); if (b) b.addEventListener('click', function () { setReview(!REVIEW); }); var x = document.getElementById('revx'); if (x) x.addEventListener('click', function () { setBannerClosed(true); }); })();
 initJS();
 route();
 window.PG = { PYODIDE_BASE: PYODIDE_BASE, pack: function () { return PACK; }, S: S, RES: RES, VERD: VERD, K: K, JSR: JSR, openSub: openSub, passed: passed, pendingOf: pendingOf, ORDER: ORDER, kEval: kEval, epochs: epochsNow,
