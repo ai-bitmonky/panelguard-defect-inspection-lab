@@ -55,6 +55,7 @@ function sceneSketch(s, stage, out, api) {
       wrap.appendChild(d);
     });
     stage.appendChild(wrap);
+    if (m.far) requestAnimationFrame(function () { wrap.style.marginBottom = (-0.7 * wrap.offsetHeight) + 'px'; });
     var pool = el('div'); pool.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:4px 12px 8px';
     BLOCKS.forEach(function (b) {
       if (m.put[b.id] || (b.bad && (m.refusedIds || {})[b.id])) return;
@@ -67,15 +68,15 @@ function sceneSketch(s, stage, out, api) {
     stage.appendChild(pool);
     var foot = el('div'); foot.style.cssText = 'padding:0 12px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
     var far = el('button', 'btn small' + (m.far ? ' on' : ''), m.far ? '◀ Back to arm\'s length' : '👁 View from 2 m'); far.id = 'far7a';
-    far.onclick = function () { m.far = !m.far; if (m.far) m.sawFar = 1; save(); draw(); };
+    far.onclick = function () { m.far = !m.far; if (m.far) { m.sawFar = 1; msg = [1, 'From 2 m: the verdict lamp still reads. The counters and the score do not — they are for later, or on demand.']; } else msg = null; save(); draw(); };
     foot.appendChild(far);
     if (msg) { var v = el('div', 'verdict ' + (msg[0] ? 'good' : 'bad'), esc(msg[1])); v.id = 'sketchmsg'; v.style.flex = '1'; foot.appendChild(v); }
     stage.appendChild(foot);
     side();
   }
   function blockLook(id) {
-    var L = { photo: '<div style="width:58px;height:58px;background:linear-gradient(135deg,#333,#777);border:1px solid #555"></div>',
-      lamp: '<div style="display:flex;align-items:center;gap:6px;color:#2ee07a;border:3px solid #2ee07a;border-radius:6px;padding:4px 10px;font:700 30px Rajdhani,Arial">● PASS</div>',
+    var L = { photo: '<div style="width:84px;height:84px;background:linear-gradient(135deg,#333,#777);border:1px solid #555"></div>',
+      lamp: '<div style="display:flex;align-items:center;gap:8px;color:#2ee07a;border:4px solid #2ee07a;border-radius:8px;padding:6px 16px;font:700 46px Rajdhani,Arial">● PASS</div>',
       score: '<div style="font-size:11px;color:#c3cdd9">score 0.41 |—|—●—|</div>', heat: '<div style="font-size:12px;border:1px solid #6d7f94;border-radius:4px;padding:1px 6px">WHY? H</div>',
       counters: '<div style="font-size:11px;color:#c3cdd9">● 120 ▲ 210 ■ 64</div>', queue: '<div style="font-size:11px;color:#c3cdd9;border:1px solid #33414f;padding:2px 5px">QUEUE · 7 waiting</div>',
       stopline: '<div style="font:700 15px Rajdhani,Arial;color:#ff5050;border:2px solid #ff5050;border-radius:6px;padding:4px 14px">■ STOP LINE</div>' }[id];
@@ -139,13 +140,13 @@ function cellPreview(r, host, api) {
 /* ================= 7c: the line: knob, Start / Stop, measured speed ================= */
 var KNOB = [10, 20, 30, 60, 120, 600, Infinity];
 function knobSVG(k) {
-  var a0 = -135, step = 270 / (KNOB.length - 1), ang = a0 + k * step, s = '<svg viewBox="0 0 160 150" width="150" height="140" style="touch-action:none;cursor:grab" id="knob7c">';
+  var a0 = -135, step = 270 / (KNOB.length - 1), ang = a0 + k * step, s = '';
   s += '<circle cx="80" cy="76" r="50" fill="#141c26" stroke="#3a4a5c" stroke-width="3"/>';
   KNOB.forEach(function (v, i) { var a = (a0 + i * step - 90) * Math.PI / 180, x = 80 + 64 * Math.cos(a), y = 76 + 64 * Math.sin(a);
     s += '<text x="' + x.toFixed(1) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" fill="' + (i === k ? '#fff' : '#7d8ca0') + '">' + (v === Infinity ? 'MAX' : v) + '</text>'; });
   var a = (ang - 90) * Math.PI / 180;
   s += '<line x1="80" y1="76" x2="' + (80 + 40 * Math.cos(a)).toFixed(1) + '" y2="' + (76 + 40 * Math.sin(a)).toFixed(1) + '" stroke="#ffb21e" stroke-width="7" stroke-linecap="round"/><circle cx="80" cy="76" r="8" fill="#ffb21e"/>';
-  return s + '<text x="80" y="146" text-anchor="middle" font-family="Orbitron,Arial" font-size="9" letter-spacing="1.5" fill="#8d9bb0">CELLS / MIN</text></svg>';
+  return s + '<text x="80" y="146" text-anchor="middle" font-family="Orbitron,Arial" font-size="9" letter-spacing="1.5" fill="#8d9bb0">CELLS / MIN</text>';
 }
 function beltPreview(r, host, api) {
   var m = api.mech, c = card(host, 'LIVE PREVIEW · the line', 'Your counters and your cell view. Cells come from the validation tray, one by one, through your real flow.');
@@ -160,10 +161,13 @@ function beltPreview(r, host, api) {
   var sp = el('div', 'hint'); sp.style.cssText = 'flex:1;min-width:180px;font-size:14px'; ctrl.appendChild(sp);
   var info = card(host, 'HOW FAST IS ONE REAL DECISION?', 'Measured in this browser: photo check + live model + gates + logbook, per cell.');
   var V = null;
-  var k = KNOB.indexOf(m.knob != null ? m.knob : 30); if (k < 0) k = 2;
+  var k = m.knob === 'MAX' ? KNOB.length - 1 : KNOB.indexOf(m.knob != null ? m.knob : 30); if (k < 0) k = 2;
+  var svg = null;
   function drawKnob() {
-    kb.innerHTML = knobSVG(k);
-    var svg = kb.querySelector('svg');
+    if (svg) { svg.innerHTML = knobSVG(k); return; }
+    kb.innerHTML = '<svg viewBox="0 0 160 150" width="150" height="140" style="touch-action:none;cursor:grab" id="knob7c" tabindex="0" aria-label="line speed knob">' + knobSVG(k) + '</svg>';
+    svg = kb.querySelector('svg');
+    svg.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 0; if (d) { e.preventDefault(); k = Math.max(0, Math.min(KNOB.length - 1, k + d)); turned(); } });
     function setFrom(e) { var b = svg.getBoundingClientRect(), x = e.clientX - (b.left + b.width * 80 / 160), y = e.clientY - (b.top + b.height * 76 / 150);
       var ang = Math.atan2(y, x) * 180 / Math.PI + 90; if (ang > 180) ang -= 360; var nk = Math.round((Math.max(-135, Math.min(135, ang)) + 135) / 45); if (nk !== k) { k = nk; turned(); } }
     svg.addEventListener('pointerdown', function (e) { svg.setPointerCapture(e.pointerId); setFrom(e); svg.onpointermove = setFrom; });
@@ -214,7 +218,7 @@ function queuePreview(r, host, api) {
       agree: mine.filter(function (a) { return a.expert != null && (a.said === 'stop') === (a.expert === 1); }).length, known: mine.filter(function (a) { return a.expert != null; }).length }; }).then(function (x) {
       res.innerHTML = '<h3 class="fh" style="font-size:12px;margin:0 0 4px">CAN ONE CHECKER KEEP UP?</h3>';
       if (!x) return;
-      if (x.n !== (m.answered || 0)) { var rr = x.rate && { answered: x.rate.answered, medianSeconds: x.rate.medianSeconds, perHour: x.rate.perHour, share: x.rate.share, perMinute: 30, neededPerHour: x.rate.neededPerHour, keepsUp: x.rate.keepsUp, checkers: x.rate.checkers }; api.setMech({ answered: x.n, rate: rr }); m.answered = x.n; }
+      if (x.n > (m.answered || 0)) {                    /* only grows: a re-run or a reload starts a new queue, it never takes your progress away */ var rr = x.rate && { answered: x.rate.answered, medianSeconds: x.rate.medianSeconds, perHour: x.rate.perHour, share: x.rate.share, perMinute: 30, neededPerHour: x.rate.neededPerHour, keepsUp: x.rate.keepsUp, checkers: x.rate.checkers }; api.setMech({ answered: x.n, rate: rr }); m.answered = x.n; }
       tiles(res, [[x.n + ' / 10', 'cells you cleared', x.n >= 10 ? 'g' : 'a'], [x.waiting, 'still waiting', ''], [x.known ? x.agree + ' / ' + x.known : '—', 'agree with the expert', '']]);
       if (x.rate) {
         var R = x.rate;
@@ -273,7 +277,7 @@ function matchPredict(body, api, pr, lock, whyBox, P) {
 function boardPreview(r, host, api) {
   var scr = SCR('7e'), c = card(host, 'LIVE PREVIEW · the shift board', 'Your SVG charts, counted from the real Step 5 logbook.');
   if (!scr || !r || r.missing) { noData(c, api, 'Run the cell first.'); return; }
-  scr.style.setProperty('--u', '11px'); mount(c, scr, 0);
+  mount(c, scr, 0);
   var b = r.b, P = api.pred || {};
   if (b && P.locked) { var cc = card(host, 'THE MANAGER\'S ANSWERS', 'Read straight from your charts.');
     var first = b.blocks.slice(0, 3), last = b.blocks.slice(-3), share = function (L) { var p = 0, n = 0; L.forEach(function (x) { p += x.person; n += x.pass + x.person + x.stop; }); return n ? 100 * p / n : 0; };
@@ -286,7 +290,7 @@ function boardPreview(r, host, api) {
 function reportPreview(r, host, api) {
   var scr = SCR('7f'), m = api.mech, c = card(host, 'LIVE PREVIEW · one button, one report', 'Your REPORT button runs the crew, the checker, then shows the report — or holds it back.');
   if (!scr || !r || r.missing) { noData(c, api, 'Run the cell first.'); return; }
-  scr.style.setProperty('--u', '11px'); mount(c, scr, 0);
+  mount(c, scr, 0);
   var rep = scr.querySelector('.report');
   if (rep && !rep._pg7) { rep._pg7 = 1;
     rep.addEventListener('report', function (e) { var d = e.detail || {}; api.setMech({ reported: 1, held: !!d.held, removed: d.removed || [] }); m.reported = 1; info(); });
@@ -315,11 +319,11 @@ async function fireFault1(NS, pg, C, k) {
   if (k === 'camera') await C.feed(pg.card(['F1', 'F2', 'F3'][FLOWN % 3]));
   if (k === 'model') { var mdl = NS.model; NS.model = null; try { await C.feed(pg.card(ids.stop[FLOWN % ids.stop.length])); } finally { NS.model = mdl; } }
   if (k === 'flow') await C.feed({ id: 'X' + (++FLOWN), kind: 'mono', tries: 1, photo: null });
-  if (k === 'empty') { keep = NS.queue.splice(0); var qh = C.el.querySelector('.side .queue');
+  if (k === 'empty') { keep = NS.queue.splice(0); if (C.queue) C.queue.show();
     var ev = new KeyboardEvent('keydown', { key: 'p', bubbles: true }); document.body.dispatchEvent(ev);
-    var pb = C.el.querySelector('.side button[data-say="pass"]'); if (pb) pb.click();
+    var pb = C.el.querySelector('.screen-side button[data-say="pass"]'); if (pb) pb.click();
     await new Promise(function (r) { setTimeout(r, 60); }); }
-  var w = C.el.querySelector('.main .lamp .word'), head = (C.el.querySelector('.side .qhead') || {}).textContent || '';
+  var w = C.el.querySelector('.screen-main .lamp .word'), head = (C.el.querySelector('.screen-side .qhead') || {}).textContent || '';
   var after = JSON.parse(JSON.stringify(NS.counts)), qa = NS.queue.length;
   if (keep) { keep.forEach(function (x) { NS.queue.push(x); }); if (C.queue) C.queue.show(); }
   return { k: k, lamp: w ? w.textContent : null, head: head, queued: k === 'empty' ? 0 : qa - qm, moved: JSON.stringify(after) !== JSON.stringify(k === 'empty' ? before : after) ? 1 : 0, emptySame: k === 'empty' ? JSON.stringify(after) === JSON.stringify(before) : null,
@@ -334,8 +338,11 @@ function drillPreview(r, host, api) {
   var scr = SCR('7g'), m = api.mech, fixedNow = !!(r && !r.missing && window.PG_STEP7.substeps[6].check(r).pass);
   var c = card(host, 'LIVE PREVIEW · the whole console', fixedNow ? 'Fixed console. Fire every fault again to prove the safe default.' : 'Starter console, with 2 planted bugs. Break it with the fault panel.');
   if (!scr || !r || r.missing) { noData(c, api, 'Run the cell first (the starter code runs as it is).'); return; }
-  scr.style.cssText = 'height:430px;--u:' + U().unitFor(Math.max(560, host.clientWidth - 30), 470) + 'px';
-  mount(c, scr, 0);
+  scr.dataset.fixed = '1'; scr.style.cssText = 'width:1280px;height:720px;transform-origin:0 0;--u:' + U().unitFor(1280, 720) + 'px';
+  var wrap = mount(c, scr, 0); wrap.style.padding = '0';
+  function fit() { var k = Math.min(1, wrap.clientWidth / 1280); scr.style.transform = 'scale(' + k + ')'; wrap.style.height = Math.ceil(720 * k) + 'px'; }
+  fit(); if (window.ResizeObserver) new ResizeObserver(fit).observe(wrap);
+  c.appendChild(el('p', 'hint', 'This is your console at 1280×720, shrunk to fit. “Open the console” (after the fix) shows it full screen.'));
   var fp = card(host, 'FAULT PANEL · ' + (fixedNow ? 'FIXED CODE' : 'STARTER CODE WITH 2 PLANTED BUGS'), 'Each button makes a real fault in the real console. Then say if the screen is right.');
   var row = el('div'); row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap'; fp.appendChild(row);
   var outB = el('div'); fp.appendChild(outB);
@@ -343,10 +350,12 @@ function drillPreview(r, host, api) {
   var wv = el('div', 'hint'); watch.appendChild(wv);
   var C = null;
   api.jsEval(function (NS) { if (!NS.makeConsole) return null; scr.innerHTML = ''; C = NS.makeConsole(scr); window.PG7_CONSOLE = C;
-    var lastT = NS.counts.total, lastQ = NS.queue.length;
-    var tick = setInterval(function () { if (!scr.isConnected) return clearInterval(tick); var t = NS.counts.total, q = NS.queue.length;
-      if (q < lastQ && !NS.belt.running && !DRILL) { wv.innerHTML = 'A person answered a cell: CELLS ' + lastT + ' → <b>' + t + '</b> ' + (t > lastT ? '<b style="color:#ff5050">— counted AGAIN (BUG 2)</b>' : '<b style="color:#3dffa0">— counted once ✓</b>'); var b = m.bug2 || {}; b[fixedNow ? 'fixed' : 'buggy'] = t > lastT ? 'double' : 'once'; api.setMech({ bug2: b }); m.bug2 = b; }
-      lastT = t; lastQ = q; }, 150);
+    function watchAnswer() { if (DRILL || !NS.queue.length) return; var t0 = NS.counts.total, a0 = NS.answers.length;
+      setTimeout(function () { if (NS.answers.length === a0) return; var t = NS.counts.total, dbl = t > t0 && !NS.belt.running;
+        wv.innerHTML = 'A person answered a cell: CELLS ' + t0 + ' → <b>' + t + '</b> ' + (dbl ? '<b style="color:#ff5050">— counted AGAIN (BUG 2)</b>' : '<b style="color:#3dffa0">— counted once ✓</b>');
+        var b = m.bug2 || {}; b[fixedNow ? 'fixed' : 'buggy'] = dbl ? 'double' : 'once'; api.setMech({ bug2: b }); m.bug2 = b; }, 600); }
+    scr.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.screen-side button[data-say]')) watchAnswer(); }, true);
+    document.addEventListener('keydown', function onk(e) { if (!scr.isConnected) return document.removeEventListener('keydown', onk, true); if (/^[ps]$/i.test(e.key) && !(e.target.closest && e.target.closest('textarea,input'))) watchAnswer(); }, true);
     return 1; });
   FAULTS7.forEach(function (f) {
     var done = (fixedNow ? m.fixed : m.buggy) || {}, b = el('button', 'btn small' + (done[f[0]] ? ' on' : ''), (done[f[0]] ? '✓ ' : '⚡ ') + f[1]); b.setAttribute('data-fault7', f[0]);

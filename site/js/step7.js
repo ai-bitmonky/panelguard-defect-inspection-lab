@@ -17,7 +17,7 @@ function hasDoc() { return typeof document !== 'undefined' && document.createEle
 var SCREENS = G.PG7_SCREENS || (G.PG7_SCREENS = {});
 var KEYH = null, keysOn = false;
 function unitFor(w, h) { return Math.max(7, Math.min(30, Math.min(w / 64, (h || 1e9) / 36))); }
-function sizeHost(host) { var w = host.clientWidth || 460; host.style.setProperty('--u', unitFor(w, host.clientHeight || 0).toFixed(2) + 'px'); }
+function sizeHost(host) { if (host.dataset.fixed) return; var w = host.clientWidth || 460; host.style.setProperty('--u', Math.max(9, Math.min(30, w / 32)).toFixed(2) + 'px'); }
 function extra(pg) {
   function screen(id) {
     var host = SCREENS[id];
@@ -204,6 +204,12 @@ var s7b = { id: '7b', name: 'Show one cell', kind: 'code', lang: 'js',
 "  .lamp .shape { font-size: 4.6em; }",
 "  .lamp .word { font-size: 4.2em; line-height: 1; font-weight: 700; letter-spacing: .03em; text-align: center; }",
 "  .cellview .meta { grid-column: 1 / 3; font-size: 1.15em; color: #c3cdd9; font-family: Space Mono, Consolas, monospace; }",
+"  .hmi button { font: inherit; font-weight: 700; color: #e9eff6; background: #1a2430; border: 2px solid #3a4a5c; border-radius: .4em;",
+"                padding: .35em .9em; cursor: pointer; }",
+"  .hmi button:hover:not(:disabled) { background: #22303f; }",
+"  .hmi button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }",
+"  .hmi kbd { font: 700 .6em Space Mono, Consolas, monospace; color: #e9eff6; border: 1px solid #7d8ca0; border-bottom-width: 3px;",
+"             border-radius: .3em; padding: .05em .4em; margin-left: .5em; vertical-align: middle; }",
 "`);",
 "",
 "// 4. One real cell through the real flow, on screen (live preview on the right)",
@@ -453,7 +459,7 @@ var s7d = { id: '7d', name: 'The person\'s queue', kind: 'code', lang: 'js',
 "function queueView(host, onChange = () => {}) {",
 "  const el = html(`<div class='hmi queue'>",
 "      <div class='qhead'></div>",
-"      <div class='qbody'><canvas class='photo' width='384' height='384'></canvas><div class='why' hidden></div></div>",
+"      <div class='qbody'><canvas class='photo' width='384' height='384'></canvas><div class='reason' hidden></div></div>",
 "      <div class='qbtns'>",
 "        <button class='big' data-key='pass' data-say='pass'>● PASS <kbd>P</kbd></button>",
 "        <button class='big' data-key='stop' data-say='stop'>■ STOP <kbd>S</kbd></button>",
@@ -462,7 +468,7 @@ var s7d = { id: '7d', name: 'The person\'s queue', kind: 'code', lang: 'js',
 "  host.appendChild(el);",
 "  let busy = false;",
 "  function show() {",
-"    const item = queue[0], why = el.querySelector('.why');",
+"    const item = queue[0], why = el.querySelector('.reason');",
 "    el.querySelector('.qhead').textContent = queue.length ? `QUEUE · ${queue.length} waiting · cell ${item.card.id} (${item.card.kind})` : 'QUEUE · no cells waiting';",
 "    el.querySelectorAll('button').forEach((b) => { b.disabled = !item; });",
 "    why.hidden = true;",
@@ -478,7 +484,7 @@ var s7d = { id: '7d', name: 'The person\'s queue', kind: 'code', lang: 'js',
 "    show(); onChange(item);",
 "  }",
 "  function toggleWhy() {",
-"    const item = queue[0], why = el.querySelector('.why');",
+"    const item = queue[0], why = el.querySelector('.reason');",
 "    if (!item) return;",
 "    why.hidden = !why.hidden;",
 "    if (why.hidden) return drawPhoto(el.querySelector('.photo'), item.card.photo);",
@@ -512,7 +518,7 @@ var s7d = { id: '7d', name: 'The person\'s queue', kind: 'code', lang: 'js',
 "  .queue .qhead { font-size: 1.2em; font-weight: 700; color: #c3cdd9; letter-spacing: .04em; }",
 "  .queue .qbody { display: flex; gap: .8em; align-items: flex-start; flex-wrap: wrap; }",
 "  .queue .photo { width: 16em; height: 16em; image-rendering: pixelated; border: 1px solid #33414f; }",
-"  .queue .why { flex: 1; min-width: 12em; font-size: 1.15em; line-height: 1.4; color: #dfe7f0; }",
+"  .queue .reason { flex: 1; min-width: 12em; font-size: 1.15em; line-height: 1.4; color: #dfe7f0; }",
 "  .queue .qbtns { display: flex; gap: .6em; flex-wrap: wrap; }",
 "  .queue button.big { font-size: 1.7em; min-width: 6.5em; min-height: 2.6em; border-width: .12em; border-color: currentColor; background: #141c26; }",
 "  .queue button:disabled { opacity: .35; cursor: default; }",
@@ -640,15 +646,15 @@ var s7e = { id: '7e', name: 'The shift board', kind: 'code', lang: 'js',
 "  const max = Math.max(10, b.all.per100, b.mono.per100, b.poly.per100) * 1.2, X = (v) => 10 + 280 * v / max;",
 "  const met = b.all.per100 <= b.target;",
 "  const bar = (y, g, name) => `<rect x='10' y='${y}' width='${X(g.per100) - 10}' height='26' fill='#4f6d8c'/>` +",
-"    `<text x='14' y='${y + 19}' class='t'>${name} ${g.passed} of ${g.defects} = ${g.per100} per 100</text>`;",
+"    `<text x='14' y='${y + 19}' class='lbl'>${name} ${g.passed} of ${g.defects} = ${g.per100} per 100</text>`;",
 "  const el = html(`<div class='hmi board'>",
 "    <figure><figcaption>LANES OVER THE SHIFT · ${b.blocks.length} blocks of 50 cells</figcaption>",
-"      <svg viewBox='0 0 300 140'>${lanes}<text x='0' y='136' class='t'>start</text><text x='300' y='136' class='t' text-anchor='end'>end of shift</text></svg>",
+"      <svg viewBox='0 0 300 140'>${lanes}<text x='0' y='136' class='lbl'>start</text><text x='300' y='136' class='lbl' text-anchor='end'>end of shift</text></svg>",
 "      <div class='key'><span data-key='pass'>● pass (bottom)</span> <span data-key='person'>▲ check (middle)</span> <span data-key='stop'>■ stop (top)</span></div></figure>",
 "    <figure><figcaption>DEFECTS PASSED · TARGET AT MOST ${b.target} PER 100</figcaption>",
 "      <svg viewBox='0 0 300 70'>${bar(8, b.all, 'all')}<line x1='${X(b.target)}' x2='${X(b.target)}' y1='0' y2='44' class='tg'/>",
-"        <text x='${X(b.target)}' y='58' class='t' text-anchor='middle'>target ${b.target}</text></svg>",
-"      <div class='verdict' data-key='${met ? 'pass' : 'stop'}'>${met ? '● TARGET MET' : '■ TARGET MISSED'}</div></figure>",
+"        <text x='${X(b.target)}' y='58' class='lbl' text-anchor='middle'>target ${b.target}</text></svg>",
+"      <div class='target' data-key='${met ? 'pass' : 'stop'}'>${met ? '● TARGET MET' : '■ TARGET MISSED'}</div></figure>",
 "    <figure><figcaption>MONO VS POLY · DEFECTS PASSED PER 100</figcaption>",
 "      <svg viewBox='0 0 300 80'>${bar(6, b.mono, 'mono')}${bar(42, b.poly, 'poly')}</svg></figure>",
 "  </div>`);",
@@ -660,10 +666,10 @@ var s7e = { id: '7e', name: 'The shift board', kind: 'code', lang: 'js',
 "  .board figure { margin: 0; padding: .7em; background: #0e141b; border: 1px solid #263240; border-radius: .5em; }",
 "  .board figcaption { font-size: 1em; font-weight: 700; letter-spacing: .05em; color: #c3cdd9; margin-bottom: .4em; }",
 "  .board svg { width: 100%; height: auto; display: block; }",
-"  .board .t { font: 600 11px Space Mono, Consolas, monospace; fill: #fff; }",
+"  .board .lbl { font: 600 11px Space Mono, Consolas, monospace; fill: #fff; }",
 "  .board .tg { stroke: #fff; stroke-width: 3; stroke-dasharray: 4 3; }",
 "  .board .key { font-size: 1em; display: flex; gap: .8em; flex-wrap: wrap; margin-top: .3em; }",
-"  .board .verdict { font-size: 1.6em; font-weight: 700; margin-top: .3em; }",
+"  .board .target { font-size: 1.6em; font-weight: 700; margin-top: .3em; }",
 "`);",
 "",
 "const board = shiftBoard(auditLog);",
@@ -773,6 +779,7 @@ var s7f = { id: '7f', name: 'One button, one report', kind: 'code', lang: 'js',
 "  .report { display: flex; flex-direction: column; gap: .6em; }",
 "  .report .rbtns { display: flex; gap: .6em; align-items: center; }",
 "  .report .badge { font-size: 1.3em; font-weight: 700; padding: .4em .7em; border: 2px solid currentColor; border-radius: .4em; color: #c3cdd9; }",
+"  .report .badge[data-key=pass] { color: var(--pass); }  .report .badge[data-key=stop] { color: var(--stop); }",
 "  .report .paper { margin: 0; padding: .8em; background: #e9eff6; color: #0a0f15; border-radius: .3em; white-space: pre-wrap;",
 "                   font: 1.05em/1.45 Space Mono, Consolas, monospace; max-height: 26em; overflow: auto; user-select: text; }",
 "`);",
@@ -845,9 +852,9 @@ var s7g = { id: '7g', name: 'Break it before the plant does', kind: 'code', lang
 "function makeConsole(root) {",
 "  root.innerHTML = '';",
 "  const el = html(`<div class='hmi console'>",
-"      <header><b class='brand'>PANELGUARD · EL STATION 1</b><div class='ctrs'></div><span class='state'>LINE STOPPED</span></header>",
-"      <section class='main'></section>",
-"      <aside class='side'></aside>",
+"      <header><b class='station'>PANELGUARD · EL STATION 1</b><div class='ctrs'></div><span class='state'>LINE STOPPED</span></header>",
+"      <section class='screen-main'></section>",
+"      <aside class='screen-side'></aside>",
 "      <footer>",
 "        <button class='big start' data-key='pass'>▶ START LINE</button>",
 "        <button class='big halt' data-key='stop'>■ STOP LINE</button>",
@@ -858,9 +865,9 @@ var s7g = { id: '7g', name: 'Break it before the plant does', kind: 'code', lang
 "      <div class='drawer' hidden></div>",
 "    </div>`);",
 "  root.appendChild(el);",
-"  const cell = cellView(el.querySelector('.main'));",
+"  const cell = cellView(el.querySelector('.screen-main'));",
 "  const ctr = countersView(el.querySelector('.ctrs'));",
-"  const q = queueView(el.querySelector('.side'), (item) => { onResult(item); ctr.update(); });   // BUG 2 (planted)",
+"  const q = queueView(el.querySelector('.screen-side'), (item) => { onResult(item); ctr.update(); });   // BUG 2 (planted)",
 "  let last = LAMPS.none;                                  // the lamp on screen now",
 "  cell.show({ card: { id: '-', kind: 'waiting' }, out: null, lamp: last });",
 "",
@@ -883,7 +890,7 @@ var s7g = { id: '7g', name: 'Break it before the plant does', kind: 'code', lang
 "    state.textContent = 'LINE STOPPED'; state.dataset.key = 'stop';",
 "  }",
 "  function halt() { belt.running = false; }",
-"  el.querySelector('.speed').textContent = belt.perMinute + ' cells / min';",
+"  el.querySelector('.speed').textContent = (belt.perMinute === Infinity ? 'MAX' : belt.perMinute) + ' cells / min';",
 "  el.querySelector('.start').addEventListener('click', start);",
 "  el.querySelector('.halt').addEventListener('click', halt);",
 "",
@@ -901,15 +908,17 @@ var s7g = { id: '7g', name: 'Break it before the plant does', kind: 'code', lang
 "             height: 100%; padding: .7em; background: #0a0e13; }",
 "  .console header, .console footer { grid-column: 1 / 3; display: flex; align-items: center; gap: .8em; flex-wrap: wrap;",
 "                                     padding: .5em .7em; background: #101820; border: 1px solid #243040; border-radius: .5em; }",
-"  .console .brand { font-size: 1.15em; letter-spacing: .12em; color: #c3cdd9; }",
+"  .console .station { font-size: 1.1em; letter-spacing: .12em; color: #c3cdd9; }",
+"  .console header .ctr { font-size: 1em; padding: .2em .6em; }",
 "  .console .state { margin-left: auto; font-size: 1.3em; font-weight: 700; color: #c3cdd9; }",
-"  .console .main .cellview { height: 100%; grid-template-columns: auto 1fr; }",
-"  .console .main .photo { width: 16em; height: 16em; }",
-"  .console .main .lamp .word { font-size: 5.2em; }",
-"  .console .main .lamp .shape { font-size: 5.4em; }",
-"  .console .side { min-height: 0; overflow: auto; }",
-"  .console .side .photo { width: 11em; height: 11em; }",
-"  .console .side button.big { font-size: 1.45em; }",
+"  .console .screen-main .cellview { height: 100%; grid-template-columns: auto 1fr; }",
+"  .console .screen-main .photo { width: 16em; height: 16em; }",
+"  .console .screen-main .lamp .word { font-size: 5.2em; }",
+"  .console .screen-main .lamp .shape { font-size: 5.4em; }",
+"  .console .screen-side { min-height: 0; overflow: auto; }",
+"  .console .screen-side .photo { width: 9em; height: 9em; }",
+"  .console .screen-side .qhead { font-size: 1.05em; }",
+"  .console .screen-side button.big { font-size: 1.35em; min-width: 5.2em; }",
 "  .console footer .big { font-size: 1.5em; min-height: 2.4em; border-color: currentColor; background: #141c26; }",
 "  .console footer .halt { min-width: 9em; }",
 "  .console .speed { color: #c3cdd9; font-size: 1.15em; }",
@@ -945,7 +954,7 @@ var s7g = { id: '7g', name: 'Break it before the plant does', kind: 'code', lang
     var snap = snapCounts(NS), host = document.createElement('div'), out = { steps: [] }, saveModel = NS.model, wasRun = NS.belt.running, keysWas = pg.keysNow();
     host.style.cssText = 'position:fixed;left:-30000px;top:0;width:1366px;height:768px;--u:' + unitFor(1366, 768) + 'px'; document.body.appendChild(host);
     NS.belt.running = false;
-    function look(C) { var w = host.querySelector('.main .lamp .word'); return { lamp: w ? w.textContent : null, total: NS.counts.total, none: NS.counts.none, person: NS.counts.person, queue: NS.queue.length,
+    function look(C) { var w = host.querySelector('.screen-main .lamp .word'); return { lamp: w ? w.textContent : null, total: NS.counts.total, none: NS.counts.none, person: NS.counts.person, queue: NS.queue.length,
       head: (host.querySelector('.qhead') || {}).textContent || '' }; }
     try {
       NS.queue.length = 0;
@@ -959,13 +968,13 @@ var s7g = { id: '7g', name: 'Break it before the plant does', kind: 'code', lang
       await C.feed({ id: 'X9', kind: 'mono', tries: 1, photo: null }); out.steps.push(Object.assign({ what: 'flow error (no photo data)', want: 'NO VERDICT' }, look()));
       /* a cell comes back from the person through the real button: CELLS must not move (counted once, when it arrived) */
       await C.feed(pg.card(ids.person[0])); var t1 = NS.counts.total, nq = NS.queue.length;
-      host.querySelector('.side button[data-say="stop"]').click();
+      host.querySelector('.screen-side button[data-say="stop"]').click();
       for (var w = 0; w < 200 && NS.queue.length >= nq; w++) await new Promise(function (res) { setTimeout(res, 20); });
       await new Promise(function (res) { setTimeout(res, 30); });
       out.button = { before: t1, after: NS.counts.total, answered: nq - NS.queue.length };
       /* empty queue: P must do nothing */
-      var b0 = NS.counts.byPerson, c0 = JSON.stringify(NS.counts); NS.queue.length = 0; var qv = NS.queueView(host.querySelector('.side'));
-      await qv.say('pass'); out.empty = { same: JSON.stringify(NS.counts) === c0 && NS.counts.byPerson === b0, head: host.querySelector('.side .queue:last-child .qhead').textContent };
+      var b0 = NS.counts.byPerson, c0 = JSON.stringify(NS.counts); NS.queue.length = 0; var qv = NS.queueView(host.querySelector('.screen-side'));
+      await qv.say('pass'); out.empty = { same: JSON.stringify(NS.counts) === c0 && NS.counts.byPerson === b0, head: host.querySelector('.screen-side .queue:last-child .qhead').textContent };
       var m = measureHost(function (h2) { NS.makeConsole(h2).show({ card: pg.card(ids.pass[0]), out: { lane: 'pass' }, lamp: NS.LAMPS.pass, ms: 1 }); });
       out.meas = m;
     } catch (e) { out.err = errMsg(e); }

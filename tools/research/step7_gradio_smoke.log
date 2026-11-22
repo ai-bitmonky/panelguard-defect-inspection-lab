@@ -1,0 +1,69 @@
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Using an approximate input token count for model 'scripted-rules': assuming one token per four characters because a native token count is unavailable.
+Closing server running on port: 59799
+{
+ "crewai": "1.15.44",
+ "gradio": "6.32.0",
+ "keras": "3.15.1",
+ "langgraph": "1.2.24",
+ "best_w": 0.5,
+ "blend_max_diff_vs_js": 1.1920928955078125e-07,
+ "blocks_built": "Blocks with 8 event handlers",
+ "30_cells": {
+  "pass": 12,
+  "person": 14,
+  "stop": 4,
+  "none": 0,
+  "total": 30,
+  "byPerson": 0
+ },
+ "median_ms": 17.5,
+ "lamps_add_up": true,
+ "answer_resumed": {
+  "queue_before": 14,
+  "queue_after": 13,
+  "total_before": 30,
+  "total_after": 30,
+  "logged": "stop"
+ },
+ "faults": {
+  "camera F1": "CHECK",
+  "model not loaded": "NO VERDICT (model not loaded)",
+  "flow error": "NO VERDICT"
+ },
+ "odd_answers": [
+  "NO VERDICT",
+  "NO VERDICT",
+  "NO VERDICT",
+  "NO VERDICT"
+ ],
+ "empty_queue_no_change": true,
+ "why": "<b>Score 0.261</b> \u00b7 pass below 0.191 \u00b7 stop from 0.707",
+ "board": {
+  "passed": 6,
+  "defects": 165,
+  "per100": 3.6,
+  "matches_js_shift3": true
+ },
+ "report": {
+  "badge": "\u25cf EVERY NUMBER CHECKED \u00b7 the checker removed 8, 543 from draft 1",
+  "lines": 10,
+  "first_line": "SHIFT QUALITY REPORT \u2014 for the plant manager"
+ },
+ "server": {
+  "port": 59799,
+  "page_ok": true,
+  "start_s": 0.2
+ },
+ "client_next_cell": "<div class='ctrs'><span data-key='pass' style='color:#2ee07a'>PASS <b>1</b></span><span data-key='person' style='color:#",
+ "client_board": "<div class='board'><div>LANES OVER THE SHIFT<svg viewBox='0 0 300 120'><rect x='",
+ "server_closed": true
+}
+GRADIO TWIN OK

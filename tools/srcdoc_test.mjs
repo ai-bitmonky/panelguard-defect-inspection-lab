@@ -2,7 +2,7 @@
 // it must load, start Python AND TensorFlow.js, run LangGraph (pause/resume + recursion limit), with zero console errors. (Full Step 3 in a srcdoc frame: TARGET=srcdoc node tests/s3_e2e.mjs)
 import { chromium } from 'playwright'; import { mirrorCDN } from './tests/cdn.mjs';
 import fs from 'fs';
-const f = fs.readdirSync('../dist').filter((x) => /v0.7.html$/.test(x))[0];
+const f = fs.readdirSync('../dist').filter((x) => /v0.8.html$/.test(x))[0];
 const html = fs.readFileSync('../dist/' + f, 'utf8');
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true }); const ctx = await b.newContext(); await mirrorCDN(ctx); const p = await ctx.newPage();
 const errs = []; p.on('pageerror', (e) => errs.push('PAGEERR ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push('CONSOLE ' + m.text().slice(0, 200)); });
