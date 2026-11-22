@@ -32,6 +32,12 @@ function flag(host, h) {
   } else if (h.frozen && h.ok) { var g = el('div', 'hint', '🔒 Frozen since the seal broke' + (h.at ? ' (' + esc(h.at) + ')' : '') + ': model, blend, gates and flow unchanged.'); g.setAttribute('data-flag8', 'honest'); host.appendChild(g); }
   else if (!h.frozen) host.appendChild(el('div', 'hint', 'No freeze sheet recorded here' + (window.PG && window.PG.review && window.PG.review() ? ' (review mode)' : '') + '.'));
 }
+/* the flag, computed NOW (a tuning cell re-run after the seal broke shows up at once on every test result) */
+function liveFlag(host, api, then) {
+  var ph = el('div'); host.appendChild(ph);
+  api.jsEval(function (NS, pg) { return U().honesty(NS, pg); }).then(function (h) { flag(ph, h); if (then) then(h); });
+  return ph;
+}
 /* a number line 0..max ("defects passed per 100") with bands, dots and marks; returns an SVG string */
 function numLine(o) {
   var W = 600, H0 = o.h || 86, x0 = 24, x1 = W - 16, mx = o.max || 20, X = function (v) { return x0 + (x1 - x0) * Math.max(0, Math.min(mx, v)) / mx; }, y = H0 - 26, s = '';
@@ -159,7 +165,7 @@ function sceneFreeze(s, stage, out, api) {
 /* ================= 8b: the trial card ================= */
 function trialCard(r, host, api) {
   if (!r || r.missing) { noData(host, api, 'Run the cell first.'); return; }
-  flag(host, r.honest);
+  liveFlag(host, api);
   if (r.review) host.appendChild(el('div', 'hint', 'Review mode: the seal check is skipped here; the student\'s seal is not touched.'));
   var t = r.trial, v = r.val, met = t.all.per100 <= t.target;
   var c = card(host, 'LINE TRIAL · ' + r.n + ' SEALED CELLS', 'Frozen model, blend, gates and flow. One run. A perfect checker answers the person\'s queue (an assumption).');
@@ -227,7 +233,7 @@ function lever(box, api) {
 }
 function intervalCard(r, host, api) {
   if (!r || r.missing) { noData(host, api, 'Run the cell first.'); return; }
-  flag(host, r.honest);
+  liveFlag(host, api);
   var c = card(host, 'HOW SURE · DEFECTS PASSED PER 100', 'From one tray of ' + r.n + ' real defects (' + r.k + ' passed).');
   var b = el('div'); b.id = 'interval8';
   var cnt = {}, dots = (r.pulls || []).map(function (v) { var q = Math.round(v * 2) / 2, k = cnt[q] = (cnt[q] || 0) + 1; return { v: q, c: '#46e3ff88', r: 3, y: 104 - 6 * k }; });
@@ -246,6 +252,7 @@ function gauge(v) { var w = Math.min(100, 100 * v / 0.5); var col = v > 0.25 ? C
 function driftCard(r, host, api) {
   if (!r || r.missing) { noData(host, api, 'Run the cell first.'); return; }
   var m = api.mech; m.matrix = m.matrix || {};
+  liveFlag(host, api);
   var c = card(host, 'TODAY · THE TEST TRAY AS ONE SHIFT', 'Same factory, cells the model never saw. Reference: the validation tray. PSI: below 0.1 calm · 0.1–0.25 watch · above 0.25 act (rules of thumb, not laws).');
   var g = el('div'); g.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:8px'; c.appendChild(g);
   ALS.forEach(function (a) { var d = el('div', null, '<div style="font-size:13px;color:#8d9bb0">' + a[1] + '</div>' + gauge(r.today[a[0]])); g.appendChild(d); });
@@ -284,5 +291,5 @@ function driftCard(r, host, api) {
   }
 }
 
-window.PGViz8 = { freeze: sceneFreeze, trialCard: trialCard, lever: lever, intervalCard: intervalCard, driftCard: driftCard, _: { el: el, card: card, tiles: tiles, esc: esc, why: why, flag: flag, numLine: numLine, f0: f0, f1: f1, f3: f3, noData: noData, shake: shake, photoCanvas: photoCanvas, thumbOf: thumbOf, C: C } };
+window.PGViz8 = { freeze: sceneFreeze, trialCard: trialCard, lever: lever, intervalCard: intervalCard, driftCard: driftCard, _: { el: el, card: card, tiles: tiles, esc: esc, why: why, flag: flag, liveFlag: liveFlag, numLine: numLine, f0: f0, f1: f1, f3: f3, noData: noData, shake: shake, photoCanvas: photoCanvas, thumbOf: thumbOf, C: C } };
 })();

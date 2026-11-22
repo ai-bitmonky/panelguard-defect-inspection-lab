@@ -50,3 +50,10 @@ Object.assign(FILLS, {
   '7e': { right: ['lane', "'pass'"], wrong: [['decision', "'pass'"], ['lane', "'stop'"]] },
   '7f': { right: ['facts()', 'ok'], wrong: [['facts', 'ok'], ['facts()', 'wrong']] },
 });
+// Step 8 (8b-8d JavaScript, 8e Python)
+Object.assign(FILLS, {
+  '8b': { right: ['idx_test', 'bestW', 'routePoly'], wrong: [['idx_val', 'bestW', 'routePoly'], ['idx_test', '0.7', 'routePoly'], ['idx_test', 'bestW', 'route']] },
+  '8c': { right: ['1.96', 'kPassed', '1'], wrong: [['1.645', 'kPassed', '1'], ['1.96', 'nDefects', '1'], ['1.96', 'kPassed', '0']] },
+  '8d': { right: ['N[k]', '0.25'], wrong: [['rk', '0.25'], ['N[k]', '0.1']] },
+  '8e': { right: ['part', 'idx_val'], wrong: [['part', 'idx_test'], ['order', 'idx_val']] },
+});

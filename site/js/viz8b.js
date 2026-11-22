@@ -87,7 +87,7 @@ function ownCard(r, host, api) {
       g.appendChild(el('div', null, '<div style="font:700 30px Orbitron,Arial;color:' + LAMP[2] + '">' + LAMP[1] + ' ' + LAMP[0] + '</div><div class="hint">' + esc(what) + '</div><div style="font-size:14px">score ' + x.p.toFixed(3) + ' (CNN ' + x.cnn.toFixed(3) + ', Step 2 ' + x.svc.toFixed(3) + ') · pass below ' + x.low.toFixed(3) + ' · stop from ' + x.high.toFixed(3) + (x.problem ? '<br><b>Photo check: ' + esc(x.problem) + '</b> → a person decides' : '') + '</div>'));
       res.appendChild(g);
       var NM = { bright: 'brightness', contrast: 'contrast', sharp: 'sharpness' };
-      var t = el('table', 'tbl', '<tr><th>photo number</th><th>this photo</th><th>training photos (validation)</th><th>where it falls</th></tr>' + Object.keys(x.pct).map(function (k) { var q = x.pct[k]; var out = q.pct < 1 || q.pct > 99; return '<tr><td style="font-family:inherit">' + NM[k] + '</td><td>' + q.v.toFixed(1) + '</td><td>' + q.lo.toFixed(1) + ' to ' + q.hi.toFixed(1) + '</td><td style="color:' + (out ? C.rd : C.gr) + '">' + (q.pct < 1 ? 'below all but ' + f1(q.pct) + '%' : q.pct > 99 ? 'above ' + f1(q.pct) + '%' : 'percentile ' + f0(q.pct)) + '</td></tr>'; }).join(''));
+      var t = el('table', 'tbl', '<tr><th>photo number</th><th>this photo</th><th>training photos (validation)</th><th>where it falls</th></tr>' + Object.keys(x.pct).map(function (k) { var q = x.pct[k]; var out = q.pct < 1 || q.pct > 99; return '<tr><td style="font-family:inherit">' + NM[k] + '</td><td>' + q.v.toFixed(1) + '</td><td>' + q.lo.toFixed(1) + ' to ' + q.hi.toFixed(1) + '</td><td style="color:' + (out ? C.rd : C.gr) + '">' + (q.pct < 1 ? 'lower than 99% of them' : q.pct > 99 ? 'higher than 99% of them' : 'percentile ' + f0(q.pct)) + '</td></tr>'; }).join(''));
       res.appendChild(t);
       res.appendChild(el('div', 'verdict ' + (far.length ? 'bad' : 'good'), far.length ? '<b>Far from the training photos</b> (' + far.map(function (k) { return NM[k]; }).join(', ') + ' outside what the model has seen). Do not trust this verdict.' : 'The photo numbers sit inside the range of the training photos. The verdict is meaningful only if it really is an EL photo of one cell.'));
       api.setMech({ tried: 1, ownLast: { what: what, lane: x.lane, p: x.p, far: far } }); m.tried = 1; side();
@@ -160,14 +160,16 @@ function judge(F, dec, ticks) {
   if (dec === 'cond') {
     var any = CONDS.filter(function (c) { return !c[2] && ticks[c[0]]; }).length;
     if (!any) why.push('“Go with conditions” needs at least one condition ticked.');
-    F.need.forEach(function (k) { if (!ticks[k]) why.push('Missing condition: “' + CONDS.filter(function (c) { return c[0] === k; })[0][1] + '” — ' + ({ c_bigger: 'the interval goes up to ' + f1(F.hi) + ', above ' + F.target + '.', c_second: F.checkers == null ? 'one checker\'s capacity was not measured.' : F.checkers + ' checkers are needed for ' + f0(F.needed) + ' cells per hour.', c_poly: 'poly ' + f1(F.T.poly.per100) + ' vs mono ' + f1(F.T.mono.per100) + ' per 100.', c_labels: F.T.unsureEscapes + ' escaped defects had unsure labels.' }[k])); });
+    F.need.forEach(function (k) { if (!ticks[k]) why.push('Missing condition: “' + CONDS.filter(function (c) { return c[0] === k; })[0][1] + '” — ' + ({ c_bigger: 'the interval goes up to ' + f1(F.hi) + ', above ' + F.target + '.', c_second: F.checkers == null ? 'one checker\'s capacity was not measured.' : F.checkers + ' checkers are needed for ' + f0(F.needed) + ' cells per hour.', c_poly: 'poly ' + f1(F.T.poly.per100) + ' vs mono ' + f1(F.T.mono.per100) + ' per 100.', c_labels: F.T.unsureEscapes + ' defect' + (F.T.unsureEscapes > 1 ? 's' : '') + ' that passed had an unsure label.' }[k])); });
   }
   if (dec !== 'nogo' && !ticks.c_drift && !(dec === 'go')) why.push('Missing condition: “Run the drift alarm every shift” — on the line there are no labels, the alarm is the only early warning.');
   return why;
 }
-function sceneAcceptance(s, stage, out, api) {
+function sceneAcceptance(s, stage, out, api, hLive) {
   var m = api.mech; m.ticks = m.ticks || {};
+  if (hLive === undefined) { stage.innerHTML = '<div class="hint" style="padding:12px">Reading your numbers…</div>'; api.jsEval(function (NS, pg) { return window.PG_STEP8_UTIL.honesty(NS, pg); }).then(function (h) { sceneAcceptance(s, stage, out, api, h || null); }); return {}; }
   var F = acceptFacts(api);
+  if (F && hLive) { F.honest = hLive; F.dishonest = !!(hLive.frozen && hLive.ok === false); }
   stage.innerHTML = ''; out.innerHTML = '';
   if (!F) { X8().noData(stage, api, 'Finish 8b and 8c first: the sheet is filled from the trial and its interval.'); return {}; }
   var w = el('div'); w.style.cssText = 'padding:10px 12px'; stage.appendChild(w);
@@ -186,7 +188,7 @@ function sceneAcceptance(s, stage, out, api) {
   var dec = el('div'); dec.style.cssText = 'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap'; w.appendChild(dec);
   [['go', 'GO', 'run the line as built', C.gr], ['cond', 'GO WITH CONDITIONS', 'run it, but only with the ticked conditions', C.am], ['nogo', 'NO-GO', 'do not run it yet', C.rd]].forEach(function (d) {
     var b = el('button', 'bet' + (m.dec === d[0] ? ' sel' : ''), '<div class="bi" style="color:' + d[3] + '">' + d[1] + '</div>' + esc(d[2])); b.setAttribute('data-dec8', d[0]); b.style.flex = '1';
-    b.disabled = !!m.done; b.onclick = function () { api.setMech({ dec: d[0] }); m.dec = d[0]; sceneAcceptance(s, stage, out, api); };
+    b.disabled = !!m.done; b.onclick = function () { api.setMech({ dec: d[0] }); m.dec = d[0]; sceneAcceptance(s, stage, out, api, F.honest); };
     dec.appendChild(b);
   });
   var cl = el('div'); cl.style.cssText = 'margin-top:10px'; cl.appendChild(el('b', null, 'Conditions (tick all that apply)'));
@@ -199,7 +201,7 @@ function sceneAcceptance(s, stage, out, api) {
     if (w2.length) { msg.innerHTML = ''; msg.appendChild(el('div', 'verdict bad', '<b>The sheet refuses this decision:</b><ul style="margin:4px 0">' + w2.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>')); shake(sh); api.setMech({ refused: (m.refused || 0) + 1 }); return; }
     var note = m.dec === 'nogo' && !F.missed && !F.dishonest ? ' The numbers would also allow a go with conditions; a no-go is still a careful, valid choice.' : '';
     api.setMech({ done: 1, stamped: { dec: m.dec, ticks: Object.keys(m.ticks), at: new Date().toLocaleString() } }); m.done = 1;
-    sceneAcceptance(s, stage, out, api); var x = stage.querySelector('#stampmsg8'); if (x) x.appendChild(el('div', 'verdict good', 'Stamped. The decision fits the numbers.' + note));
+    sceneAcceptance(s, stage, out, api, F.honest); var x = stage.querySelector('#stampmsg8'); if (x) x.appendChild(el('div', 'verdict good', 'Stamped. The decision fits the numbers.' + note));
   };
   w.appendChild(st); w.appendChild(msg);
   if (m.done && m.stamped) { var sp = el('div', null, { go: 'GO', cond: 'GO WITH CONDITIONS', nogo: 'NO-GO' }[m.stamped.dec]); sp.setAttribute('data-stamp8', m.stamped.dec); sp.style.cssText = 'position:absolute;right:14px;bottom:8px;transform:rotate(-8deg);font:900 26px Orbitron,Arial;letter-spacing:.08em;padding:6px 12px;border:4px solid ' + { go: '#1f9d55', cond: '#c98a0b', nogo: '#d23a4a' }[m.stamped.dec] + ';color:' + { go: '#1f9d55', cond: '#c98a0b', nogo: '#d23a4a' }[m.stamped.dec] + ';border-radius:8px;opacity:.85;pointer-events:none'; sh.appendChild(sp);
@@ -374,7 +376,7 @@ function sceneRecap(s, stage, out, api) {
     w.appendChild(el('div', 'hint', Object.keys(m.seen).length + ' of ' + D.stages.length + ' stages seen.'));
     /* the final test */
     var ft = el('div'); ft.id = 'final8'; ft.style.marginTop = '14px'; w.appendChild(ft);
-    ft.appendChild(el('h2', null, '<span class="k">TEST</span>Final test · 15 questions · Steps 1–8'));
+    var h2 = el('h2', null, 'FINAL TEST · ' + QS.length + ' questions · Steps 1–8'); h2.style.cssText = 'font-size:17px;color:#46e3ff;margin:4px 0'; ft.appendChild(h2);
     ft.appendChild(el('p', 'hint', 'Every question says what to do. Each has one Check: then it shows the correct answer and locks. Questions you have not checked stay open until you press Submit at the end.'));
     QS.forEach(function (Q, i) { var st = m.q[Q.id] || (m.q[Q.id] = {}); ft.appendChild(qCard(Q, 0, st, !!m.submitted, function (a, good) { m.q[Q.id] = { a: a, locked: 1, good: good ? 1 : 0 }; save({ q: m.q }); draw(); side(); }, i + 1)); });
     if (!m.submitted) {
@@ -388,7 +390,7 @@ function sceneRecap(s, stage, out, api) {
       ft.appendChild(el('div', 'verdict good', 'Submitted ' + esc(m.submitted) + '. The test is locked. Score: <b>' + (QS.length - wrong.length) + ' of ' + QS.length + '</b>.'));
       if (wrong.length) {
         var rt = el('div'); rt.id = 'retake8'; ft.appendChild(rt);
-        rt.appendChild(el('h2', null, '<span class="k">RETAKE</span>Only the ' + wrong.length + ' question' + (wrong.length > 1 ? 's' : '') + ' you missed · other values'));
+        rt.appendChild(el('h2', null, '<span style="color:#ffb547">RETAKE · </span>only the ' + wrong.length + ' question' + (wrong.length > 1 ? 's' : '') + ' you missed · other values'));
         wrong.forEach(function (Q) { var st = m.rq[Q.id] || (m.rq[Q.id] = {}); rt.appendChild(qCard(Q, 1, st, false, function (a, good) { m.rq[Q.id] = { a: a, locked: 1, good: good ? 1 : 0 }; save({ rq: m.rq }); draw(); side(); }, QS.indexOf(Q) + 1)); });
       }
     }
@@ -396,6 +398,7 @@ function sceneRecap(s, stage, out, api) {
   }
   function side() {
     out.innerHTML = '';
+    X8().liveFlag(out, api);
     var sc = card(out, 'SCORECARD', m.submitted ? 'Final.' : 'Fills in as you check.'); sc.id = 'score8';
     var right = QS.filter(function (Q) { return m.q[Q.id] && m.q[Q.id].good; }).length;
     tiles(sc, [[right + ' / ' + QS.length, 'right', right >= 12 ? 'g' : right >= 8 ? 'a' : 'r'], [QS.filter(function (Q) { return m.q[Q.id] && m.q[Q.id].locked; }).length, 'checked', ''], [m.submitted ? 'yes' : 'no', 'submitted', m.submitted ? 'g' : '']]);
