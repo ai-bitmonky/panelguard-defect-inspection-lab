@@ -201,14 +201,32 @@ details[open]>summary::before{transform:rotate(90deg)}
 .pgd-enter .pgd-fade{animation:pgdFade .9s ease-out both}
 .pgd-enter .pgd-draw{stroke-dasharray:var(--len,600);animation:pgdDraw 1.1s ease-out both}
 .pgd-enter .pgd-grow{transform-box:fill-box;transform-origin:center;animation:pgdGrow .5s ease-out both}
+/* motion right after a student action (never before it) */
+@keyframes pgdPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:none}}
+@keyframes pgdDrop{from{transform:translateY(-26px);opacity:0}to{transform:none;opacity:1}}
+@keyframes pgdSlideL{from{transform:translateX(60px);opacity:.2}to{transform:none;opacity:1}}
+@keyframes pgdFlip{0%{transform:scaleX(1)}50%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+@keyframes pgdBelt{to{transform:translateX(-26px)}}
+@keyframes pgdShake{0%,100%{transform:none}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.pgd-acted .pgd-pop,.pgd-enter .pgd-pop{transform-box:fill-box;transform-origin:center;animation:pgdPop .5s ease-out both}
+.pgd-acted .pgd-drop{animation:pgdDrop .5s ease-out both}
+.pgd-acted .pgd-drop2{animation:pgdDrop .5s .18s ease-out both}
+.pgd-acted .pgd-slide{animation:pgdSlideL .55s ease-out both}
+.pgd-acted .pgd-flip{transform-box:fill-box;transform-origin:center;animation:pgdFlip .5s ease-in-out both}
+.pgd-acted .pgd-shake{animation:pgdShake .5s ease-out both}
+.pgd-acted .pgd-flowonce{stroke-dasharray:10 10;animation:pgdFlow .6s linear 2}
+.pgd-acted .pgd-beltmove{animation:pgdBelt .6s linear 1}
+.pgd-acted .pgd-draw{stroke-dasharray:var(--len,600);animation:pgdDraw .9s ease-out both}
 @media (prefers-reduced-motion:reduce){
+  .pgd-acted *,.pgd-enter .pgd-pop{animation:none!important}
   .pgd-target .pgd-ring>*,.pgd-flow,.pgd-enter .pgd-in,.pgd-enter .pgd-in2,.pgd-enter .pgd-in3,.pgd-enter .pgd-fade,.pgd-enter .pgd-draw,.pgd-enter .pgd-grow{animation:none!important}
   .pgd *{transition:none!important}
 }
 
 /* old diagrams in a dark wrapper: colours inverted, photos kept as they are */
-.pgd-legacy{border-radius:14px;overflow:hidden;border:1px solid #1d3448;background:#05080d;box-shadow:0 12px 40px rgba(0,0,0,.45);max-width:1100px}
-.pgd-legacy-pic svg{display:block;width:100%;height:auto;max-height:calc(100vh - 300px);filter:invert(.94) hue-rotate(180deg) saturate(1.35) brightness(.98)}
+.pgd-legacy{border-radius:14px;overflow:hidden;border:1px solid #1d3448;background:#0f0f10;box-shadow:0 12px 40px rgba(0,0,0,.45);max-width:1100px}
+.pgd-legacy-pic{background:#0f0f10}
+.pgd-legacy-pic svg{display:block;margin:0 auto;width:100%;height:auto;max-height:calc(100vh - 300px);filter:invert(.94) hue-rotate(180deg) saturate(1.35) brightness(.98)}
 .pgd-legacy-pic svg image{filter:invert(1) hue-rotate(180deg)}
 .pgd-read{max-width:1100px}
 
@@ -232,6 +250,7 @@ details[open]>summary::before{transform:rotate(90deg)}
   .pgd-print .pgd-pstage{width:100%;height:auto;border:1px solid #333;border-radius:6pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .pgd-print .pgd-pstage .pgd-chip{display:none}
   .pgd-print .pgd-pstage{filter:invert(.93) hue-rotate(180deg) saturate(1.4)}
+  .pgd-print .pgd-pstage .pgd-bg{display:none}
   .pgd-print .pgd-pstage image{filter:invert(1) hue-rotate(180deg)}
   .pgd-print .pgd-wt b,.pgd-print summary,.pgd-print .pgd-qq,.pgd-print .pgd-bt{color:#000!important}
   .pgd-print .pgd-wtag{color:#333!important;border-color:#999!important}

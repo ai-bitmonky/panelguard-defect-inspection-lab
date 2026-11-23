@@ -98,9 +98,9 @@ var A = {
     return '<defs><linearGradient id="' + id + 'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08101b"/><stop offset=".7" stop-color="#0a1322"/><stop offset="1" stop-color="#05080e"/></linearGradient>' +
       '<radialGradient id="' + id + 'r" cx=".62" cy="-.1" r=".9"><stop offset="0" stop-color="#0f2a40" stop-opacity=".8"/><stop offset="1" stop-color="#0f2a40" stop-opacity="0"/></radialGradient>' +
       '<pattern id="' + id + 'p" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#12304a" stroke-width=".7"/></pattern></defs>' +
-      '<rect width="' + W + '" height="' + H + '" fill="url(#' + id + 'g)"/><rect width="' + W + '" height="' + H + '" fill="url(#' + id + 'r)"/>' +
+      '<g class="pgd-bg"><rect width="' + W + '" height="' + H + '" fill="url(#' + id + 'g)"/><rect width="' + W + '" height="' + H + '" fill="url(#' + id + 'r)"/>' +
       '<rect width="' + W + '" height="' + (o.floor || H) + '" fill="url(#' + id + 'p)" opacity=".38"/>' +
-      (o.floor ? '<rect y="' + o.floor + '" width="' + W + '" height="' + (H - o.floor) + '" fill="#04070c" opacity=".7"/><line x1="0" y1="' + o.floor + '" x2="' + W + '" y2="' + o.floor + '" stroke="#1e3a52" stroke-width="1.5"/>' : '');
+      (o.floor ? '<rect y="' + o.floor + '" width="' + W + '" height="' + (H - o.floor) + '" fill="#04070c" opacity=".7"/><line x1="0" y1="' + o.floor + '" x2="' + W + '" y2="' + o.floor + '" stroke="#1e3a52" stroke-width="1.5"/>' : '') + '</g>';
   },
   /* a glow filter (blur) — returns its id inside defs markup */
   glow: function (id, sd) { return '<filter id="' + id + '" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="' + (sd || 6) + '"/></filter>'; },
@@ -149,6 +149,94 @@ var A = {
   }
 };
 
+/* ---------------- richer art helpers (batch 2) ---------------- */
+/* common filters + gradients for one frame: returns {defs, sh (drop shadow id), gl (soft glow id), gls (glass gradient id), mt (metal gradient id)} */
+A.fx = function () {
+  var k = uid('fx');
+  return { sh: k + 's', gl: k + 'g', gls: k + 'l', mt: k + 'm', vg: k + 'v',
+    defs: '<defs><filter id="' + k + 's" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur in="SourceAlpha" stdDeviation="7"/><feOffset dy="8"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+      '<filter id="' + k + 'g" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+      '<linearGradient id="' + k + 'l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2b3e" stop-opacity=".92"/><stop offset=".55" stop-color="#0e1826" stop-opacity=".9"/><stop offset="1" stop-color="#0a121c" stop-opacity=".95"/></linearGradient>' +
+      '<linearGradient id="' + k + 'm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4757"/><stop offset=".45" stop-color="#1d2632"/><stop offset="1" stop-color="#11171f"/></linearGradient>' +
+      '<radialGradient id="' + k + 'v" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#46e3ff" stop-opacity=".16"/><stop offset="1" stop-color="#46e3ff" stop-opacity="0"/></radialGradient></defs>' };
+};
+/* a glass panel: soft fill, top highlight, thin rim. o: {r, col (rim), fx (from A.fx), op} */
+A.glass = function (x, y, w, h, o) {
+  o = o || {}; var r = o.r == null ? 14 : o.r, col = o.col || '#2b4760';
+  return '<g' + (o.fx ? ' filter="url(#' + o.fx.sh + ')"' : '') + (o.cls ? ' class="' + o.cls + '"' : '') + '><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + r + '" fill="' + (o.fx ? 'url(#' + o.fx.gls + ')' : '#0e1826') + '" stroke="' + col + '" stroke-opacity="' + (o.op || .8) + '" stroke-width="1.4"/>' +
+    '<path d="M' + (x + r) + ' ' + (y + 1.5) + 'H' + (x + w - r) + '" stroke="#ffffff" stroke-opacity=".14" stroke-width="2" stroke-linecap="round"/></g>';
+};
+/* a conveyor belt seen slightly from above: top surface y..y+h, rollers below. o: {fx, moving} */
+A.belt = function (x, y, w, h, o) {
+  o = o || {}; var s = '', k = uid('bl');
+  s += '<defs><linearGradient id="' + k + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26313f"/><stop offset="1" stop-color="#121922"/></linearGradient>' +
+    '<pattern id="' + k + 'p" width="26" height="' + h + '" patternUnits="userSpaceOnUse"><path d="M0 0V' + h + '" stroke="#0a0f15" stroke-width="2" opacity=".55"/></pattern></defs>';
+  s += '<ellipse cx="' + (x + w / 2) + '" cy="' + (y + h + 30) + '" rx="' + (w / 2 + 10) + '" ry="12" fill="#000" opacity=".45"/>';
+  s += '<rect x="' + x + '" y="' + (y + h) + '" width="' + w + '" height="14" rx="3" fill="' + (o.fx ? 'url(#' + o.fx.mt + ')' : '#1d2632') + '"/>';
+  for (var i = 0; i <= Math.floor(w / 60); i++) s += '<circle cx="' + (x + 14 + i * 60) + '" cy="' + (y + h + 7) + '" r="5" fill="#0b1016" stroke="#3a4757"/>';
+  s += '<path d="M' + (x + 10) + ' ' + y + 'H' + (x + w - 10) + 'L' + (x + w) + ' ' + (y + h) + 'H' + x + 'Z" fill="url(#' + k + ')" stroke="#3a4757" stroke-width="1.2"/>';
+  s += '<path d="M' + (x + 10) + ' ' + y + 'H' + (x + w - 10) + 'L' + (x + w) + ' ' + (y + h) + 'H' + x + 'Z" fill="url(#' + k + 'p)"' + (o.moving ? ' class="pgd-beltmove"' : '') + '/>';
+  s += '<path d="M' + (x + 10) + ' ' + (y + .8) + 'H' + (x + w - 10) + '" stroke="#5d6b80" stroke-opacity=".6"/>';
+  return s;
+};
+/* a card that holds a real cell photo, with depth. o: {fx, ring (colour), label, sub, full} */
+A.photoCard = function (id, x, y, s, o) {
+  o = o || {}; var p = 5;
+  return '<g' + (o.cls ? ' class="' + o.cls + '"' : '') + '><rect x="' + (x - p) + '" y="' + (y - p) + '" width="' + (s + 2 * p) + '" height="' + (s + 2 * p) + '" rx="7" fill="#0b121b" stroke="' + (o.ring || '#2b4157') + '" stroke-width="' + (o.ring ? 2.2 : 1.2) + '"' + (o.fx ? ' filter="url(#' + o.fx.sh + ')"' : '') + '/>' +
+    A.cell(id, x, y, s, { full: o.full, r: 3 }) + (o.label ? A.t(x + s / 2, y + s + p + 17, o.label, { size: o.ls || 13, a: 'middle', f: 'm', fill: o.lc || COL.dim }) : '') + '</g>';
+};
+/* an arc gauge: frac 0..1, optional target tick. o: {col, label, val (text), target, w} */
+A.gauge = function (cx, cy, r, frac, o) {
+  o = o || {}; var a0 = Math.PI * 0.8, a1 = Math.PI * 2.2, sw = o.w || 12;
+  function pt(f, rr) { var a = a0 + (a1 - a0) * f; return (cx + rr * Math.cos(a)).toFixed(1) + ' ' + (cy + rr * Math.sin(a)).toFixed(1); }
+  function arc(f0, f1, col, wdt, op) { var big = (f1 - f0) * (a1 - a0) > Math.PI ? 1 : 0; return '<path d="M' + pt(f0, r) + 'A' + r + ' ' + r + ' 0 ' + big + ' 1 ' + pt(f1, r) + '" stroke="' + col + '" stroke-width="' + wdt + '" fill="none" stroke-linecap="round"' + (op ? ' opacity="' + op + '"' : '') + '/>'; }
+  var s = arc(0, 1, '#18222f', sw) + (frac > 0.001 ? arc(0, Math.min(1, frac), o.col || COL.cy, sw) : '');
+  if (o.target != null) { var a = a0 + (a1 - a0) * o.target; s += '<path d="M' + (cx + (r - sw) * Math.cos(a)) + ' ' + (cy + (r - sw) * Math.sin(a)) + 'L' + (cx + (r + sw) * Math.cos(a)) + ' ' + (cy + (r + sw) * Math.sin(a)) + '" stroke="#fff" stroke-width="2.5"/>' + A.t(cx + (r + sw + 14) * Math.cos(a), cy + (r + sw + 14) * Math.sin(a) + 5, o.tl || '', { size: 13, a: 'middle', f: 'm', fill: '#fff' }); }
+  if (o.val) s += A.t(cx, cy + 8, o.val, { size: o.vs || 26, a: 'middle', f: 'm', w: 700, fill: o.vc || '#fff', cls: o.vcls });
+  if (o.label) s += A.t(cx, cy + r * 0.62 + 10, o.label, { size: 14, a: 'middle', fill: COL.dim });
+  return s;
+};
+/* a finished chart frame: axes with real ticks. o: {x,y,w,h, xd:[min,max], yd:[min,max], xt:[...], yt:[...], fx(v)->label, fy(v)->label, xl, yl, grid}
+   returns {svg, X(v), Y(v)} */
+A.chart = function (o) {
+  var X = function (v) { return o.x + (v - o.xd[0]) / (o.xd[1] - o.xd[0]) * o.w; }, Y = function (v) { return o.y + o.h - (v - o.yd[0]) / (o.yd[1] - o.yd[0]) * o.h; };
+  var s = '<rect x="' + o.x + '" y="' + o.y + '" width="' + o.w + '" height="' + o.h + '" fill="#08101a" opacity=".55"/>';
+  (o.yt || []).forEach(function (v) { s += '<line x1="' + o.x + '" x2="' + (o.x + o.w) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="#16273a"' + (o.grid === false ? ' opacity="0"' : '') + '/>' + A.t(o.x - 8, Y(v) + 5, o.fy ? o.fy(v) : String(v), { size: 13, a: 'end', f: 'm', fill: COL.dim }); });
+  (o.xt || []).forEach(function (v) { s += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="' + (o.y + o.h) + '" y2="' + (o.y + o.h + 6) + '" stroke="#5d6b80"/>' + A.t(X(v), o.y + o.h + 22, o.fx ? o.fx(v) : String(v), { size: 13, a: 'middle', f: 'm', fill: COL.dim }); });
+  s += '<path d="M' + o.x + ' ' + o.y + 'V' + (o.y + o.h) + 'H' + (o.x + o.w) + '" stroke="#5d6b80" stroke-width="1.5" fill="none"/>';
+  if (o.xl) s += A.t(o.x + o.w / 2, o.y + o.h + 44, o.xl, { size: 14, a: 'middle', fill: COL.dim });
+  if (o.yl) s += '<text x="' + (o.x - 46) + '" y="' + (o.y + o.h / 2) + '" font-family="' + FB + '" font-size="14" font-weight="600" fill="' + COL.dim + '" text-anchor="middle" transform="rotate(-90 ' + (o.x - 46) + ' ' + (o.y + o.h / 2) + ')">' + esc(o.yl) + '</text>';
+  return { svg: s, X: X, Y: Y };
+};
+/* a lock badge: a value the student unlocks in the lab (prediction or code gap) */
+A.lock = function (x, y, label) {
+  return '<g class="pgd-lock"><rect x="' + (x - 6) + '" y="' + (y - 17) + '" width="' + (label.length * 7.6 + 34) + '" height="24" rx="12" fill="#0b121b" stroke="#5d6b80" stroke-dasharray="3 3"/>' +
+    '<path d="M' + (x + 3) + ' ' + (y - 6) + 'v-3a4 4 0 0 1 8 0v3" stroke="#8d9bb0" stroke-width="1.6" fill="none"/><rect x="' + (x + 1) + '" y="' + (y - 6) + '" width="12" height="9" rx="2" fill="#8d9bb0"/>' +
+    A.t(x + 20, y, label, { size: 13, fill: COL.dim }) + '</g>';
+};
+
+/* ---------------- shared maths (same rules as the lab's jskernel.js) ---------------- */
+var M = {
+  cutAt: function (y, s, recall) { var d = []; for (var i = 0; i < y.length; i++) if (y[i] === 1) d.push(s[i]); d.sort(function (a, b) { return b - a; }); var k = Math.ceil((recall == null ? 0.95 : recall) * d.length - 1e-9); return d[Math.max(0, k - 1)]; },
+  rates: function (y, s, cut) { var tp = 0, fn = 0, fp = 0, tn = 0; for (var i = 0; i < y.length; i++) { var st = s[i] >= cut; if (y[i] === 1) { if (st) tp++; else fn++; } else { if (st) fp++; else tn++; } } return { cut: cut, tp: tp, fn: fn, fp: fp, tn: tn, rec: tp / (tp + fn), far: fp / (fp + tn), prec: tp + fp ? tp / (tp + fp) : 0 }; },
+  twoGates: function (y, s, low, high) { var hi = Math.max(high, low), o = { low: low, high: high, n: y.length, defPass: 0, defHuman: 0, defStop: 0, okPass: 0, okHuman: 0, okStop: 0 };
+    for (var i = 0; i < y.length; i++) { var k = s[i] < low ? 'Pass' : (s[i] >= hi ? 'Stop' : 'Human'); o[(y[i] === 1 ? 'def' : 'ok') + k]++; }
+    o.nDef = o.defPass + o.defHuman + o.defStop; o.nOk = o.okPass + o.okHuman + o.okStop; o.passRate = o.defPass / o.nDef; o.human = (o.defHuman + o.okHuman) / o.n; o.autoStop = (o.defStop + o.okStop) / o.n; o.autoPass = (o.defPass + o.okPass) / o.n; return o; },
+  gatesFor: function (y, s) { var d = []; for (var i = 0; i < y.length; i++) if (y[i] === 1) d.push(s[i]); d.sort(function (a, b) { return a - b; });
+    var low = d[Math.floor(0.05 * d.length)], order = s.map(function (v, i) { return i; }).sort(function (a, b) { return s[b] - s[a]; }), high = Infinity, caught = 0;
+    order.forEach(function (i, n) { caught += y[i]; if (caught / (n + 1) >= 0.95) high = s[i]; }); return { low: low, high: high, nDef: d.length }; }
+};
+/* the validation tray, per cell: Step 2 score (svc) and CNN score (cnn). The student's own scores when 2c / 3f passed, else the reference run. */
+function val() {
+  var F = (window.PGD_FACTS || {}).s3; if (!F || !F.val) return null;
+  var v = F.val, o = { id: v.id, y: v.y, prob: v.prob, kind: v.kind, svc: v.svc, cnn: v.cnn, youSvc: false, youCnn: false };
+  var r2 = liveRes('2c'); if (r2 && r2.cells && r2.cells.length === v.id.length) { o.svc = r2.cells.map(function (c) { return c[1]; }); o.youSvc = true; }
+  var r3 = liveRes('3f'); if (r3 && r3.cells && r3.cells.length === v.id.length) { o.cnn = r3.cells.map(function (c) { return c[1]; }); o.youCnn = true; }
+  return o;
+}
+/* has the student answered this substep's prediction (or passed it)? */
+function predDone(id) { var p = liveSub(id).pred; return !!(liveRes(id) || (p && p.locked)); }
+
 /* ---------------- the Work it out strip ----------------
    rows: { h: 'heading' } | { t: 'plain line' } | { k: 'label', v: '1,234', op: '÷'|'×'|'−'|'+'|'=', res: true, col } | { tag: 'your value'|'typical value' } | { bar: share 0..1, col, mark } */
 function workHTML(rows) {
@@ -173,7 +261,7 @@ function sess(id) {
 function ctxFor(id, mode, extra) {
   var spec = REG[id], S = sess(id);
   var c = {
-    id: id, mode: mode, state: S.state, A: A, fmt: fmt, pct: pct, esc: esc, counts: counts(), meta: meta, liveRes: liveRes, liveSub: liveSub, pixels: pixels,
+    id: id, mode: mode, state: S.state, A: A, fmt: fmt, pct: pct, esc: esc, counts: counts(), meta: meta, liveRes: liveRes, liveSub: liveSub, pixels: pixels, val: val, M: M, predDone: predDone,
     facts: window.PGD_FACTS || {}, enter: false, reduce: reduced(), print: mode === 'print'
   };
   for (var k in extra) c[k] = extra[k];
@@ -197,12 +285,12 @@ function mount(host, id) {
     else if (S.snaps[i]) { S.state = JSON.parse(S.snaps[i]); }
     draw(entering);
   }
-  function draw(entering) {
+  function draw(entering, acted) {
     var f = spec.frames[S.i];
     var c = ctxFor(id, 'live', { enter: !!entering && !reduced() });
     c.state = S.state;
     c.next = function () { if (S.i < N - 1) { var nx = S.i + 1; setTimeout(function () { go(nx, true); focusFirst(); }, 0); } };
-    c.redraw = function () { draw(false); };
+    c.redraw = function (acted) { draw(false, acted); };
     c.setWork = function (rows) { wb.innerHTML = workHTML(rows); };
     c.rework = function () { try { wb.innerHTML = workHTML(f.work ? f.work(c) : []); } catch (e) { log('work failed', e && e.message); } };
     c.onCleanup = function (fn) { cleanup.push(fn); };
@@ -212,6 +300,8 @@ function mount(host, id) {
     svg.innerHTML = markup;
     svg.setAttribute('aria-label', 'Frame ' + (S.i + 1) + ' of ' + N + ': ' + f.cap + '. ' + (f.note || ''));
     svg.classList.toggle('pgd-enter', !!c.enter);
+    svg.classList.toggle('pgd-acted', !!acted && !reduced());
+    if ((acted || c.enter) && !reduced()) countUp(svg);
     host.querySelector('.pgd-fno').textContent = 'FRAME ' + (S.i + 1) + ' / ' + N;
     host.querySelector('.pgd-capt').textContent = f.cap;
     try { wb.innerHTML = workHTML(f.work ? f.work(c) : []); } catch (e) { log('work failed', e && e.message); wb.innerHTML = ''; }
@@ -234,6 +324,17 @@ function wire(root, f, c) {
     if (fn) onTap(t, function () { fn(c, t); });
   });
   if (f.bind) f.bind(c, root);
+}
+
+/* numbers that count up after an action: <text data-pgd-from="12">57</text> counts 12 -> 57 (keeps commas, decimals, % and the rest of the text) */
+function countUp(root) {
+  root.querySelectorAll('[data-pgd-from]').forEach(function (el) {
+    var txt = el.textContent, m = txt.match(/-?[\d,]*\.?\d+/); if (!m) return;
+    var to = parseFloat(m[0].replace(/,/g, '')), from = parseFloat(el.getAttribute('data-pgd-from')), dec = (m[0].split('.')[1] || '').length, t0 = performance.now(), ms = 650;
+    if (!isFinite(from) || from === to) return;
+    function f(x) { return txt.replace(m[0], x.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec })); }
+    (function tick() { var k = Math.min(1, (performance.now() - t0) / ms), e = 1 - Math.pow(1 - k, 3); if (!el.isConnected) return; el.textContent = f(from + (to - from) * e); if (k < 1) requestAnimationFrame(tick); else el.textContent = txt; })();
+  });
 }
 
 /* ---------------- interaction helpers (mouse, touch, keyboard) ---------------- */
@@ -294,6 +395,6 @@ function printHTML(id) {
 
 window.PGD = { register: register, has: has, mount: mount, printHTML: printHTML, art: A, COL: COL, onTap: onTap, onDrag: onDrag, onHold: onHold, svgPoint: svgPoint,
   meta: meta, counts: counts, pixels: pixels, cellURL: cellURL, fullURL: fullURL, hasFull: hasFull, whenPack: whenPack, liveRes: liveRes, liveSub: liveSub,
-  workHTML: workHTML, fmt: fmt, pct: pct, esc: esc, reduced: reduced, log: log, ids: function () { return Object.keys(REG); },
+  workHTML: workHTML, val: val, M: M, predDone: predDone, countUp: countUp, fmt: fmt, pct: pct, esc: esc, reduced: reduced, log: log, ids: function () { return Object.keys(REG); },
   _sess: SESS, reset: function (id) { if (id) delete SESS[id]; else for (var k in SESS) delete SESS[k]; } };
 })();

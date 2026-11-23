@@ -41,5 +41,8 @@ k = int(np.where(cid == 6)[0][0]); im = X[k].astype(int)
 best = (0, 24, 28)   # the 8 x 8 patch with the dark spot on the crack and a piece of busbar (row 24-31, column 28-35)
 F['patch'] = {'cell': 6, 'y': best[1], 'x': best[2], 'vals': im[best[1]:best[1] + 8, best[2]:best[2] + 8].tolist()}
 F['cell6'] = {'min': int(im.min()), 'max': int(im.max())}
-json.dump(F, open(os.path.join(here, 'src/facts.json'), 'w'), indent=1)
+FJ = os.path.join(here, 'src/facts.json')
+old = json.load(open(FJ)) if os.path.exists(FJ) else {}
+old.update(F)   # keeps the Step 2-3 keys made by facts23.py
+json.dump(old, open(FJ, 'w'), separators=(',', ':'))
 print(json.dumps({k: v for k, v in F.items() if k != 'patch'}, indent=None)[:3000]); print(F['patch'])
