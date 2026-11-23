@@ -542,7 +542,7 @@ function tray8f(c, fx) {
   var s = '';
   TRAYS8F.forEach(function (q) { s += '<rect x="' + (q[3] - 120) + '" y="300" width="240" height="214" rx="14" fill="#0b121b" stroke="' + q[2] + '" stroke-width="3"/>' + t(q[3], 334, q[1], { size: 18, a: 'middle', f: 'h', fill: q[2] });
     var inn = Object.keys(c.state.put).filter(function (k) { return c.state.put[k] === q[0]; });
-    inn.forEach(function (k, i) { var nm = CARDS8F.filter(function (x) { return x[0] === k; })[0][1]; s += '<rect x="' + (q[3] - 104) + '" y="' + (350 + i * 32) + '" width="208" height="26" rx="5" fill="#f1ecdf"/>' + t(q[3], 368 + i * 32, nm, { size: 14, a: 'middle', f: 'h', fill: '#1f2937' }); }); });
+    inn.forEach(function (k, i) { var nm = CARDS8F.filter(function (x) { return x[0] === k; })[0][1]; s += '<g class="pgd-keep"><rect x="' + (q[3] - 104) + '" y="' + (350 + i * 32) + '" width="208" height="26" rx="5" fill="#f1ecdf"/>' + t(q[3], 368 + i * 32, nm, { size: 14, a: 'middle', f: 'h', fill: '#1f2937' }) + '</g>'; }); });
   return s;
 }
 function card8f(F, key) {

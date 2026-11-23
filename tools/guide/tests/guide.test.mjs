@@ -214,6 +214,11 @@ if (PARTS.includes(5)) {
     if (['1a', '0b', '2d', '3g', '4b', '5a', '5b', '6f', '6c', '7e', '7f', '8a', '8c', '8f'].includes(id)) { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
     await page.evaluate(() => { document.body.classList.remove('pgd-printing'); });
   }
+  // print: light paper art keeps its colours (inside .pgd-keep), so it does not print as a dark box
+  const naked = await page.evaluate((ids) => { const PAPER = /^#(efe9da|f1ecdf|f4f1ea|f2efe6|ffd36b|efe6d0)$/i, out = []; const box = document.createElement('div'); document.body.appendChild(box);
+    for (const id of ids) { box.innerHTML = window.PGD.printHTML(id); box.querySelectorAll('rect,path').forEach((r) => { const f = (r.getAttribute('fill') || '').trim(); const w = +r.getAttribute('width') || 0; const hh = +r.getAttribute('height') || 0, op = parseFloat(r.getAttribute('fill-opacity') || r.getAttribute('opacity') || '1'); if (PAPER.test(f) && (w === 0 || w > 60) && (hh === 0 || hh >= 20) && op >= 0.5 && !r.closest('.pgd-keep') && !r.closest('.pgd-chip')) out.push(id); }); }
+    box.remove(); return [...new Set(out)]; }, ONLY);
+  expect(naked.length === 0, 'print: every light-paper shape sits in .pgd-keep' + (naked.length ? ' — missing in ' + naked.join(',') : ''));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const id of ['0a', '1c', '2c', '3f', '4b', '5c', '6e', '7b', '8g']) {   // one per step: no pulse, and acting adds no motion class
     await page.evaluate((i) => { window.PGD.reset(i); window.PGDiagram.open(i, 'diagram'); }, id); await page.waitForTimeout(150);

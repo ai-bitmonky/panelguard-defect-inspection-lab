@@ -212,7 +212,7 @@ function card5b() {   // the real values for cell 496 at each station
     lines: ['photo check: ' + (pr || 'photo ok'), 'model: score ' + f3(p), 'fork: lane ' + lane, 'logbook: ' + (lane === 'person' ? 'waiting' : lane)] };
 }
 function paper5b(K, n, fx, o) {
-  o = o || {}; var x = 34, y = 40, w = 380, h = 476, s = '';
+  o = o || {}; var x = 34, y = 40, w = 380, h = 476, s = '<g class="pgd-keep">';   // light paper: keeps its colours in print
   s += '<g filter="url(#' + fx.sh + ')"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="6" fill="#efe9da"/></g>';
   s += '<rect x="' + (x + w / 2 - 40) + '" y="' + (y - 14) + '" width="80" height="26" rx="5" fill="url(#' + fx.mt + ')" stroke="#8d9bb0"/>';   // the clip
   s += t(x + 20, y + 38, 'TRAVELLER CARD', { size: 18, f: 'h', fill: '#1d2a38', ls: '.08em' }) + t(x + w - 20, y + 38, 'cell ' + K.id, { size: 16, a: 'end', f: 'm', w: 700, fill: '#1d2a38' });
@@ -230,7 +230,7 @@ function paper5b(K, n, fx, o) {
   var ly = y + 80 + 8 * 30 + 6;
   s += '<path d="M' + (x + 16) + ' ' + (ly - 14) + 'h' + (w - 32) + '" stroke="#1d2a38" stroke-dasharray="3 3"/>' + t(x + 22, ly + 6, 'LOGBOOK LINES', { size: 14, f: 'h', fill: '#1d2a38', ls: '.06em' }) + t(x + w - 20, ly + 6, (o.lines || K.lines.slice(0, n)).length + ' line' + ((o.lines || K.lines.slice(0, n)).length === 1 ? '' : 's'), { size: 14, a: 'end', f: 'm', fill: '#4a5668' });
   (o.lines || K.lines.slice(0, n)).forEach(function (ln, j) { s += '<g class="' + (j === n - 1 && !o.still ? 'pgd-drop' : '') + '">' + t(x + 22, ly + 34 + j * 26, (j + 1) + '. ' + ln, { size: 15, f: 'm', fill: '#1d2a38' }) + '</g>'; });
-  return s;
+  return s + '</g>';
 }
 function line5b(n, fx, o) {
   o = o || {}; var s = '', y = 140, x0 = 460;
@@ -560,7 +560,7 @@ function seen5f() { return !!D.liveRes('5f'); }   // the expert labels of the 5 
 function unsure5f() { var L = L5(); if (!L) return null; var ids = L.unsure(5); return { L: L, cells: ids.map(function (id) { var i = L.at[id]; return { id: id, p: L.s[i], y: L.y[i], kind: L.v.kind[i] === 'p' ? 'poly' : 'mono' }; }) }; }
 function snap5f(q, x, y, fx, o) {   // the saved card on the shelf
   o = o || {};
-  return '<g' + (o.cls ? ' class="' + o.cls + '"' : '') + '>' + '<rect x="' + x + '" y="' + y + '" width="230" height="150" rx="6" fill="#efe9da"' + (fx ? ' filter="url(#' + fx.sh + ')"' : '') + '/>' +
+  return '<g class="pgd-keep' + (o.cls ? ' ' + o.cls : '') + '">' + '<rect x="' + x + '" y="' + y + '" width="230" height="150" rx="6" fill="#efe9da"' + (fx ? ' filter="url(#' + fx.sh + ')"' : '') + '/>' +
     t(x + 14, y + 26, 'SAVED CARD', { size: 14, f: 'h', fill: '#1d2a38', ls: '.06em' }) + t(x + 216, y + 26, 'cell-' + q.id, { size: 14, a: 'end', f: 'm', w: 700, fill: '#7a1020' }) +
     t(x + 14, y + 54, 'at: person desk', { size: 15, f: 'm', fill: '#1d2a38' }) + t(x + 14, y + 78, 'score: ' + f3(q.p), { size: 15, f: 'm', fill: '#1d2a38' }) + t(x + 14, y + 102, 'lane: person', { size: 15, f: 'm', fill: '#1d2a38' }) + t(x + 14, y + 126, 'answer: ' + (o.ans || '…waiting'), { size: 15, f: 'm', w: 700, fill: o.ans ? '#7a1020' : '#8a8274' }) + '</g>';
 }
