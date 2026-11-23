@@ -1,0 +1,12 @@
+{
+  "name": "PanelGuard",
+  "image": "mcr.microsoft.com/devcontainers/python:3.13",
+  "postCreateCommand": "pip install -r tools/takehome/requirements.txt && git clone --depth 1 https://github.com/zae-bayern/elpv-dataset tools/takehome/elpv-dataset",
+  "forwardPorts": [7860],
+  "portsAttributes": {
+    "7860": { "label": "PanelGuard operator console", "onAutoForward": "openBrowser" }
+  },
+  "customizations": {
+    "vscode": { "extensions": ["ms-python.python"] }
+  }
+}

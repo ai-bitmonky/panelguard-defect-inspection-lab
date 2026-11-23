@@ -6,3 +6,7 @@ tools/audit/shots/
 tools/audit/shots_sizes/
 tools/audit/shots_small/
 tools/audit/shots_v12/
+
+# student run outputs
+tools/takehome/elpv-dataset/
+tools/takehome/.venv/
