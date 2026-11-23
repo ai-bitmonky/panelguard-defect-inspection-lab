@@ -622,7 +622,7 @@ function tagTargets(st, want) {   // the asked tag first (keyboard order); the d
   [want, 'num'].forEach(function (k) {
     if (!k || st.used.indexOf(k) >= 0) return;
     var j = ['kind', 'sure', 'num'].indexOf(k), y = 126 + j * 112;
-    s += A.target('t_' + k, '<rect x="656" y="' + (y - 4) + '" width="262" height="92" rx="14" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { kind: 'drag', cls: 'pgd-nochip', to: snapTo(785, y + 42, 320, 290, 24) });
+    s += A.target('t_' + k, '<rect x="656" y="' + (y - 4) + '" width="262" height="92" rx="14" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { name: 'drag the ' + k + ' tag onto the mistakes pile', kind: 'drag', cls: 'pgd-nochip', to: snapTo(785, y + 42, 320, 290, 24) });
   });
   return s;
 }

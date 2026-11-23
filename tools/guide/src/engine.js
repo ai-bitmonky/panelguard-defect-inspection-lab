@@ -138,7 +138,7 @@ var A = {
       : k === 'hold' ? '<circle cx="' + ix + '" cy="' + iy + '" r="6.5" fill="none" stroke="#1a1103" stroke-width="2"/><circle cx="' + ix + '" cy="' + iy + '" r="3" fill="#1a1103"/>'
       : '<circle cx="' + ix + '" cy="' + iy + '" r="6.5" fill="none" stroke="#1a1103" stroke-width="2"/><circle cx="' + ix + '" cy="' + iy + '" r="1.8" fill="#1a1103"/>';
     return '<g class="pgd-target' + (o.cls ? ' ' + o.cls : '') + '" data-pgd-t="' + key + '" data-pgd-act="' + k + '"' + (o.to ? ' data-pgd-to="' + o.to + '"' : '') +
-      ' tabindex="0" role="button" aria-label="' + esc(label) + '"' + (o.style ? ' style="' + o.style + '"' : '') + '>' +
+      ' tabindex="0" role="button" aria-label="' + esc(o.name || label || key.replace(/[_-]/g, ' ')) + '"' + (o.style ? ' style="' + o.style + '"' : '') + '>' +
       '<g class="pgd-ring">' + shape + '</g>' + (o.inner || '') +
       '<g class="pgd-chip"><rect x="' + x0 + '" y="' + (ly - 19) + '" width="' + lw + '" height="30" rx="15" fill="' + COL.am + '"/>' + icon +
       A.t(x0 + 30 + (lw - 30) / 2 - 4, ly + 1, label.toUpperCase(), { size: 14, fill: '#1a1103', a: 'middle', w: 700, ls: '.06em' }) + '</g></g>';

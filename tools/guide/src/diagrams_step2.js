@@ -230,7 +230,7 @@ function tray2b(c, fx, opts) {
     });
     var lx = TC.x + (TC.r1 + 26) * Math.cos(am), ly = TC.y + (TC.r1 + 26) * Math.sin(am);
     g += t(lx, ly + 5, 'fold ' + (k + 1), { size: 15, a: 'middle', f: 'm', w: 700, fill: chk ? '#ffb547' : done ? C.gr : C.dim }) + '</g>';
-    if (opts && opts.tap && !done && !chk) s += A.target('f' + k, '<path d="' + wedge(TC.x, TC.y, TC.r0, TC.r1, a0, a1) + '" fill="#ffb547" fill-opacity=".08" stroke="#ffb547" stroke-width="3"/>', k === opts.first ? opts.label : '', TC.x, 462, { inner: g, cls: k === opts.first ? '' : 'pgd-nochip' });
+    if (opts && opts.tap && !done && !chk) s += A.target('f' + k, '<path d="' + wedge(TC.x, TC.y, TC.r0, TC.r1, a0, a1) + '" fill="#ffb547" fill-opacity=".08" stroke="#ffb547" stroke-width="3"/>', k === opts.first ? opts.label : '', TC.x, 462, { name: 'tap fold ' + (k + 1) + ' on the turntable', inner: g, cls: k === opts.first ? '' : 'pgd-nochip' });
     else s += g;
   }
   s += '<circle cx="' + TC.x + '" cy="' + TC.y + '" r="' + (TC.r0 - 4) + '" fill="#0a121c" stroke="#2b4157"/>' + t(TC.x, TC.y - 4, fmt(F.nTrain || 1574), { size: 19, a: 'middle', f: 'm', w: 700 }) + t(TC.x, TC.y + 18, 'train cells', { size: 14, a: 'middle', fill: C.dim });
@@ -526,7 +526,7 @@ function scene2e(c, fx) {
     s += t(bx + 80, b.y + 92, b.lab, { size: 16, a: 'middle', w: 700, fill: b.col });
     s += t(bx + 80, b.y + 116, k.toUpperCase(), { size: 13, a: 'middle', f: 'm', fill: C.dim2 });
     var pill = '<rect x="' + (bx + 30) + '" y="' + (b.y + 130) + '" width="100" height="40" rx="20" fill="' + (used ? '#0b121b' : b.col) + '" fill-opacity="' + (used ? 1 : .2) + '" stroke="' + b.col + '" stroke-width="2"' + (used ? ' stroke-dasharray="4 4"' : '') + '/>' + t(bx + 80, b.y + 157, String(R.r[k]), { size: 21, a: 'middle', f: 'm', w: 700, fill: used ? C.dim2 : '#fff' });
-    if (!used && st.j < 3) s += A.target('t' + k, '<rect x="' + (bx + 26) + '" y="' + (b.y + 126) + '" width="108" height="48" rx="24" fill="none" stroke="#ffb547" stroke-width="2.5"/>', '', 0, 0, { kind: 'drag', cls: 'pgd-nochip', to: '0,0', inner: '<g class="pgd-pill">' + pill + '</g>' });
+    if (!used && st.j < 3) s += A.target('t' + k, '<rect x="' + (bx + 26) + '" y="' + (b.y + 126) + '" width="108" height="48" rx="24" fill="none" stroke="#ffb547" stroke-width="2.5"/>', '', 0, 0, { name: 'drag the ' + b.lab + ' count into the report', kind: 'drag', cls: 'pgd-nochip', to: '0,0', inner: '<g class="pgd-pill">' + pill + '</g>' });
     else s += pill;
   });
   s += t(270, 500, 'validation tray · ' + R.n + ' cells · cutoff from 2d', { size: 15, a: 'middle', fill: C.dim });

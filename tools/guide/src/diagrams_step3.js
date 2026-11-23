@@ -78,7 +78,7 @@ function scene3a(c, fx) {
   var list = TRAY3A.slice().sort(function (a, b) { return (a === want ? -1 : 0) - (b === want ? -1 : 0); });   // the asked one first in the DOM (keyboard order); the picture keeps the tray order
   list.forEach(function (k) {
     var j = TRAY3A.indexOf(k), x = 616, y = 100 + j * 62, used = st.got.indexOf(k) >= 0;
-    if (!used && want) { var dd = AX[want].dock(); s += A.target('h_' + k, '<rect x="' + (x - 4) + '" y="' + (y - 4) + '" width="208" height="58" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { kind: 'drag', cls: 'pgd-nochip', to: snapTo(x + 100, y + 25, dd[0], dd[1], 24), inner: handle3a(k, x, y, false) }); }
+    if (!used && want) { var dd = AX[want].dock(); s += A.target('h_' + k, '<rect x="' + (x - 4) + '" y="' + (y - 4) + '" width="208" height="58" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { name: 'drag the ' + k + ' handle onto the stack', kind: 'drag', cls: 'pgd-nochip', to: snapTo(x + 100, y + 25, dd[0], dd[1], 24), inner: handle3a(k, x, y, false) }); }
     else s += handle3a(k, x, y, used);
   });
   if (want) s += '<g class="pgd-chip"><rect x="610" y="370" width="300" height="30" rx="15" fill="#ffb547"/>' + t(760, 391, 'DRAG A HANDLE TO THE ? MARK', { size: 14, a: 'middle', w: 700, fill: '#1a1103', ls: '.05em' }) + '</g>';
@@ -387,8 +387,8 @@ function judge3d(c, yes) {   // two answer buttons; the right one is first in th
   var s = '<g class="pgd-chip"><rect x="560" y="290" width="372" height="32" rx="16" fill="#ffb547"/>' + t(746, 312, 'COULD THE CAMERA TAKE THIS PHOTO?', { size: 14, a: 'middle', w: 700, fill: '#1a1103', ls: '.04em' }) + '</g>';
   var bY = '<rect x="560" y="336" width="178" height="58" rx="12" fill="#0b1f17" stroke="#3dffa0" stroke-width="2"/>' + t(649, 372, 'YES, IT COULD', { size: 16, a: 'middle', f: 'h', fill: C.gr });
   var bN = '<rect x="754" y="336" width="178" height="58" rx="12" fill="#1f0b12" stroke="#ff4d6a" stroke-width="2"/>' + t(843, 372, 'NO', { size: 16, a: 'middle', f: 'h', fill: C.rd });
-  var tY = A.target('yes', '<rect x="556" y="332" width="186" height="66" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { cls: 'pgd-nochip', inner: bY });
-  var tN = A.target('no', '<rect x="750" y="332" width="186" height="66" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { cls: 'pgd-nochip', inner: bN });
+  var tY = A.target('yes', '<rect x="556" y="332" width="186" height="66" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { cls: 'pgd-nochip', inner: bY, name: 'Yes, the camera could take it' });
+  var tN = A.target('no', '<rect x="750" y="332" width="186" height="66" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { cls: 'pgd-nochip', inner: bN, name: 'No, the camera could not' });
   s += yes ? tY + tN : tN + tY;
   if (c.state.wrong) s += t(746, 424, c.state.wrong, { size: 15, a: 'middle', fill: '#ff8aa0', cls: 'pgd-shake' });
   return s;
