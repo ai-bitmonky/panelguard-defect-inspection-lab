@@ -8,7 +8,7 @@
 // Run: cd tools/guide/tests && node guide.test.mjs   (env ONLY=1a,0b  limits parts 4-5; PARTS=1,2,3,4,5; MODES=mouse|keyboard)
 import { chromium } from 'playwright'; import { mirrorCDN } from '../../tests/cdn.mjs'; import path from 'path'; import { fileURLToPath } from 'url'; import fs from 'fs';
 const here = path.dirname(fileURLToPath(import.meta.url));
-const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v2.2.html');
+const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v' + (process.env.GV || '2.3') + '.html');
 const SHOTS = path.resolve(here, '../shots'); fs.mkdirSync(SHOTS, { recursive: true });
 const NEW = ['0a', '0b', '0c', '0d', '1a', '1b', '1c', '1d', '1e', '2a', '2b', '2c', '2d', '2e', '3a', '3b', '3c', '3d', '3e', '3f', '3g',
   '4a', '4b', '4c', '4d', '4e', '4f', '5a', '5b', '5c', '5d', '5e', '5f', '5g'];
