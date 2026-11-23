@@ -10,7 +10,8 @@ import { chromium } from 'playwright'; import { mirrorCDN } from '../../tests/cd
 const here = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v2.2.html');
 const SHOTS = path.resolve(here, '../shots'); fs.mkdirSync(SHOTS, { recursive: true });
-const NEW = ['0a', '0b', '0c', '0d', '1a', '1b', '1c', '1d', '1e', '2a', '2b', '2c', '2d', '2e', '3a', '3b', '3c', '3d', '3e', '3f', '3g'];
+const NEW = ['0a', '0b', '0c', '0d', '1a', '1b', '1c', '1d', '1e', '2a', '2b', '2c', '2d', '2e', '3a', '3b', '3c', '3d', '3e', '3f', '3g',
+  '4a', '4b', '4c', '4d', '4e', '4f', '5a', '5b', '5c', '5d', '5e', '5f', '5g'];
 const MODES = (process.env.MODES || 'mouse,keyboard').split(',');
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : NEW;
 const PARTS = (process.env.PARTS || '1,2,3,4,5').split(',').map(Number);
@@ -64,18 +65,32 @@ async function act(page, t, mode) {
     if ((await targets(page)).find((q) => q.key === t.key)) { await page.focus(sel).catch(() => {}); await page.keyboard.press('Enter'); }
   }
 }
+const SHOT_MID = process.env.MID !== '0', SMALL = {};
+/* smallest stage label on screen (px): font-size x the stage scale, over visible <text> of the stage */
+async function fontAudit(page, id, k, w) {
+  if (w > 1400) return;
+  const r = await page.evaluate(() => {
+    const svg = document.querySelector('#pgd-panel .pgd-stage'); if (!svg) return null;
+    const sc = svg.getBoundingClientRect().width / 960; let min = 99, txt = '';
+    svg.querySelectorAll('text').forEach((t) => { if (!t.textContent.trim() || t.closest('.pgd-chip') && getComputedStyle(t.closest('.pgd-chip')).display === 'none') return; const fs = parseFloat(t.getAttribute('font-size') || getComputedStyle(t).fontSize) * sc; if (fs < min) { min = fs; txt = t.textContent.slice(0, 30); } });
+    return { min: Math.round(min * 10) / 10, txt, sc: Math.round(sc * 1000) / 1000 };
+  });
+  if (r) { SMALL[id + ' f' + (k + 1)] = r; if (r.min < 12) log('SMALL', id, 'f' + (k + 1), r.min + 'px', JSON.stringify(r.txt), 'scale', r.sc); }
+}
 async function drive(page, id, mode, w) {
   await page.evaluate((i) => { window.PGD.reset(i); window.PGDiagram.open(i, 'diagram'); }, id);
   await page.waitForTimeout(300);
-  let f = await frameOf(page), steps = 0, shots = 0;
+  let f = await frameOf(page), steps = 0, shots = 0, sub = 0;
   const seen = new Set();
   while (f && steps < 60) {
-    if (!seen.has(f.i)) { seen.add(f.i); await page.waitForTimeout(700); await page.screenshot({ path: `${SHOTS}/g_${id}_f${f.i + 1}_${w}.png` }); shots++; }
+    if (!seen.has(f.i)) { seen.add(f.i); sub = 0; await page.waitForTimeout(700); await page.screenshot({ path: `${SHOTS}/g_${id}_f${f.i + 1}_${w}.png` }); shots++; await fontAudit(page, id, f.i, w); }
     const ts = await targets(page); if (!ts.length) break;
     const t = ts.find((q) => q.chip) || ts[0];
     await act(page, t, mode); steps++;
     await page.waitForTimeout(160);
-    f = await frameOf(page);
+    const f2 = await frameOf(page);
+    if (f2 && f && f2.i === f.i && SHOT_MID) { sub++; await page.waitForTimeout(450); await page.screenshot({ path: `${SHOTS}/g_${id}_f${f.i + 1}_a${sub}_${w}.png` }); }   // mid-frame state (frames with more than one action)
+    f = f2;
   }
   const end = await frameOf(page);
   expect(end && end.i === end.n - 1 && seen.size === end.n, `${id} ${mode}: reached the last frame (${end && end.i + 1}/${end && end.n}) in ${steps} actions, ${shots} screenshots`);
@@ -160,6 +175,7 @@ if (PARTS.includes(4)) {
     const { ctx, page, errors } = await openPage(w, h);
     for (const id of ONLY) { const e0 = errors.length; await drive(page, id, mode, w); if (errors.length > e0) expect(false, `${id} ${mode}: console errors ${errors.slice(e0).join(' | ')}`); }
     expect(errors.length === 0, `part 4 ${mode}: zero console errors` + (errors.length ? ': ' + JSON.stringify(errors.slice(0, 4)) : ''));
+    if (w < 1400) { const bad = Object.entries(SMALL).filter(([, r]) => r.min < 12); expect(bad.length === 0, `part 4 ${mode}: no stage label below 12 px at ${w} (` + (bad.length ? bad.map(([k, r]) => k + ' ' + r.min).join(', ') : 'smallest ' + Math.min(...Object.values(SMALL).map((r) => r.min)) + ' px') + ')'); }
     await ctx.close();
   }
 }
@@ -173,7 +189,7 @@ if (PARTS.includes(5)) {
     const r = await page.evaluate((i) => ({ printed: window.__printed, frames: document.querySelectorAll('.pgd-print .pgd-pframe').length, n: document.querySelector('#pgd-panel')._pgd.n,
       empty: [...document.querySelectorAll('.pgd-print .pgd-pstage')].filter((s) => s.innerHTML.length < 800).length }), id);
     expect(r.frames === r.n && r.empty === 0 && r.printed > 0, `${id} print: ${r.frames}/${r.n} frames as static pictures (empty ${r.empty})`);
-    if (id === '1a' || id === '0b' || id === '2d' || id === '3g') { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
+    if (id === '1a' || id === '0b' || id === '2d' || id === '3g' || id === '4b' || id === '5a') { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
     await page.evaluate(() => { document.body.classList.remove('pgd-printing'); });
   }
   await page.emulateMedia({ reducedMotion: 'reduce' });

@@ -593,13 +593,13 @@ function col4e(x, w, name, g, col, fx, o) {
   s += t(x + 18, 96, name.toUpperCase(), { size: 17, f: 'h', fill: col, ls: '.08em' }) + t(x + w - 18, 96, g.n + ' cells', { size: 15, a: 'end', f: 'm', fill: C.dim });
   var rate = g.def ? g.defPass / g.def : 0;
   s += '<text x="' + (x + 18) + '" y="146" font-family="' + A.FM + '" font-size="40" font-weight="700" fill="' + (rate > 0.05 ? '#ff8aa0' : '#fff') + '">' + p1(rate) + '</text>';
-  s += t(x + 18, 172, g.defPass + ' of ' + g.def + ' defects passed with no check', { size: 15, fill: C.dim });
+  s += t(x + 18, 172, g.defPass + ' of ' + g.def + ' defects passed', { size: 15, fill: C.dim });
   var D2 = dots4e(x + 18, 190, g, Math.floor((w - 36) / 13), 5); s += D2.svg;
   if (o.few) s += '<path d="M' + (x + 14) + ' ' + (196 + D2.h) + 'h' + (w - 28) + '" stroke="#ffb547" stroke-width="2" stroke-dasharray="5 4"/>' + t(x + 18, 220 + D2.h, 'Few dots: 1 cell = ' + (100 / g.def).toFixed(1) + ' points', { size: 15, w: 700, fill: C.am });
   var yc = Math.max(300, 250 + D2.h + (o.few ? 30 : 0));
   s += t(x + 18, yc, 'the mistakes', { size: 15, fill: C.dim });
   g.cells.slice(0, 8).forEach(function (c, j) { s += mcard(c, x + 18 + (j % 4) * 62, yc + 14 + Math.floor(j / 4) * 62, 50); });
-  s += t(x + 18, 500, 'to a person: ' + p0(g.person / g.n) + ' of its cells', { size: 15, f: 'm', fill: '#ffcf6b' });
+  s += t(x + 18, 500, 'to a person: ' + p0(g.person / g.n), { size: 15, f: 'm', fill: '#ffcf6b' });
   return s;
 }
 function shelf4e(st, fx, want) {
@@ -702,13 +702,17 @@ function cases4f() {
   return miss.concat(fa);
 }
 function card4f(q, x, y, S, o) {
-  o = o || {}; var col = q.kind === 'missed' ? '#ff4d6a' : '#ffb547', s = '';
-  s += '<rect x="' + (x - 8) + '" y="' + (y - 8) + '" width="' + (S + 16) + '" height="' + (S + (o.small ? 36 : 64)) + '" rx="6" fill="#e9e4d8"' + (o.fx ? ' filter="url(#' + o.fx.sh + ')"' : '') + '/>';
+  o = o || {}; var col = q.kind === 'missed' ? '#ff4d6a' : '#ffb547', s = '', sm = o.small;
+  s += '<rect x="' + (x - 6) + '" y="' + (y - 6) + '" width="' + (S + 12) + '" height="' + (S + (sm ? 46 : 64)) + '" rx="6" fill="#e9e4d8"' + (o.fx ? ' filter="url(#' + o.fx.sh + ')"' : '') + '/>';
   s += A.cell(q.id, x, y, S, { full: true, r: 1 }) + img(heatURL(q.cam, 16, 'f4' + q.id, { alpha: 1, floor: 0.45 }), x, y, S, { px: 1, op: .75 });
   s += '<circle cx="' + (x + S / 2) + '" cy="' + (y - 2) + '" r="6" fill="' + col + '" stroke="#5a1020"/>';
-  if (o.back) s += t(x, y + S + 20, 'expert ' + q.prob + ' · ' + q.type, { size: 14, f: 'm', w: 700, fill: q.prob > 0 && q.prob < 1 ? '#8a6a00' : '#283445' });
-  else s += t(x, y + S + 20, q.kind === 'missed' ? 'missed defect' : 'false alarm', { size: o.small ? 14 : 15, w: 700, fill: q.kind === 'missed' ? '#b0102e' : '#9a5a00' });
-  if (!o.small) s += t(x, y + S + 42, 'score ' + f3(q.b), { size: 14, f: 'm', fill: '#283445' });
+  if (sm) {
+    if (o.back) s += t(x, y + S + 17, 'exp ' + q.prob, { size: 14, f: 'm', w: 700, fill: q.prob > 0 && q.prob < 1 ? '#8a5a00' : '#283445' }) + t(x, y + S + 34, q.type, { size: 14, f: 'm', fill: '#4a5668' });
+    else s += t(x, y + S + 17, f3(q.b), { size: 14, f: 'm', w: 700, fill: q.kind === 'missed' ? '#b0102e' : '#9a5a00' });
+    return s;
+  }
+  s += t(x, y + S + 20, q.kind === 'missed' ? 'missed defect' : 'false alarm', { size: 15, w: 700, fill: q.kind === 'missed' ? '#b0102e' : '#9a5a00' });
+  s += t(x, y + S + 42, 'score ' + f3(q.b), { size: 14, f: 'm', fill: '#283445' });
   return s;
 }
 function board4f(c, fx, o) {
@@ -718,7 +722,7 @@ function board4f(c, fx, o) {
     s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="12" fill="#2a2016" stroke="' + b[3] + '" stroke-opacity=".7" stroke-width="2"/>' + '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="12" fill="url(#' + fx.vg + ')" opacity=".4"/>';
     s += t(x + 14, y + 28, b[1].toUpperCase(), { size: 15, f: 'h', fill: b[3], ls: '.06em' }) + t(x + 14, y + 48, b[2].toUpperCase(), { size: 15, f: 'h', fill: b[3], ls: '.06em' });
     s += '<circle cx="' + (x + w - 26) + '" cy="' + (y + 32) + '" r="18" fill="#0b121b" stroke="' + b[3] + '"/>' + '<text x="' + (x + w - 26) + '" y="' + (y + 39) + '" text-anchor="middle" font-family="' + A.FM + '" font-size="20" font-weight="700" fill="#fff">' + n.length + '</text>';
-    n.forEach(function (q, j) { s += '<g class="' + (st.last === q.id ? 'pgd-pop' : '') + '">' + card4f(q, x + 16 + (j % 3) * 66, y + 72 + Math.floor(j / 3) * 86, 46, { small: 1, back: o.back }) + '</g>'; });
+    n.forEach(function (q, j) { s += '<g class="' + (st.last === q.id ? 'pgd-pop' : '') + '">' + card4f(q, x + 16 + (j % 3) * 68, y + 70 + Math.floor(j / 3) * 76, 48, { small: 1, back: o.back }) + '</g>'; });
     if (st.held && !o.done) s += A.target('b_' + b[0], '<rect x="' + (x - 3) + '" y="' + (y - 3) + '" width="' + (w + 6) + '" height="' + (h + 6) + '" rx="14" fill="none" stroke="#ffb547" stroke-width="2.5" stroke-dasharray="6 5"/>', 'pin here', x + w / 2, y + h - 20, { cls: k ? 'pgd-nochip' : '' });
   });
   return s;
