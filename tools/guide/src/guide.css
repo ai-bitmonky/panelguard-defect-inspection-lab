@@ -186,6 +186,7 @@ details[open]>summary::before{transform:rotate(90deg)}
 .pgd-target.dragging{cursor:grabbing}
 .pgd-target[data-pgd-act=drag]{cursor:grab}
 .pgd-chip{pointer-events:none}
+.pgd-nochip>.pgd-chip{display:none}
 @keyframes pgdPulse{0%,100%{opacity:1}50%{opacity:.45}}
 @keyframes pgdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes pgdFade{from{opacity:0}to{opacity:1}}
