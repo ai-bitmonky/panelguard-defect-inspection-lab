@@ -112,21 +112,21 @@ function scene2a(c, o) {
   BENCH.forEach(function (b, i) { s += bench(b, i, st, fx); s += st.at > i ? '<g class="' + (st.at === i + 1 ? 'pgd-in' : '') + '">' + benchInside(b, i, id, 'crack', fx) + '</g>' : '<g opacity=".13">' + benchInside(b, i, id, 'good', fx) + '</g>' + t(b.x + BW / 2, BY + 150, 'waiting', { size: 16, a: 'middle', fill: C.dim2 }); });
   // the dock with the real photo
   s += A.glass(22, BY, 176, BH, { fx: fx, col: '#2b4157' }) + t(36, BY + 33, 'REAL CELL ' + id, { size: 15, f: 'h', fill: C.dim, ls: '.08em' }) + t(36, BY + 56, 'cracked, mono', { size: 15, fill: '#ff8aa0' });
-  if (st.at > 0) s += '<g opacity=".4">' + A.photoCard(id, 40, 92, 140, { full: true }) + '</g>' + (o && o.drag != null ? t(110, 270, 'now at bench ' + BENCH[Math.min(3, st.at) - 1].k, { size: 15, a: 'middle', fill: C.dim }) : '');
+  if (st.at > 0) s += '<g opacity=".4">' + A.photoCard(id, 40, 104, 140, { full: true }) + '</g>' + (o && o.drag != null ? t(110, 282, 'now at bench ' + BENCH[Math.min(3, st.at) - 1].k, { size: 15, a: 'middle', fill: C.dim }) : '');
   if (st.at > 0 && !(o && o.drag != null)) s += A.photoCard(id, BENCH[st.at - 1].x + 16, BY + 236, 44, { full: true });
   s += rack(st, fx);
   if (o && o.drag != null) {
-    var b = BENCH[o.drag], hx = st.at === 0 ? 40 : BENCH[st.at - 1].x + 16, hy = st.at === 0 ? 92 : BY + 236;
+    var b = BENCH[o.drag], hx = st.at === 0 ? 40 : BENCH[st.at - 1].x + 16, hy = st.at === 0 ? 104 : BY + 236;
     var sz = st.at === 0 ? 140 : 44, ccx = hx + sz / 2, ccy = hy + sz / 2, tx = ccx + Math.round((b.x + BW / 2 - ccx) / 40) * 40, ty = ccy + Math.round((BY + 150 - ccy) / 40) * 40;
     s += A.target('carry', '<rect x="' + (hx - 6) + '" y="' + (hy - 6) + '" width="' + (sz + 12) + '" height="' + (sz + 12) + '" rx="8" fill="none" stroke="#ffb547" stroke-width="3"/>',
-      'drag the photo to ' + b.k, st.at === 0 ? 110 : hx + 56, st.at === 0 ? 290 : BY + 262,
-      { kind: 'drag', to: tx + ',' + ty, inner: '<g class="pgd-carry">' + A.photoCard(id, hx, hy, sz, { fx: fx, full: true }) + '</g>', la: st.at === 0 ? 'middle' : 'start' });
-  } else if (st.at === 0) s += A.photoCard(id, 40, 92, 140, { fx: fx, full: true });
+      'drag the photo to ' + b.k, st.at === 0 ? 30 : hx + 56, st.at === 0 ? 300 : BY + 262,
+      { kind: 'drag', to: tx + ',' + ty, inner: '<g class="pgd-carry">' + A.photoCard(id, hx, hy, sz, { fx: fx, full: true }) + '</g>', la: 'start' });
+  } else if (st.at === 0) s += A.photoCard(id, 40, 104, 140, { fx: fx, full: true });
   return s;
 }
 function bind2a(c, root, to) {
   var el = root.querySelector('[data-pgd-t=carry]'); if (!el) return;
-  var st = c.state, hx = st.at === 0 ? 40 : BENCH[st.at - 1].x + 16, hy = st.at === 0 ? 92 : BY + 236, b = BENCH[to];
+  var st = c.state, hx = st.at === 0 ? 40 : BENCH[st.at - 1].x + 16, hy = st.at === 0 ? 104 : BY + 236, b = BENCH[to];
   var drag = D.onDrag(root, el, { start: { x: hx, y: hy }, step: 40,
     move: function (p) { el.setAttribute('transform', 'translate(' + (p.x - hx) + ' ' + (p.y - hy) + ')'); },
     drop: function (p) {

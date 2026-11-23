@@ -55,7 +55,7 @@ function stack3a(c, fx, st) {
   var on = function (k) { return st.got.indexOf(k) >= 0; };
   if (on('rows')) s += '<g class="' + (st.last === 'rows' ? 'pgd-in' : '') + '">' + A.arrow(x - 16, y, x - 16, y + S, AX.rows.col, { w: 3 }) + '<text x="' + (x - 26) + '" y="' + (y + S / 2) + '" font-family="' + A.FM + '" font-size="17" font-weight="700" fill="' + AX.rows.col + '" text-anchor="middle" transform="rotate(-90 ' + (x - 26) + ' ' + (y + S / 2) + ')">64 rows</text></g>';
   if (on('cols')) s += '<g class="' + (st.last === 'cols' ? 'pgd-in' : '') + '">' + A.arrow(x, y + S + 16, x + S, y + S + 16, AX.cols.col, { w: 3 }) + t(x + S / 2, y + S + 40, '64 columns', { size: 17, a: 'middle', f: 'm', w: 700, fill: AX.cols.col }) + '</g>';
-  if (on('phot')) { var k2 = S3A.n - 1; s += '<g class="' + (st.last === 'phot' ? 'pgd-in' : '') + '">' + A.arrow(x + S + 12, y - 6, x + S + 12 + k2 * S3A.ox, y - 6 + k2 * S3A.oy, AX.phot.col, { w: 3 }) + t(x + S + 30 + k2 * S3A.ox, y - 14 + k2 * S3A.oy, fmt(2624) + ' photos', { size: 17, f: 'm', w: 700, fill: AX.phot.col }) + '</g>'; }
+  if (on('phot')) { var k2 = S3A.n - 1; s += '<g class="' + (st.last === 'phot' ? 'pgd-in' : '') + '">' + A.arrow(x + S + 12, y - 6, x + S + 12 + k2 * S3A.ox, y - 6 + k2 * S3A.oy, AX.phot.col, { w: 3 }) + t(x + S + 12 + k2 * S3A.ox, y - 24 + k2 * S3A.oy, fmt(2624) + ' photos', { size: 17, a: 'end', f: 'm', w: 700, fill: AX.phot.col }) + '</g>'; }
   if (on('chan')) s += '<g class="' + (st.last === 'chan' ? 'pgd-in' : '') + '"><circle cx="' + (x + S + 64) + '" cy="' + (y + S + 6) + '" r="34" fill="#0b121b" stroke="' + AX.chan.col + '" stroke-width="2"/><rect x="' + (x + S + 40) + '" y="' + (y + S + 2) + '" width="48" height="8" fill="#8a8f96" stroke="' + AX.chan.col + '"/>' + t(x + S + 64, y + S + 30, '1 layer', { size: 14, a: 'middle', f: 'm', fill: AX.chan.col }) + '<path d="M' + (x + S - 4) + ' ' + (y + S - 4) + 'L' + (x + S + 34) + ' ' + (y + S + 4) + '" stroke="' + AX.chan.col + '" stroke-dasharray="3 3"/></g>';
   return s;
 }
@@ -287,7 +287,7 @@ function scene3c(c, fx, o) {
       t(848, yc + 8, '→ 1 score', { size: 20, a: 'middle', f: 'm', w: 700, fill: '#ff8aa0' }) + t(848, yc + 32, '0 = good, 1 = defect', { size: 14, a: 'middle', fill: C.dim }) + t(848, yc + 56, fmt(N.B.head || 129) + ' weights', { size: 14, a: 'middle', f: 'm', fill: C.dim }) + '</g>';
   }
   // the shelf of blocks
-  s += A.glass(28, 336, 904, 184, { fx: fx, col: '#22384d' }) + t(46, 362, o.head ? 'WEIGHTS PER BLOCK' : 'THE SHELF: FILTER BLOCKS', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+  s += A.glass(28, 336, 904, 184, { fx: fx, col: '#22384d' }) + t(46, 362, o.head ? 'WEIGHTS PER BLOCK' : 'THE SHELF', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
   if (!o.head) N.B.forEach(function (b, k) {
     var x = 60 + k * 214, y = 384, hide = k === 2 && !N.open;
     if (st.n > k) { s += '<rect x="' + x + '" y="' + y + '" width="190" height="104" rx="12" fill="none" stroke="' + BCOL[k] + '" stroke-opacity=".35" stroke-dasharray="5 5"/>' + t(x + 95, y + 58, 'in the network ✓', { size: 15, a: 'middle', fill: BCOL[k] }); return; }
@@ -295,7 +295,7 @@ function scene3c(c, fx, o) {
       [0, 1, 2].map(function (i) { return '<rect x="' + (x + 14 + i * 6) + '" y="' + (y + 18 - i * 4) + '" width="44" height="44" rx="3" fill="#0f2233" stroke="' + BCOL[k] + '" stroke-opacity=".6"/>'; }).join('') +
       t(x + 80, y + 34, 'block ' + (k + 1), { size: 17, w: 700, fill: BCOL[k] }) + t(x + 80, y + 58, (hide ? '?' : b.filt) + ' filters', { size: 15, f: 'm', fill: '#c7d4e4' }) +
       t(x + 14, y + 90, '3 × 3 each, then halve', { size: 14, fill: C.dim }) + '</g>';
-    if (st.n === k) s += A.target('blk', '<rect x="' + (x - 4) + '" y="' + (y - 4) + '" width="198" height="112" rx="15" fill="none" stroke="#ffb547" stroke-width="2.5"/>', 'drag into the network', x + 95, y - 12, { kind: 'drag', to: snapTo(x + 95, y + 52, SLOT[k].x + SLOT[k].f / 2, yc, 24), inner: brick });
+    if (st.n === k) s += A.target('blk', '<rect x="' + (x - 4) + '" y="' + (y - 4) + '" width="198" height="112" rx="15" fill="none" stroke="#ffb547" stroke-width="2.5"/>', 'drag into the network', x + 95, y + 128, { kind: 'drag', to: snapTo(x + 95, y + 52, SLOT[k].x + SLOT[k].f / 2, yc, 24), inner: brick });
     else s += brick;
   });
   else {   // bar chart of the weights per block
