@@ -376,6 +376,13 @@ function onHold(el, o) {
   el.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') stop(); });
 }
 
+/* ---------------- a thumbnail: frame 1 of a diagram, fresh state, static (no listeners) ---------------- */
+function thumbSVG(id) {
+  var spec = REG[id]; if (!spec) return '';
+  var c = ctxFor(id, 'print', {}); c.state = spec.init ? spec.init() : {}; c.next = c.redraw = c.setWork = c.rework = c.onCleanup = function () {};
+  try { return spec.frames[0].svg(c).replace(/<g class="pgd-chip">[\s\S]*?<\/g><\/g>/g, '</g>'); } catch (e) { log('thumb failed', id, e && e.message); return ''; }
+}
+
 /* ---------------- print: every frame as a static picture with its note and numbers ---------------- */
 function printHTML(id) {
   var spec = REG[id]; if (!spec) return '';
@@ -397,6 +404,6 @@ function printHTML(id) {
 
 window.PGD = { register: register, has: has, mount: mount, printHTML: printHTML, art: A, COL: COL, onTap: onTap, onDrag: onDrag, onHold: onHold, svgPoint: svgPoint,
   meta: meta, counts: counts, pixels: pixels, cellURL: cellURL, fullURL: fullURL, hasFull: hasFull, whenPack: whenPack, liveRes: liveRes, liveSub: liveSub,
-  workHTML: workHTML, val: val, M: M, predDone: predDone, countUp: countUp, fmt: fmt, pct: pct, esc: esc, reduced: reduced, log: log, ids: function () { return Object.keys(REG); },
+  workHTML: workHTML, thumbSVG: thumbSVG, val: val, M: M, predDone: predDone, countUp: countUp, fmt: fmt, pct: pct, esc: esc, reduced: reduced, log: log, ids: function () { return Object.keys(REG); },
   _sess: SESS, reset: function (id) { if (id) delete SESS[id]; else for (var k in SESS) delete SESS[k]; } };
 })();

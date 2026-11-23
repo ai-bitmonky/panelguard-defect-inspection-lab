@@ -34,7 +34,7 @@ var GROUP8A = [['model', 'bestW'], ['low', 'lowPoly', 'high'], ['flow']];
 function frozen8a() {
   var m = mech('8a'), f = m.frozen, R = F8().freeze || {};
   if (f) return { you: true, model: f.params != null ? fmt(f.params) + ' numbers · sum ' + f.model : '?', bestW: String(f.bestW), low: f3(f.low), lowPoly: f3(f.lowPoly), high: f3(f.high), flow: f.maxTries + ' tries · ' + (f.rules || []).join('/') };
-  return { you: false, model: fmt(R.params) + ' numbers', bestW: String(R.bestW), low: f3(R.low), lowPoly: f3(R.lowPoly), high: f3(R.high), flow: R.maxTries + ' tries · ' + [(R.rules || {}).dark, (R.rules || {}).blank, (R.rules || {}).flat].join('/') };
+  return { you: false, model: D.liveRes('3c') ? fmt(R.params) + ' numbers' : 'your 3c CNN', bestW: String(R.bestW), low: f3(R.low), lowPoly: f3(R.lowPoly), high: f3(R.high), flow: R.maxTries + ' tries · ' + [(R.rules || {}).dark, (R.rules || {}).blank, (R.rules || {}).flat].join('/') };
 }
 function cabinet8a(c, fx, o) {
   o = o || {}; var V = frozen8a(), L = c.state.locked, s = '';
@@ -255,7 +255,7 @@ function numline8c(c, fx, o) {
   s += '<path d="M' + X8(5) + ' 56V' + NL8.y + '" stroke="#ff5050" stroke-width="2.5" stroke-dasharray="7 5"/>' + t(X8(5) + 6, 74, 'TARGET 5', { size: 14, f: 'h', fill: '#ff5050' });
   var nn = dots.length, sh = nn > 60 ? 4 : 6;
   dots.forEach(function (d, i) { var b = Math.round(d * 2) / 2, k = cnt[b] = (cnt[b] || 0) + 1; s += '<circle cx="' + X8(b) + '" cy="' + (NL8.y - 8 - (k - 1) * (2 * sh + 1)) + '" r="' + sh + '" fill="#46e3ff"' + (i >= nn - (o.fresh || 0) ? ' class="pgd-drop"' : '') + '/>'; });
-  if (o.band) { var B = o.band; s += '<g class="pgd-pop"><rect x="' + X8(B[0]) + '" y="' + (NL8.y - 268) + '" width="' + (X8(B[1]) - X8(B[0])) + '" height="22" rx="11" fill="' + (o.bcol || '#ffb547') + '" opacity=".35" stroke="' + (o.bcol || '#ffb547') + '"/>' + t(X8(B[0]), NL8.y - 278, f1(B[0]), { size: 15, a: 'middle', f: 'm', w: 700, fill: o.bcol || '#ffb547' }) + t(X8(B[1]), NL8.y - 278, f1(B[1]), { size: 15, a: 'middle', f: 'm', w: 700, fill: o.bcol || '#ffb547' }) + t((X8(B[0]) + X8(B[1])) / 2, NL8.y - 252, o.blabel || '', { size: 14, a: 'middle', f: 'h', fill: '#fff' }) + '</g>'; }
+  if (o.band) { var B = o.band; s += '<g class="pgd-pop"><rect x="' + X8(B[0]) + '" y="' + (NL8.y - 268) + '" width="' + (X8(B[1]) - X8(B[0])) + '" height="22" rx="11" fill="' + (o.bcol || '#ffb547') + '" opacity=".35" stroke="' + (o.bcol || '#ffb547') + '"/>' + t(X8(B[0]), NL8.y - 278, f1(B[0]), { size: 15, a: 'middle', f: 'm', w: 700, fill: o.bcol || '#ffb547' }) + t(X8(B[1]), NL8.y - 278, f1(B[1]), { size: 15, a: 'middle', f: 'm', w: 700, fill: o.bcol || '#ffb547' }) + t((X8(B[0]) + X8(B[1])) / 2, NL8.y - 222, o.blabel || '', { size: 14, a: 'middle', f: 'h', fill: '#fff' }) + '</g>'; }
   if (o.band2) { var B2 = o.band2; s += '<rect x="' + X8(B2[0]) + '" y="' + (NL8.y - 230) + '" width="' + (X8(B2[1]) - X8(B2[0])) + '" height="14" rx="7" fill="#46e3ff" opacity=".3" stroke="#46e3ff" stroke-dasharray="4 3"/>' + t(X8(B2[1]) + 8, NL8.y - 218, 'middle 95% of your dots', { size: 14, fill: '#46e3ff' }); }
   return s;
 }
@@ -374,7 +374,7 @@ function work8d(kind, title) {
 }
 function frame8d(kind, cap, label, mk, bindFn) {
   return { cap: cap, note: 'No expert labels on the real line: the alarms watch what the camera CAN see — the scores and simple photo numbers — and compare their mix with the validation tray (PSI).',
-    svg: function (c) { var fx = A.fx(), done = c.state.did.indexOf(kind) >= 0, s = A.stage() + fx.defs + camera8d(c, fx, done ? kind : null) + gauges8d(c, fx, done ? kind : null); if (!done) s += mk(); else s += A.target('go', '<rect x="826" y="470" width="90" height="40" rx="20" fill="#1a2430" stroke="#46e3ff" stroke-width="2"/>' + t(871, 496, 'NEXT', { size: 14, a: 'middle', f: 'h', fill: '#46e3ff' }), 'next change', 812, 494, { la: 'end' }); return s; },
+    svg: function (c) { var fx = A.fx(), done = c.state.did.indexOf(kind) >= 0, s = A.stage() + fx.defs + camera8d(c, fx, done ? kind : null) + gauges8d(c, fx, done ? kind : null); if (!done) s += mk(); else s += A.target('go', '<rect x="826" y="470" width="90" height="40" rx="20" fill="#1a2430" stroke="#46e3ff" stroke-width="2"/>' + t(871, 496, 'NEXT', { size: 14, a: 'middle', f: 'h', fill: '#46e3ff' }), 'next change', 916, 456, { la: 'end' }); return s; },
     work: function (c) { return c.state.did.indexOf(kind) >= 0 ? work8d(kind, label) : [{ h: label }, { t: 'Do it on the camera.' }]; },
     on: { go: function (c) { c.next(); }, mix: function (c) { if (c.state.did.indexOf(kind) < 0) { c.state.did.push(kind); c.redraw(true); } } },
     bind: function (c, root) { if (bindFn && c.state.did.indexOf(kind) < 0) bindFn(c, root, kind); },
@@ -612,7 +612,7 @@ function info8g(k) {
   return { cam: ['Step 0', 'An EL photo of one cell: dark lines and patches are cracks.', 'cell ' + O.id + ' · 64 × 64 grey = ' + fmt(4096) + ' numbers', fmt(4096) + ' numbers'],
     split: ['Step 1', 'Split by cell: train / validation / test. Test sealed until Step 8.', fmt(Sp.sizes[0]) + ' · ' + fmt(Sp.sizes[1]) + ' · ' + fmt(Sp.sizes[2]) + ' — cell ' + O.id + ' is in validation', 'in validation'],
     svc: ['Step 2', fmt(((F.s2 || {}).dims || {}).F) + ' hand-made features → an SVC inspector.', 'score of cell ' + O.id + ': ' + f3(J.svc), f3(J.svc)],
-    cnn: ['Step 3', 'A CNN of 4 blocks learns its own features.', fmt((F.s3 || {}).total) + ' weights · score ' + f3(J.cnn), f3(J.cnn)],
+    cnn: ['Step 3', 'A CNN of 4 blocks learns its own features.', (D.liveRes('3c') ? fmt((F.s3 || {}).total) + ' weights · ' : '') + 'score ' + f3(J.cnn), f3(J.cnn)],
     gate: ['Step 3', 'Blend the two scores, then two gates.', J.w + ' × ' + f3(J.cnn) + ' + ' + (1 - J.w) + ' × ' + f3(J.svc) + ' = ' + f3(J.p) + (J.lane === 'STOP' ? ' ≥ ' + f3(J.hi) + ' → STOP' : ' → ' + J.lane), f3(J.p) + ' → ' + J.lane],
     why: ['Step 4', 'Heat maps show where the model looks; the deletion check tests them.', 'hot squares removed: score drops ' + f3(hot.dropHot) + ' vs random ' + f3(hot.dropRand), f3(hot.dropHot) + ' vs ' + f3(hot.dropRand)],
     flow: ['Step 5', 'Photo check → score → route → person → record.', 'brightness ' + f1(O.looks.bright) + ' ≥ dark rule ' + ((F.s5 || {}).rules || {}).dark + ' · lane ' + J.lane + ' · recorded', 'lane ' + J.lane],

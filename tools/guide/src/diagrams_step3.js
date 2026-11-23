@@ -226,7 +226,7 @@ D.register('3b', {
       for (var i = 0; i < 6; i++) col += conv3b(P, i, 4).out;
       s += '<rect x="' + (O3.x + 4 * O3.cs - 4) + '" y="' + (O3.y - 4) + '" width="' + (O3.cs + 5) + '" height="' + (6 * O3.cs + 5) + '" rx="7" fill="none" stroke="#3dffa0" stroke-width="3" class="pgd-pop"/>';
       s += t(O3.x + 4.5 * O3.cs, O3.y + 6 * O3.cs + 50, 'the crack', { size: 16, a: 'middle', w: 700, fill: C.gr });
-      s += A.glass(650, 420, 282, 96, { col: '#2f6b55' }).replace('<g', '<g') + t(668, 446, 'In 3c the network has', { size: 16, fill: C.dim }) + t(668, 476, '240 filters', { size: 24, f: 'm', w: 700, fill: C.gr }) + t(668, 502, 'and learns every number itself.', { size: 16, fill: C.dim });
+      s += A.glass(650, 420, 282, 96, { col: '#2f6b55' }).replace('<g', '<g') + t(668, 446, 'In 3c the network has', { size: 16, fill: C.dim }) + t(668, 476, D.liveRes('3c') ? '240 filters' : '4 blocks of filters', { size: 24, f: 'm', w: 700, fill: C.gr }) + t(668, 502, 'and learns every number itself.', { size: 16, fill: C.dim });
       return s;
     },
     work: function (c) {
@@ -234,7 +234,7 @@ D.register('3b', {
       var colv = [], rowv = []; for (var i = 0; i < 6; i++) colv.push(conv3b(P, i, 4).out);
       var b = 0; for (var j = 0; j < 3; j++) b += P[7][j] * 1 + P[7][j + 1] * (-2) + P[7][j + 2] * 1; void rowv;
       return [{ h: 'Crack column' }, { v: colv.join(', '), k: 'output down the crack: all high' }, { h: 'Busbar row alone' }, { v: P[7][0] + '×1 + ' + P[7][1] + '×(−2) + ' + P[7][2] + '×1', k: 'a flat dark row' }, { op: '=', v: String(P[7][0] - 2 * P[7][1] + P[7][2]), k: 'almost nothing: a flat line has no dark middle', res: true },
-        { t: 'The network in 3c has <b>240</b> filters like this one, in 4 blocks.' }, { tag: 'typical value' }];
+        { t: D.liveRes('3c') ? 'The network in 3c has <b>240</b> filters like this one, in 4 blocks.' : 'The network in 3c has 4 blocks of filters like this one (the count shows after you pass 3c).' }, { tag: 'typical value' }];
     } }
   ]
 });
@@ -277,7 +277,7 @@ function scene3c(c, fx, o) {
     s += A.arrow(prevX + 4, yc, sl.x - 6, yc, '#5d6b80', { w: 2, head: 8 });
     s += '<g class="' + (st.n === k + 1 && st.acted ? 'pgd-pop' : '') + '">' + slab3c(sl.x, yc, sl.f, sheets, thumb3c(k), BCOL[k]) + '</g>';
     s += t(sl.x + sl.f / 2 + sheets * 2.5, yc + 96, b.out + ' × ' + b.out + ' × ' + (hide ? '?' : b.filt), { size: 15, a: 'middle', f: 'm', w: 700, fill: BCOL[k] });
-    s += t(sl.x + sl.f / 2 + sheets * 2.5, yc + 118, (hide ? '?' : fmt(b.conv + b.bn)) + ' weights', { size: 14, a: 'middle', f: 'm', fill: C.dim });
+    s += t(sl.x + sl.f / 2 + sheets * 2.5, yc + 118, (hide || (k === 3 && !N.open) ? '?' : fmt(b.conv + b.bn)) + ' weights', { size: 14, a: 'middle', f: 'm', fill: C.dim });
     prevX = sl.x + sl.f + sheets * 5;
   });
   if (!o.head) s += '<rect x="770" y="' + (yc - 66) + '" width="160" height="132" rx="12" fill="none" stroke="#2b3a4c" stroke-width="2" stroke-dasharray="5 5"/>' + t(850, yc - 4, 'score head', { size: 15, a: 'middle', fill: C.dim2 }) + t(850, yc + 18, 'comes last', { size: 14, a: 'middle', fill: C.dim2 });
@@ -302,7 +302,7 @@ function scene3c(c, fx, o) {
     var ch = A.chart({ x: 170, y: 378, w: 720, h: 100, xd: [0, 80000], yd: [0, 5], xt: [0, 20000, 40000, 60000, 80000], fx: function (v) { return v ? (v / 1000) + 'k' : '0'; } });
     s += ch.svg.replace(/<rect[^>]*opacity=".55"\/>/, '');
     N.B.concat([{ head: 1 }]).forEach(function (b, k) {
-      var y = 384 + k * 19, v = b.head ? (N.B.head || 129) : b.conv + b.bn, hide = k === 2 && !N.open;
+      var y = 384 + k * 19, v = b.head ? (N.B.head || 129) : b.conv + b.bn, hide = (k === 2 || k === 3) && !N.open;   // block 4's count (3·3·64·128 + …) would give block 3's filters away
       s += t(160, y + 13, b.head ? 'score head' : 'block ' + (k + 1), { size: 14, a: 'end', fill: b.head ? '#ff8aa0' : BCOL[k] });
       if (!hide) s += '<rect class="pgd-in" x="170" y="' + y + '" width="' + Math.max(2, ch.X(v) - 170) + '" height="14" rx="3" fill="' + (b.head ? '#ff4d6a' : BCOL[k]) + '"/>' + t(ch.X(v) + 8, y + 12, fmt(v), { size: 14, f: 'm', fill: '#c7d4e4' });
       else s += A.lock(180, y + 12, 'after you pass 3c');
@@ -343,7 +343,7 @@ D.register('3c', {
   { cap: 'Average each map, then one score per cell',
     note: 'Each of the last maps is averaged to one number. One last layer turns those numbers into one defect score between 0 and 1.',
     svg: function (c) { return scene3c(c, A.fx(), { head: 1 }); },
-    work: function (c) { var N = net3c(); return clean([{ h: 'The score head' }, { v: '4 × 4 × 128 → 128', k: 'one average per map' }, { v: '128 + 1 = ' + (N.B.head || 129), k: 'weights + one bias in the last layer' }, { h: 'All weights' }, { v: fmt(N.total), k: 'learned in 3e, not set by hand', res: true }, srcTag(N.you)]); } }
+    work: function (c) { var N = net3c(); return clean([{ h: 'The score head' }, { v: '4 × 4 × 128 → 128', k: 'one average per map' }, { v: '128 + 1 = ' + (N.B.head || 129), k: 'weights + one bias in the last layer' }, { h: 'All weights' }, { v: N.open ? fmt(N.total) : '?', k: N.open ? 'learned in 3e, not set by hand' : 'shows after you pass 3c (it would give block 3 away)', res: true }, srcTag(N.you)]); } }
   ]
 });
 /* ============================ 3d  Make more photos for free ============================ */
@@ -573,7 +573,7 @@ D.register('3e', {
       s += A.glass(28, 60, 404, 400, { fx: fx, col: '#2f6b55' }) + t(48, 92, 'KEPT', { size: 15, f: 'h', fill: C.gr, ls: '.12em' });
       // a vault of weights
       for (var i = 0; i < 6; i++) for (var j = 0; j < 9; j++) s += '<rect x="' + (56 + j * 40) + '" y="' + (112 + i * 34) + '" width="32" height="26" rx="4" fill="#123326" stroke="#3dffa0" stroke-opacity=".5" class="' + ((i + j) % 3 ? '' : 'pgd-fade') + '"/>';
-      s += t(48, 344, show ? 'weights of epoch ' + H.best[0] : 'weights of the best epoch', { size: 20, w: 700, fill: '#fff' }) + t(48, 372, fmt(F3().total || 98001) + ' numbers put back', { size: 16, f: 'm', fill: C.dim });
+      s += t(48, 344, show ? 'weights of epoch ' + H.best[0] : 'weights of the best epoch', { size: 20, w: 700, fill: '#fff' }) + t(48, 372, (D.liveRes('3c') ? fmt(F3().total || 98001) + ' numbers' : 'all the weights') + ' put back', { size: 16, f: 'm', fill: C.dim });
       s += show ? t(48, 420, 'validation ' + H.best[1].toFixed(3) + ' (last epoch ' + H.h[H.h.length - 1][2].toFixed(3) + ')', { size: 16, f: 'm', fill: C.gr }) : A.lock(56, 420, 'after your 3e drawing');
       return s;
     },

@@ -21,8 +21,9 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a),
 const expect = (ok, what) => { log(ok ? 'OK  ' : 'FAIL', what); if (!ok) fails.push(what); };
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
 
-async function openPage(w, h, hash = '') {
+async function openPage(w, h, hash = '', o = {}) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h } }); await mirrorCDN(ctx);
+  if (!o.hint) await ctx.addInitScript(() => { try { localStorage.setItem('pgd-hint-v3', '1'); } catch (e) {} });
   const page = await ctx.newPage(); const errors = [];
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 300)); });
   page.on('pageerror', (e) => errors.push('PAGEERROR ' + e.message));
@@ -127,8 +128,10 @@ if (PARTS.some((p) => p <= 3)) {
     await page.evaluate(() => window.PGDiagram.open('0a'));
     const ids = await page.evaluate(() => [...document.querySelectorAll('.pgd-list [data-lesson]')].map((b) => b.dataset.lesson));
     expect(ids.length === 55, `step list has 55 substeps (${ids.length})`);
-    const soon = await page.evaluate(() => [...document.querySelectorAll('.pgd-list .pgd-soon')].length);
-    expect(soon === 55 - NEW.length, `${55 - NEW.length} substeps tagged "new diagram coming" (${soon})`);
+    const soon = await page.evaluate(() => document.querySelectorAll('.pgd-soon, .pgd-legacy').length + (window.PGDLegacy ? 1 : 0));
+    expect(soon === 0, `no legacy diagram, wrapper or "new diagram coming" tag left (${soon})`);
+    const noDia = await page.evaluate((ids) => ids.filter((i) => !window.PGD.has(i)), ids);
+    expect(noDia.length === 0, `all 55 substeps have a new-engine diagram (${noDia.join(',') || 'none missing'})`);
     let bad = [];
     for (const id of ids) {
       const e0 = errors.length;
@@ -142,7 +145,15 @@ if (PARTS.some((p) => p <= 3)) {
       if (errors.length > e0) bad.push(id + ' errors: ' + errors.slice(e0).join(' | '));
     }
     expect(bad.length === 0, 'all 55 substeps x all tabs render with zero console errors' + (bad.length ? ' — ' + bad.slice(0, 8).join('; ') : ''));
-    await page.click('.pgd-list [data-lesson="4b"]'); await page.click('#pgd-tab-diagram'); await page.waitForTimeout(200); await page.screenshot({ path: `${SHOTS}/g_legacy_4b_1366.png` });
+    // All diagrams grid: 55 cards, lazy thumbnails, done marks, a card opens its diagram
+    await page.click('[data-guide=grid]'); await page.waitForTimeout(500);
+    const g = await page.evaluate(() => ({ cards: document.querySelectorAll('.pgd-gcard').length, drawn: document.querySelectorAll('.pgd-gthumb svg').length, steps: document.querySelectorAll('.pgd-gh').length, marks: document.querySelectorAll('.pgd-gmark').length }));
+    expect(g.cards === 55 && g.steps === 9 && g.marks === 55 && g.drawn > 0 && g.drawn < 55, `All diagrams grid: ${g.cards} cards in ${g.steps} steps, ${g.drawn} thumbnails drawn lazily, ${g.marks} done marks`);
+    await page.screenshot({ path: `${SHOTS}/g_grid_1366.png` });
+    await page.evaluate(() => { const p = document.querySelector('#pgd-panel'); p.scrollTop = p.scrollTop > 200 ? 0 : p.scrollHeight; }); await page.waitForTimeout(400);
+    expect(await page.evaluate(() => document.querySelectorAll('.pgd-gthumb svg').length) > g.drawn, 'grid: scrolling draws more thumbnails');
+    await page.click('.pgd-gcard[data-grid="8c"]'); await page.waitForTimeout(300);
+    expect(await page.evaluate(() => window.PGDiagram.selected() === '8c' && window.PGDiagram.tab() === 'diagram' && !!document.querySelector('#pgd-panel .pgd-stage') && !window.PGDiagram.gridOn()), 'grid card 8c opens the 8c diagram');
     await page.click('.pgd-list [data-lesson="2b"]');
     await page.click('#pgd-tab-code'); await page.waitForTimeout(100); await page.screenshot({ path: `${SHOTS}/g_code_2b_1366.png` });
     await page.click('#pgd-tab-overview'); await page.waitForTimeout(100); await page.screenshot({ path: `${SHOTS}/g_overview_2b_1366.png` });
@@ -164,6 +175,15 @@ if (PARTS.some((p) => p <= 3)) {
   await ctx.close();
 }
 if (PARTS.includes(2)) {
+  { const { ctx, page, errors } = await openPage(1366, 768, '', { hint: true });
+    await page.evaluate(() => window.PGDiagram.open('0a', 'diagram')); await page.waitForTimeout(300);
+    const h1 = await page.evaluate(() => { const h = document.querySelector('#pgd-panel .pgd-hint'), st = document.querySelector('#pgd-panel .pgd-stage'); if (!h || !st) return null; const a = h.getBoundingClientRect(), b = st.getBoundingClientRect(); return { over: a.bottom > b.top + 1, text: h.innerText.length }; });
+    expect(h1 && !h1.over && h1.text > 40, 'first open: the "how diagrams work" strip shows above the picture, not over it');
+    await page.screenshot({ path: `${SHOTS}/g_hint_1366.png` });
+    await page.click('[data-guide=hint]'); await page.waitForTimeout(150);
+    await page.evaluate(() => window.PGDiagram.open('1a', 'diagram')); await page.waitForTimeout(200);
+    expect(await page.evaluate(() => !document.querySelector('.pgd-hint') && localStorage.getItem('pgd-hint-v3') === '1'), 'hint: dismissed once, stays away');
+    expect(errors.length === 0, 'hint: zero console errors'); await ctx.close(); }
   const { ctx, page, errors } = await openPage(1366, 768, '#guide-1c');
   await page.waitForTimeout(500);
   expect(await page.evaluate(() => window.PGDiagram.isOpen() && window.PGDiagram.selected() === '1c'), 'deep link #guide-1c opens the guide at 1c');
@@ -191,13 +211,24 @@ if (PARTS.includes(5)) {
     const r = await page.evaluate((i) => ({ printed: window.__printed, frames: document.querySelectorAll('.pgd-print .pgd-pframe').length, n: document.querySelector('#pgd-panel')._pgd.n,
       empty: [...document.querySelectorAll('.pgd-print .pgd-pstage')].filter((s) => s.innerHTML.length < 800).length }), id);
     expect(r.frames === r.n && r.empty === 0 && r.printed > 0, `${id} print: ${r.frames}/${r.n} frames as static pictures (empty ${r.empty})`);
-    if (['1a', '0b', '2d', '3g', '4b', '5a', '6f', '6c', '7e', '7f'].includes(id)) { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
+    if (['1a', '0b', '2d', '3g', '4b', '5a', '5b', '6f', '6c', '7e', '7f', '8a', '8c', '8f'].includes(id)) { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
     await page.evaluate(() => { document.body.classList.remove('pgd-printing'); });
   }
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.evaluate(() => { window.PGD.reset('0a'); window.PGDiagram.open('0a', 'diagram'); });
-  const anim = await page.evaluate(() => getComputedStyle(document.querySelector('.pgd-target .pgd-ring > *')).animationName);
-  expect(anim === 'none', 'reduced motion: the target pulse is off (' + anim + ')');
+  for (const id of ['0a', '1c', '2c', '3f', '4b', '5c', '6e', '7b', '8g']) {   // one per step: no pulse, and acting adds no motion class
+    await page.evaluate((i) => { window.PGD.reset(i); window.PGDiagram.open(i, 'diagram'); }, id); await page.waitForTimeout(150);
+    const anim = await page.evaluate(() => { const r = document.querySelector('#pgd-panel .pgd-target .pgd-ring > *'); return r ? getComputedStyle(r).animationName : 'none'; });
+    const t0 = (await targets(page)).find((q) => q.chip); if (t0) { await act(page, t0, 'mouse'); await page.waitForTimeout(200); }
+    const moving = await page.evaluate(() => { const st = document.querySelector('#pgd-panel .pgd-stage'); return st.classList.contains('pgd-acted') || st.classList.contains('pgd-enter') || [...st.querySelectorAll('*')].some((e) => { const c = getComputedStyle(e); return c.animationName !== 'none' && parseFloat(c.animationDuration) > 0.02; }); });
+    expect(anim === 'none' && !moving, `reduced motion ${id}: no pulse, no motion after an action (${anim})`);
+  }
+  // accessibility: every target has a name, role and tab stop; the focus ring is visible
+  const a11y = await page.evaluate(async (ids) => { const bad = []; for (const id of ids) { window.PGD.reset(id); window.PGDiagram.open(id, 'diagram'); await new Promise((r) => setTimeout(r, 30)); document.querySelectorAll('#pgd-panel .pgd-target').forEach((t) => { if (!(t.getAttribute('aria-label') || '').trim() || t.getAttribute('role') !== 'button' || t.getAttribute('tabindex') !== '0') bad.push(id); }); } return bad; }, ONLY);
+  expect(a11y.length === 0, 'every target (frame 1 of each diagram) has an accessible name, role=button, tabindex 0' + (a11y.length ? ': ' + a11y.join(',') : ''));
+  await page.evaluate(() => { window.PGD.reset('2c'); window.PGDiagram.open('2c', 'diagram'); }); await page.focus('#pgd-panel .pgd-target'); await page.waitForTimeout(100);
+  const ring = await page.evaluate(() => getComputedStyle(document.querySelector('#pgd-panel .pgd-target .pgd-ring')).filter);
+  expect(/drop-shadow/.test(ring), 'focus ring visible on a focused target (' + ring.slice(0, 40) + ')');
+  await page.screenshot({ path: `${SHOTS}/g_focus_2c_1366.png` });
   expect(errors.length === 0, 'part 5: zero console errors' + (errors.length ? ': ' + JSON.stringify(errors.slice(0, 4)) : ''));
   await ctx.close();
 }

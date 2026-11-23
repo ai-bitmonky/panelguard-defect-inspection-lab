@@ -1,19 +1,22 @@
 /* PanelGuard Diagram guide — the shell: a full-screen overlay with a step list (search + stage filter), four tabs per
    substep (Overview / Diagram / Code explained / Hints & checks), Print this step, Previous / Next, deep links
    (#guide-1a or ?guide=1a) and the launch buttons the lab uses (window.PGDiagram.help(id) on every lab page).
-   Text content comes from window.PGTeach.data (the old guide's data, kept as it is). New diagrams come from window.PGD;
-   substeps without one show their old diagram (window.PGDLegacy) in a dark wrapper. */
+   Text content comes from window.PGTeach.data (the old guide's data, kept as it is). Every substep's diagram comes from window.PGD.
+   Chrome (v3.0): a one-time "how diagrams work" strip above the first diagram, and an "All diagrams" grid (55 lazy thumbnails by
+   step, done marks from the lab) reachable from the header. */
 (function () {
 'use strict';
-var T = window.PGTeach, D = window.PGD, L = window.PGDLegacy;
+var T = window.PGTeach, D = window.PGD;
 if (!T || !T.data) { try { console.log('[guide] PGTeach data missing: guide not built'); } catch (e) {} return; }
 var esc = D.esc;
 var IDS = Object.keys(T.data);
 var info = function (id) { return T.data[id]; };
-var selected = IDS[0], tab = 'overview', dialog = null, filter = 'all', query = '', returnFocus = null, oldHash = null;
+var selected = IDS[0], tab = 'overview', dialog = null, filter = 'all', query = '', returnFocus = null, oldHash = null, gridOn = false;
 var TABN = { overview: 'Overview', diagram: 'Diagram', code: 'Code explained', practice: 'Hints & checks' };
 function tabsFor(id) { return info(id).blocks.length ? ['overview', 'diagram', 'code', 'practice'] : ['overview', 'diagram', 'practice']; }
-function isNew(id) { return D.has(id); }
+function labDone(id) { try { return !!(window.PG && window.PG.passed && window.PG.passed(id)); } catch (e) { return false; } }
+var HINT_KEY = 'pgd-hint-v3';
+function hintSeen() { try { return localStorage.getItem(HINT_KEY) === '1'; } catch (e) { return true; } }
 var STAGES = {};
 IDS.forEach(function (id) { if (!STAGES[id[0]]) STAGES[id[0]] = info(id).stageTitle; });
 
@@ -27,13 +30,6 @@ function overview(id) {
     '<div class="pgd-io-c out"><p class="pgd-k">You make</p><p>' + esc(d.output) + '</p></div></section>' +
     '<section class="pgd-done"><p class="pgd-k">Done looks like</p><p>' + esc(d.check) + '</p></section>' +
     '<details class="pgd-more"><summary>Where this fits in the course</summary><p>' + esc(d.stagePurpose) + '</p></details></div>';
-}
-function legacy(id) {
-  var d = info(id), svg = '';
-  try { svg = L ? L.svg(id) : ''; } catch (e) { svg = ''; try { console.log('[guide] old diagram failed', id, e && e.message); } catch (x) {} }
-  return '<div class="pgd-legacy"><div class="pgd-legacy-pic">' + svg + '</div></div>' +
-    '<div class="pgd-read"><p class="pgd-k">Reading the diagram</p><p>' + esc(d.read) + '</p></div>' +
-    (L && L.data[id] ? '<details class="pgd-more"><summary>A note about this picture</summary><p>' + esc(L.data[id].note) + '</p></details>' : '');
 }
 function codeView(id, printing) {
   var d = info(id);
@@ -69,7 +65,7 @@ function renderNav() {
   vis.forEach(function (id) {
     if (id[0] !== prev) { prev = id[0]; html += '<h3 class="pgd-sh"><span>STEP ' + id[0] + '</span>' + esc(STAGES[id[0]]) + '</h3>'; }
     html += '<button type="button" class="pgd-item' + (id === selected ? ' cur' : '') + '" data-lesson="' + id + '"' + (id === selected ? ' aria-current="step"' : '') + '>' +
-      '<span class="pgd-num">' + id + '</span><span class="pgd-nm">' + esc(info(id).name) + (isNew(id) ? '' : '<em class="pgd-soon">new diagram coming</em>') + '</span></button>';
+      '<span class="pgd-num">' + id + '</span><span class="pgd-nm">' + esc(info(id).name) + '</span>' + (labDone(id) ? '<span class="pgd-done-dot" title="done in the lab" aria-label="done in the lab">✓</span>' : '') + '</button>';
   });
   dialog.querySelector('.pgd-list').innerHTML = html || '<p class="pgd-empty">No step matches. Try another word.</p>';
   dialog.querySelector('.pgd-count').textContent = vis.length + ' of ' + IDS.length + ' steps';
@@ -85,7 +81,7 @@ function renderStep() {
   var panel = dialog.querySelector('#pgd-panel');
   panel.setAttribute('aria-labelledby', 'pgd-tab-' + tab);
   panel.className = 'pgd-panel tab-' + tab;
-  if (tab === 'diagram') { if (isNew(selected)) { panel.innerHTML = ''; D.mount(panel, selected); } else panel.innerHTML = legacy(selected); }
+  if (tab === 'diagram') { panel.innerHTML = ''; D.mount(panel, selected); if (!hintSeen()) addHint(panel); }
   else panel.innerHTML = tab === 'code' ? codeView(selected) : tab === 'practice' ? practice(selected) : overview(selected);
   panel.scrollTop = 0;
   var i = IDS.indexOf(selected);
@@ -97,8 +93,41 @@ function renderStep() {
   renderNav();
   setHash('#guide-' + selected);
 }
+/* ---------- the one-time "how diagrams work" strip (never covers the picture) ---------- */
+function addHint(panel) {
+  var h = document.createElement('div'); h.className = 'pgd-hint'; h.setAttribute('role', 'note');
+  h.innerHTML = '<p><b>How the diagrams work:</b> <span class="pgd-hk"><i class="pgd-hchip">TAP</i> do the action written on the orange label, right on the picture.</span>' +
+    '<span class="pgd-hk"><i class="pgd-hdot"></i> the dots under the picture go back to an earlier frame.</span><span class="pgd-hk">The right strip works out the numbers.</span></p>' +
+    '<button type="button" class="pgd-btn" data-guide="hint">Got it</button>';
+  panel.insertBefore(h, panel.firstChild);
+}
+/* ---------- All diagrams: a grid of the 55 diagrams by step (thumbnails drawn lazily, frame 1 of each) ---------- */
+var io = null;
+function renderGrid() {
+  var panel = dialog.querySelector('#pgd-panel'), prev = '', html = '', done = 0;
+  IDS.forEach(function (id) {
+    if (id[0] !== prev) { if (prev) html += '</div>'; prev = id[0]; html += '<h3 class="pgd-gh"><span>STEP ' + id[0] + '</span>' + esc(STAGES[id[0]]) + '</h3><div class="pgd-grid">'; }
+    var ok = labDone(id); if (ok) done++;
+    html += '<button type="button" class="pgd-gcard' + (id === selected ? ' cur' : '') + '" data-grid="' + id + '" aria-label="' + id + ' ' + esc(info(id).name) + (ok ? ', done in the lab' : ', not done yet') + '">' +
+      '<span class="pgd-gthumb" data-thumb="' + id + '"></span><span class="pgd-gname"><b>' + id + '</b>' + esc(info(id).name) + '</span><span class="pgd-gmark ' + (ok ? 'ok' : '') + '" aria-hidden="true">' + (ok ? '✓ done' : 'not done') + '</span></button>';
+  });
+  panel.className = 'pgd-panel tab-grid';
+  panel.innerHTML = '<div class="pgd-gtop"><p>All ' + IDS.length + ' diagrams · <b>' + done + '</b> substeps done in the lab. Pick one to open its diagram.</p></div>' + html + '</div>';
+  dialog.querySelector('.pgd-kick').innerHTML = '<span>OVERVIEW</span>All diagrams';
+  dialog.querySelector('#pgd-title').innerHTML = '<span class="pgd-tid">55</span>All diagrams';
+  dialog.querySelector('.pgd-tabs').innerHTML = '<button type="button" role="tab" id="pgd-tab-back" aria-selected="false" data-gridback="1">← Back to ' + selected + '</button>';
+  panel.setAttribute('aria-labelledby', 'pgd-title');
+  var thumbs = panel.querySelectorAll('[data-thumb]');
+  function draw(el) { if (el.firstChild) return; el.innerHTML = '<svg viewBox="0 0 960 540" aria-hidden="true" focusable="false">' + D.thumbSVG(el.getAttribute('data-thumb')) + '</svg>'; }
+  if (io) io.disconnect();
+  if ('IntersectionObserver' in window) { io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { draw(e.target); io.unobserve(e.target); } }); }, { root: panel, rootMargin: '200px' }); thumbs.forEach(function (el) { io.observe(el); }); }
+  else thumbs.forEach(draw);
+  panel.scrollTop = 0;
+  var cur = panel.querySelector('.pgd-gcard.cur'); if (cur) { try { cur.focus({ preventScroll: false }); } catch (e) {} }
+}
+function showGrid(on) { gridOn = on; dialog.querySelector('[data-guide=grid]').setAttribute('aria-pressed', on ? 'true' : 'false'); if (on) renderGrid(); else renderStep(); }
 function setHash(h) { try { if (h) history.replaceState(history.state, '', location.pathname + location.search + h); } catch (e) {} }
-function select(id) { if (!T.data[id]) return; selected = id; renderStep(); }
+function select(id) { if (!T.data[id]) return; selected = id; gridOn = false; dialog.querySelector('[data-guide=grid]').setAttribute('aria-pressed', 'false'); renderStep(); }
 
 /* ---------- print ---------- */
 var sheet = null;
@@ -106,7 +135,7 @@ function cleanPrint() { document.body.classList.remove('pgd-printing'); if (shee
 function printStep() {
   if (!sheet) { sheet = document.createElement('div'); sheet.className = 'pgd-print'; document.body.appendChild(sheet); }
   var d = info(selected);
-  var pic = isNew(selected) ? D.printHTML(selected) : '<div class="pgd-legacy-print">' + (L ? L.svg(selected) : '') + '</div><p>' + esc(d.read) + '</p>';
+  var pic = D.printHTML(selected);
   sheet.innerHTML = '<header class="pgd-ph"><p>PanelGuard · Diagram guide · Step ' + selected[0] + ' · ' + esc(d.stageTitle) + '</p><h1>' + selected + ' · ' + esc(d.name) + '</h1></header>' +
     overview(selected) + '<h2>Diagram</h2>' + pic + (d.blocks.length ? '<h2>Code explained</h2>' + codeView(selected, true) : '') + '<h2>Hints &amp; checks</h2>' + practice(selected);
   document.body.classList.add('pgd-printing');
@@ -120,7 +149,7 @@ function build() {
   dialog.innerHTML = '<div class="pgd-shell">' +
     '<header class="pgd-top"><div class="pgd-brand"><b>PANELGUARD</b><span class="pgd-sep">/</span><span class="pgd-gt">DIAGRAM GUIDE</span></div>' +
     '<p class="pgd-sub">Pictures, code and hints for every step.</p>' +
-    '<div class="pgd-acts"><button type="button" class="pgd-btn" data-guide="print"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8V2h10v6M5 15H3V8h14v7h-2M5 12h10v6H5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Print this step</button>' +
+    '<div class="pgd-acts"><button type="button" class="pgd-btn" data-guide="grid" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 3h5v5H3zM12 3h5v5h-5zM3 12h5v5H3zM12 12h5v5h-5z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>All diagrams</button><button type="button" class="pgd-btn" data-guide="print"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8V2h10v6M5 15H3V8h14v7h-2M5 12h10v6H5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Print this step</button>' +
     '<button type="button" class="pgd-btn pri" data-guide="close" aria-label="Close the guide and go back to the lab">Back to lab<span aria-hidden="true" class="pgd-x">✕</span></button></div></header>' +
     '<div class="pgd-body"><aside class="pgd-side" aria-label="Guide steps">' +
     '<label class="pgd-sr" for="pgd-search">Find a step</label><div class="pgd-search"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input id="pgd-search" type="search" placeholder="Find a step, word or code…" autocomplete="off"></div>' +
@@ -135,10 +164,14 @@ function build() {
   dialog.addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b || !dialog.contains(b)) return;
     if (b.dataset.lesson) { select(b.dataset.lesson); var it = dialog.querySelector('[data-lesson="' + selected + '"]'); if (it) it.focus(); return; }
+    if (b.dataset.grid) { tab = 'diagram'; select(b.dataset.grid); var tb0 = dialog.querySelector('#pgd-tab-diagram'); if (tb0) tb0.focus(); return; }
+    if (b.dataset.gridback) { showGrid(false); return; }
     if (b.dataset.tab) { tab = b.dataset.tab; renderStep(); dialog.querySelector('#pgd-tab-' + tab).focus(); return; }
     var a = b.dataset.guide;
     if (a === 'close') dialog.close();
-    if (a === 'print') printStep();
+    if (a === 'grid') showGrid(!gridOn);
+    if (a === 'hint') { try { localStorage.setItem(HINT_KEY, '1'); } catch (e) {} var hn = dialog.querySelector('.pgd-hint'); if (hn) hn.remove(); var st = dialog.querySelector('#pgd-panel .pgd-target'); if (st) { try { st.focus(); } catch (e) {} } }
+    if (a === 'print') { if (gridOn) showGrid(false); printStep(); }
     if (a === 'prev' || a === 'next') { var i = IDS.indexOf(selected) + (a === 'next' ? 1 : -1); if (IDS[i]) select(IDS[i]); }
     if (a === 'expand' || a === 'collapse') dialog.querySelectorAll('#pgd-panel .pgd-block').forEach(function (x) { x.open = a === 'expand'; });
   });
@@ -164,6 +197,7 @@ function open(id, t) {
   if (id && T.data[id]) { selected = id; tab = t && TABN[t] ? t : 'overview'; }
   query = ''; filter = 'all'; dialog.querySelector('#pgd-search').value = ''; dialog.querySelector('#pgd-stage').value = 'all';
   if (!dialog.open) { try { dialog.showModal(); } catch (e) { dialog.setAttribute('open', ''); } }
+  gridOn = false; dialog.querySelector('[data-guide=grid]').setAttribute('aria-pressed', 'false');
   renderStep();
   var it = dialog.querySelector('[data-lesson="' + selected + '"]'); if (it) it.scrollIntoView({ block: 'nearest' });
   var tb = dialog.querySelector('#pgd-tab-' + tab); if (tb) { try { tb.focus({ preventScroll: true }); } catch (e) {} }
@@ -175,7 +209,8 @@ function help(id) {
   b.onclick = function () { open(id); };
   return b;
 }
-window.PGDiagram = { open: open, help: help, data: T.data, svg: function (id) { return L ? L.svg(id) : ''; }, panel: function (id, view) { return view === 'code' ? codeView(id) : view === 'practice' ? practice(id) : view === 'diagram' ? (isNew(id) ? D.printHTML(id) : legacy(id)) : overview(id); },
+window.PGDiagram = { open: open, help: help, data: T.data, svg: function (id) { return D.has(id) ? '<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">' + D.thumbSVG(id) + '</svg>' : ''; }, panel: function (id, view) { return view === 'code' ? codeView(id) : view === 'practice' ? practice(id) : view === 'diagram' ? D.printHTML(id) : overview(id); },
+  grid: function () { if (!dialog || !dialog.open) open(); showGrid(true); }, gridOn: function () { return gridOn; },
   isOpen: function () { return !!(dialog && dialog.open); }, selected: function () { return selected; }, tab: function () { return tab; } };
 
 function launch() {

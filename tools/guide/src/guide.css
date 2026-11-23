@@ -48,8 +48,6 @@ dialog.pgd::backdrop{background:rgba(2,4,8,.8)}
 .pgd-num{flex:none;width:34px;height:26px;border-radius:7px;display:grid;place-items:center;font:700 12px var(--fh);background:#121b28;border:1px solid var(--line2);color:var(--dim)}
 .pgd-item.cur .pgd-num{border-color:var(--cy);color:var(--cy);box-shadow:0 0 10px rgba(70,227,255,.35)}
 .pgd-nm{font-size:15px;font-weight:600;line-height:1.2;padding-top:3px}
-.pgd-soon{display:block;margin-top:1px;font-style:normal;font-size:12.5px;font-weight:500;color:#6c7a8e}
-.pgd-soon::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:1px;border:1px solid #6c7a8e}
 .pgd-empty{color:var(--dim);font-size:15px;padding:8px}
 
 /* ---------- main ---------- */
@@ -225,10 +223,6 @@ details[open]>summary::before{transform:rotate(90deg)}
 }
 
 /* old diagrams in a dark wrapper: colours inverted, photos kept as they are */
-.pgd-legacy{border-radius:14px;overflow:hidden;border:1px solid #1d3448;background:#0a0e14;box-shadow:0 12px 40px rgba(0,0,0,.45);max-width:1100px}
-.pgd-legacy-pic{background:transparent}
-.pgd-legacy-pic svg{display:block;margin:0 auto;width:100%;height:auto;max-height:calc(100vh - 300px);filter:invert(.94) hue-rotate(180deg) saturate(1.35) brightness(.98)}
-.pgd-legacy-pic svg image{filter:invert(1) hue-rotate(180deg)}
 .pgd-read{max-width:1100px}
 
 /* ---------- print ---------- */
@@ -264,7 +258,6 @@ details[open]>summary::before{transform:rotate(90deg)}
   .pgd-print .pgd-wr .op{color:#a05a00}
   .pgd-print .pgd-wr .k,.pgd-print .pgd-wt{color:#333}
   .pgd-print .pgd-wbar{background:#eee;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .pgd-print .pgd-legacy-print svg{width:100%;height:auto}
   .pgd-print .pgd-src{background:#f6f6f6;border:1px solid #ccc}
   .pgd-print .pgd-src pre{color:#111;font-size:9pt}
   .pgd-print .pgd-ln{color:#888;border-color:#ccc}
@@ -285,3 +278,25 @@ details[open]>summary::before{transform:rotate(90deg)}
 
 /* at laptop widths give the stage more room (the stage scale sets the smallest label size) */
 @media (max-width:1500px){.pgd-panel{padding:16px 16px 20px}.pgd-dia{gap:12px}}
+
+/* ---------- v3.0 chrome: hint strip, done marks, All diagrams grid ---------- */
+.pgd-hint{display:flex;align-items:center;gap:14px;margin:0 0 10px;padding:8px 14px;border:1px solid #6a4a14;border-radius:10px;background:linear-gradient(180deg,#1d160a,#120e07);color:#f3e3c4;font-size:15px}
+.pgd-hint p{margin:0;flex:1;display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center}
+.pgd-hk{display:inline-flex;align-items:center;gap:7px}
+.pgd-hchip{font-style:normal;font-weight:700;font-size:12px;letter-spacing:.06em;color:#1a1103;background:var(--am);border-radius:10px;padding:1px 8px}
+.pgd-hdot{display:inline-block;width:22px;height:8px;border-radius:4px;background:var(--cy)}
+.pgd-done-dot{margin-left:auto;flex:none;color:#3dffa0;font-weight:700;font-size:14px;padding-left:6px}
+.pgd-btn[aria-pressed=true]{border-color:var(--am);color:#ffd08a}
+.pgd-panel.tab-grid{overflow:auto}
+.pgd-gtop p{margin:0 0 6px;color:var(--dim)}
+.pgd-gh{display:flex;gap:10px;align-items:baseline;margin:18px 0 8px;font-size:16px;color:#dbe6f2}
+.pgd-gh span{font-family:var(--fh);font-size:12px;letter-spacing:.12em;color:var(--cy)}
+.pgd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.pgd-gcard{display:flex;flex-direction:column;gap:6px;text-align:left;padding:8px;border:1px solid var(--line2);border-radius:10px;background:#0b111a;color:var(--ink)}
+.pgd-gcard:hover,.pgd-gcard.cur{border-color:var(--cy2);box-shadow:0 0 14px rgba(70,227,255,.18)}
+.pgd-gthumb{display:block;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#08101b}
+.pgd-gthumb svg{display:block;width:100%;height:100%}
+.pgd-gname{font-size:15px;line-height:1.25}.pgd-gname b{font-family:var(--fm);color:var(--am);margin-right:6px}
+.pgd-gmark{font-size:13px;color:#6c7a8e}.pgd-gmark.ok{color:#3dffa0;font-weight:700}
+@media (prefers-reduced-motion:reduce){.pgd-pan{transition:none!important}}
+.pgd-gthumb *{animation:none!important;transition:none!important}
