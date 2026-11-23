@@ -1,0 +1,598 @@
+PanelGuard - Student Guide v2.0 - the text of every screen, in order
+Video: PanelGuard_Student_Guide_v2.0.mp4 (110 screens, 29:14)
+
+[0:00] Screen 1
+PanelGuard  (Student guide · version 2.0)
+- A student guide to the Solar Panel Defect Inspection Lab.
+- Part 1: the lab in your browser, Steps 0 to 8.
+- Part 2: the same system as a Python project in GitHub Codespaces.
+- Pause the video at any screen. Every screen says what to do and why.
+
+[0:20] Screen 2
+What you need  (Before you start)
+- A laptop with Chrome. Not a phone: the screens need space.
+- Internet, for the first visit to the lab.
+- For Part 2 only: a free GitHub account.
+- Nothing to install on the laptop.
+
+[0:36] Screen 3
+Part 1 · The lab  (Runs in Chrome · nothing to install)
+- You build a real solar-cell defect inspector, step by step, inside one web page.
+- Python and TensorFlow.js run in the browser tab itself.
+- Steps 0 to 8, 55 small pages. Do them in order.
+
+[0:54] Screen 4  -  Part 1 · Getting started
+1  Open the lab
+What to do: Open Chrome and type the address below. A bar at the top shows Python loading into the tab (about 40 MB the first time).
+Good to know: Wait. Do not reload. The next visit is faster.
+On screen: https://ai-bitmonky.github.io/panelguard-defect-inspection-lab/
+
+[1:09] Screen 5  -  Part 1 · Getting started
+2  Wait for green
+What to do: Ready when the dot next to Python turns green, top right.
+Good to know: The TensorFlow.js dot is red here only because this recording PC has no graphics chip. The lab still works.
+
+[1:22] Screen 6  -  Part 1 · Getting started
+3  The parts of every page
+What to do: 1 Course list.
+2 Step title and story.
+3 Strip of substeps.
+4 Task box.
+5 Result panel: what to do next, results, checks.
+Good to know: Every page has the same parts.
+
+[1:36] Screen 7  -  Part 1 · Getting started
+4  Steps, substeps and locks
+What to do: A lock means: finish the one before. A tick means done. Tap a done substep to look back.
+Good to know: Your work saves itself in this browser on this laptop. Come back later and carry on.
+Watch out: Same laptop, same Chrome each time. Clearing browsing data deletes your progress.
+
+[1:56] Screen 8  -  Part 1 · Getting started
+5  The task box
+What to do: Each numbered line is one gap in the code and says what to type there. A hand sign marks a hands-on part.
+Good to know: Read the task box first.
+
+[2:08] Screen 9  -  Part 1 · Getting started
+6  Blanks and RUN
+What to do: Each gap is a ____ blank, drawn as a yellow box. Type your answer in its place, then press RUN (or Ctrl + Enter).
+Good to know: "Reset this cell" brings the starter code back.
+Watch out: Change only the blanks.
+
+[2:23] Screen 10  -  Part 1 · Getting started
+7  If a blank is still empty
+What to do: RUN with a blank left in: nothing runs. A red CHECK names the line with the blank.
+Good to know: Fill it and press RUN again.
+
+[2:34] Screen 11  -  Part 1 · Getting started
+8  If an answer is wrong
+What to do: A wrong answer gives a red CHECK in plain words: what went wrong and where to look.
+Good to know: No limit on tries. Read, fix the gap, RUN again.
+
+[2:47] Screen 12  -  Part 1 · Getting started
+9  Worked example
+What to do: Stuck? Open "Worked example". Same idea, other case, other numbers.
+Good to know: It never shows your answer.
+
+[2:54] Screen 13  -  Part 1 · Getting started
+10  PASS, then the next one opens
+What to do: A green PASS unlocks the next substep. Some pages then show a TO DO hands-on task: do it to finish.
+Good to know: After a pass, tap "WHY THIS WORKS" for a step-by-step explanation.
+
+[3:09] Screen 14  -  Part 1 · Getting started
+11  Predict before you run
+What to do: Some pages ask for a prediction before RUN. ONE try. RUN stays off until you answer.
+Good to know: Then the page shows the answer and why. A wrong guess costs nothing.
+
+[3:22] Screen 15  -  Part 1 · Getting started
+12  More space on small screens
+What to do: 1 folds the course list. 2 folds the result panel. Tap again to bring them back.
+Good to know: 3 Keep "Review mode" OFF. It is for teachers; work there is not saved.
+
+[3:36] Screen 16  -  Part 1 · Step 0 of 8
+Step 0 · Meet the line  (No code · about 10 minutes)
+- Story: you run the last camera station of a solar module line. Someone must say PASS or STOP for every cell.
+- You will know the station, what defects look like, and which mistake costs more.
+
+[3:54] Screen 17  -  Part 1 · Step 0 of 8 · 0a
+0a  Walk the station
+What you do: No code. Tap the 4 glowing numbered rings: camera, power contacts, monitor, sorter. The result panel explains each part.
+What you learn: A current makes each cell glow. Broken parts stay dark in the photo.
+
+[4:08] Screen 18  -  Part 1 · Step 0 of 8 · 0b
+0b  See real defects
+What you do: Look at each of the 6 photo cards. Guess: good or bad? Then tap the card to flip it.
+What you learn: Cracks are thin dark lines; dead areas are dark patches. The straight lines across every cell are busbars: normal.
+
+[4:24] Screen 19  -  Part 1 · Step 0 of 8 · 0c
+0c  Weigh the two mistakes
+What you do: Drag the two orange cards, missed defect and false alarm, onto the cost each one causes. Or tap a card, then a box.
+What you learn: The course target: stop at least 95 of every 100 defects (recall), then count good cells stopped for nothing.
+
+[4:43] Screen 20  -  Part 1 · Step 0 of 8 · 0d
+0d  Inspect 12 cells
+What you do: You are the inspector. For each of 12 real cells tap PASS or STOP. Your score shows at the end.
+What you learn: You feel the job the machine must do, cell after cell.
+
+[4:56] Screen 21  -  Part 1 · Step 1 of 8
+Step 1 · Get the data ready  (Python with numpy · about 30 minutes)
+- Story: the factory saved 2,624 real cell photos, each scored by experts.
+- You will load, count, label, split and scale them. The test tray gets sealed.
+
+[5:12] Screen 22  -  Part 1 · Step 1 of 8 · 1a
+1a  Load the pack
+What you do: Gap 1: the numpy type for one byte, 0 to 255. Gap 2: how many photos the file holds. RUN. Then tap 2 photos on the wall.
+What you learn: dtype says how to read the bytes; shape says how to cut them.
+Watch out: Type numbers without commas.
+
+[5:31] Screen 23  -  Part 1 · Step 1 of 8 · 1b
+1b  Count the cells
+What you do: First predict: the accuracy of a lazy model that says OK for every cell. One try. Then fill the cell type and the second "unsure" score. RUN.
+What you learn: Count first: know how rare defects are.
+Watch out: Text in quotes must match exactly, small letters too.
+
+[5:49] Screen 24  -  Part 1 · Step 1 of 8 · 1c
+1c  Make the label
+What you do: Type one cut value so 0.67 and 1.0 become defects and 0 and 0.33 stay OK. RUN. Then drag the yellow line to two other places.
+What you learn: The label is a choice. Write the rule down.
+Watch out: A cell exactly AT the cut counts as a defect.
+
+[6:08] Screen 25  -  Part 1 · Step 1 of 8 · 1d
+1d  Split the data
+What you do: Train 60%, validation 20%, test 20%. Gap 1: the label array that keeps the defect share equal in each tray. RUN. Then roll the dice 3 times.
+What you learn: Each tray has its own job. The test tray is now sealed.
+
+[6:25] Screen 26  -  Part 1 · Step 1 of 8 · 1e
+1e  Scale and flatten
+What you do: Gap 1: the number that turns the brightest pixel into 1.0. Gap 2: how many numbers one flat photo has. RUN. Then drag the lens onto the darkest pixel.
+What you learn: To a model a photo is one long row of numbers.
+
+[6:42] Screen 27  -  Part 1 · Step 2 of 8
+Step 2 · First inspector with scikit-learn  (Python · about 40 minutes)
+- Story: try classic machine learning first. Goal: stop at least 95 of every 100 defects.
+- You will have a first inspector, a cutoff and an honest report card.
+
+[6:58] Screen 28  -  Part 1 · Step 2 of 8 · 2a
+2a  Build the features
+What you do: Gap 1: PCA may learn from the train tray only: type the train index array. RUN. Then measure at least 3 feature mixes with the chips and tap "Use this mix".
+What you learn: Anything that learns from data learns from train only.
+
+[7:15] Screen 29  -  Part 1 · Step 2 of 8 · 2b
+2b  Train three inspectors
+What you do: First bet: tap the model you think wins. One try. Gap 1: the number of folds in the plan. Gap 2: the train index array. RUN.
+What you learn: Folds let you compare models fairly, inside the train tray.
+Watch out: Features and labels must be the same cells.
+
+[7:34] Screen 30  -  Part 1 · Step 2 of 8 · 2c
+2c  Read scores, not verdicts
+What you do: Gap 1: the column number of "chance of defect". RUN. Then drag the gate until 95 of 100 defects are stopped.
+What you learn: A model gives a score. You choose where to stop.
+
+[7:48] Screen 31  -  Part 1 · Step 2 of 8 · 2d
+2d  Hit the target
+What you do: First predict: tap where on the line the answer will be. One try. Gap 1: the 95% target as a fraction. RUN.
+What you learn: Fix the recall you need, then take the highest cutoff that keeps it.
+
+[8:03] Screen 32  -  Part 1 · Step 2 of 8 · 2e
+2e  Write the report card
+What you do: Gap 1: your cutoff variable from 2d. Gap 2: finish "all good cells = fp + ?". RUN. Then sort each missed defect into a reason box.
+What you learn: Report both: what you catch and what it costs.
+
+[8:18] Screen 33  -  Part 1 · Step 3 of 8
+Step 3 · Train a CNN with Keras + TensorFlow  (JavaScript with TensorFlow.js · about 60 to 90 minutes)
+- Story: hand-made features missed thin cracks. A network learns its own filters.
+- You will have a trained network, a blend with Step 2, and two gates. The Python Keras version is shown below each cell, read-only.
+
+[8:38] Screen 34  -  Part 1 · Step 3 of 8
+Step 3 · Quick or Full training  (Read this before 3e)
+- In 3e you pick the length above the code: Quick = 10 epochs, Full = 30. One epoch = one pass over the 1,574 training photos.
+- The first epoch shows the real time and a countdown. Without a graphics chip, one epoch can take several minutes.
+- Keep the tab open until it ends. Do not reload. The model is saved in the browser.
+
+[9:07] Screen 35  -  Part 1 · Step 3 of 8 · 3a
+3a  Shape the photos
+What you do: First drag the 4 tiles into the order TensorFlow reads. Gap 1: that shape as a list of 4 numbers. Gap 2: the number that turns 255 into 1.0. RUN.
+What you learn: TensorFlow reads all photos as one 4-number tensor.
+Watch out: From here the code is JavaScript: square brackets, exact names.
+
+[9:27] Screen 36  -  Part 1 · Step 3 of 8 · 3b
+3b  See what a filter sees
+What you do: No code. Tap the 9 squares of a 3 × 3 filter (0, +1, −1) until the crack glows at least 2.5 times brighter than the busbars.
+What you learn: A CNN layer is many such filters. Training finds their numbers.
+
+[9:44] Screen 37  -  Part 1 · Step 3 of 8 · 3c
+3c  Build the network
+What you do: Gaps: channels in a gray photo, the missing number in 16, 32, ?, 128, and the outputs per cell. RUN. Then tap the block with the most weights.
+What you learn: Weights per layer = 3 × 3 × channels in × filters out.
+
+[9:59] Screen 38  -  Part 1 · Step 3 of 8 · 3d
+3d  Make more photos for free
+What you do: First drag the 5 changed photos into boxes: still a real cell photo, or not? Check. Gap 1: the axis to reverse for a left-right flip. RUN.
+What you learn: Only make changes the camera could really produce.
+
+[10:15] Screen 39  -  Part 1 · Step 3 of 8 · 3e
+3e  Train it
+What you do: First predict: draw the validation score from epoch 1 to 30, then Check. Fill the loss name and the defect-count variable. Pick Quick or Full, RUN, and watch the curves.
+What you learn: The app keeps the best epoch on validation.
+Watch out: Keep the tab open until training ends.
+
+[10:34] Screen 40  -  Part 1 · Step 3 of 8 · 3f
+3f  Score it and blend it
+What you do: Gap 1: the index for the same cell's Step 2 score. Gap 2: the best false-alarm rate so far. RUN. Then drag the gate on the CNN scores to 95%.
+What you learn: Two inspectors make different mistakes; a mix can cancel some.
+
+[10:52] Screen 41  -  Part 1 · Step 3 of 8 · 3g
+3g  Two gates, not one
+What you do: First drag both gates until at most 5% of defects pass. Gaps: two shares as fractions. RUN. Then set gates for a line with one checker.
+What you learn: Two gates make three lanes: pass, a person looks, stop.
+Watch out: A wider middle lane sends more cells to the person.
+
+[11:12] Screen 42  -  Part 1 · Step 4 of 8
+Step 4 · See what the model looks at  (JavaScript · about 45 minutes)
+- Story: check that the model stops cells for the right reason, the crack, not the busbars.
+- You will have heat maps you can trust and a to-do list of its weak spots.
+
+[11:30] Screen 43  -  Part 1 · Step 4 of 8 · 4a
+4a  Mark where YOU look
+What you do: No code. You are the expert: paint over the defect on each of 3 real cells.
+What you learn: Later you compare your marks with where the network looks.
+
+[11:42] Screen 44  -  Part 1 · Step 4 of 8 · 4b
+4b  The cover-up test
+What you do: First drag the gray patch until the score falls a lot. Gap 1: the step-size name. Gap 2: the score before the cover. RUN.
+What you learn: Hide a part. If the score falls, that part mattered.
+
+[11:57] Screen 45  -  Part 1 · Step 4 of 8 · 4c
+4c  Ask the network directly
+What you do: Gaps: block 3 counted from 0, the weights variable, the function that turns negatives into 0. RUN (about a minute). Then press and hold on each heat map.
+What you learn: Grad-CAM shows which places pushed the score up.
+
+[12:13] Screen 46  -  Part 1 · Step 4 of 8 · 4d
+4d  Is the heat map honest?
+What you do: First predict: put your 10 tokens on hottest or random pixels, then Check. Gaps: 10% as a fraction, and the count K. RUN.
+What you learn: Test a heat map by removing what it calls important.
+
+[12:28] Screen 47  -  Part 1 · Step 4 of 8 · 4e
+4e  Where does it fail?
+What you do: First drag the two useful chips into the table rows. Gaps: the auto-pass lane name and the other cell type, both in quotes. RUN.
+What you learn: An average can hide a weak spot. Split mistakes by group.
+
+[12:43] Screen 48  -  Part 1 · Step 4 of 8 · 4f
+4f  Turn mistakes into a to-do list
+What you do: No code. Put each real mistake into an action box, then tap "Done sorting". No single right answer.
+What you learn: In Step 8 these boxes become your data shopping list.
+
+[12:57] Screen 49  -  Part 1 · Step 5 of 8
+Step 5 · Wire the flow with LangGraph  (JavaScript with LangGraph · about 60 minutes)
+- Story: every cell must be checked, scored, routed and recorded, and unsure cells must wait for a person.
+- You will have a working flow and one full shift through it.
+
+[13:14] Screen 50  -  Part 1 · Step 5 of 8 · 5a
+5a  Draw the flow
+What you do: No code. Drag an arrow from each station to the next one a cell visits. All 7 arrows; wrong ones are refused.
+What you learn: Draw the flow before you code it.
+
+[13:27] Screen 51  -  Part 1 · Step 5 of 8 · 5b
+5b  The traveller card
+What you do: First put every field a station needs on the card. Type the two gaps the task box names. RUN.
+What you learn: The card is the state. The log field adds lines; other fields keep the last value.
+
+[13:42] Screen 52  -  Part 1 · Step 5 of 8 · 5c
+5c  First two stations
+What you do: Type the two gaps and RUN: one real cell goes through. Then tap the cell token, station by station, to END.
+What you learn: A station returns only what it changes.
+
+[13:55] Screen 53  -  Part 1 · Step 5 of 8 · 5d
+5d  The fork
+What you do: First predict: drag 4 real cells into the lanes the fork will choose, then Check. Type the two gaps. RUN.
+What you learn: A conditional edge is a function that names the next station.
+
+[14:08] Screen 54  -  Part 1 · Step 5 of 8 · 5e
+5e  Shoot again, but not forever
+What you do: Fill gap 2. Run 1: no cap in gap 1, as the task box says: see the endless loop. Run 2: the real cap.
+What you learn: Every loop needs a counter and a way out.
+Watch out: Run 1 is meant to fail. Read its message.
+
+[14:27] Screen 55  -  Part 1 · Step 5 of 8 · 5f
+5f  Stop and wait for a person
+What you do: Type the two gaps. RUN: 5 cells pause. Then decide each paused cell, pass or stop.
+What you learn: A pause needs a memory (checkpointer) and one thread id per cell.
+
+[14:40] Screen 56  -  Part 1 · Step 5 of 8 · 5g
+5g  Run a shift
+What you do: Type the two gaps for the poly gate. RUN: the whole validation tray goes through. Then tap every defect that passed in the logbook.
+What you learn: The flow guarantees the routing; quality still depends on scores and people.
+
+[14:56] Screen 57  -  Part 1 · Step 6 of 8
+Step 6 · Add the CrewAI quality crew  (JavaScript with MiniCrew · about 60 minutes)
+- Story: three AI workers write the shift report, and a checker tests every number.
+- MiniCrew uses CrewAI's names in the browser; the Python CrewAI version sits beside each cell.
+
+[15:13] Screen 58  -  Part 1 · Step 6 of 8 · 6a
+6a  Who does what
+What you do: No code. Drag each tool card and job card onto the right worker. Wrong cards are refused.
+What you learn: Each worker gets only what it needs.
+
+[15:23] Screen 59  -  Part 1 · Step 6 of 8 · 6b
+6b  Make a tool
+What you do: Type the three gaps from the task box. RUN. Then call each of the 4 tools from the call panel.
+What you learn: Numbers come from tools, never from the model.
+
+[15:36] Screen 60  -  Part 1 · Step 6 of 8 · 6c
+6c  Hire the workers
+What you do: Type the three gaps. RUN. Then tap each of the 3 ID badges to read what its model is given.
+What you learn: Role, goal and backstory become the model's instructions. The brain here is scripted: no key needed.
+
+[15:51] Screen 61  -  Part 1 · Step 6 of 8 · 6d
+6d  Give the jobs an order
+What you do: First predict: tap each report line, filled or missing. Run 1 is wrong on purpose: writer first. Run 2: the right order and context.
+What you learn: Run order and context are two different settings.
+
+[16:06] Screen 62  -  Part 1 · Step 6 of 8 · 6e
+6e  Kick off
+What you do: Type the three gaps. RUN: the crew works. Then tap the glowing worker to step through the trace to the report.
+What you learn: Agent loop: decide, call a tool, read, answer.
+
+[16:19] Screen 63  -  Part 1 · Step 6 of 8 · 6f
+6f  Never trust, check
+What you do: First find the planted wrong numbers and tap "Done". Type the three gaps. RUN: your checker guards the report.
+What you learn: Check every number against the tools.
+
+[16:30] Screen 64  -  Part 1 · Step 6 of 8 · 6g
+6g  Plug in a real model (optional)
+What you do: Optional. Run the crew with a real model using your own API key, or tap "Skip — no key".
+What you learn: The key stays in page memory only.
+Watch out: Real models work only in the downloaded single-file lab.
+
+[16:46] Screen 65  -  Part 1 · Step 7 of 8
+Step 7 · Build the operator console  (JavaScript, HTML, CSS · about 60 to 75 minutes)
+- Story: the operator has about 2 seconds per cell. Everything goes behind one clear screen.
+- You will have a console with a lamp, a line, a queue, a board and a report, tested against faults.
+
+[17:05] Screen 66  -  Part 1 · Step 7 of 8 · 7a
+7a  Sketch the screen
+What you do: No code. Drag the 7 blocks into the screen frame; the rules check each move. Then view it "from 2 metres".
+What you learn: The operator has about 2 seconds per cell.
+
+[17:18] Screen 67  -  Part 1 · Step 7 of 8 · 7b
+7b  Show one cell
+What you do: Type the two gaps. RUN: one live cell and its lamp. Then try the "No colour" and "From 2 m" switches.
+What you learn: The lamp must never guess when the answer is unknown, missing or broken.
+
+[17:33] Screen 68  -  Part 1 · Step 7 of 8 · 7c
+7c  Run the line
+What you do: Type the gap. RUN. Turn the speed knob, press Start, run 30 real cells.
+What you learn: Every cell counts once, under the lamp shown.
+
+[17:43] Screen 69  -  Part 1 · Step 7 of 8 · 7d
+7d  The person's queue
+What you do: Type the two gaps. RUN. Then clear 10 queued cells with the buttons or the keys P and S.
+What you learn: Your speed shows how many checkers the line needs.
+
+[17:55] Screen 70  -  Part 1 · Step 7 of 8 · 7e
+7e  The shift board
+What you do: First predict: match each manager question to the chart that answers it, then Check. Type the two gaps. RUN.
+What you learn: The question picks the chart.
+
+[18:06] Screen 71  -  Part 1 · Step 7 of 8 · 7f
+7f  One button, one report
+What you do: Type the two gaps. RUN. Then press REPORT in the preview, then COPY.
+What you learn: One button runs the whole crew, with the number check built in.
+
+[18:18] Screen 72  -  Part 1 · Step 7 of 8 · 7g
+7g  Break it before the plant does
+What you do: Run the starter code with its 2 planted bugs. Break it with the fault panel. Fix BUG 1 and BUG 2 as the task box says. Run again and fire all 4 faults.
+What you learn: Test the screen with real faults before the plant does.
+Watch out: Change only the two marked lines.
+
+[18:40] Screen 73  -  Part 1 · Step 8 of 8
+Step 8 · Line trial and go / no-go  (JavaScript and Python · about 60 minutes)
+- Story: the sealed test tray opens once, for an honest trial.
+- You will have a trial result, an interval, a drift alarm, a go / no-go decision and the final test.
+
+[18:57] Screen 74  -  Part 1 · Step 8 of 8 · 8a
+8a  Freeze, then break the seal
+What you do: No code. Lock all 6 lines of the freeze sheet, lock your guess range, then press and hold the seal until it breaks.
+What you learn: Freeze first, test once.
+Watch out: After the seal, do not re-run earlier tuning cells.
+
+[19:13] Screen 75  -  Part 1 · Step 8 of 8 · 8b
+8b  The line trial
+What you do: Type the three gaps from the task box. RUN once: every sealed cell goes through your frozen flow. Compare with your guess.
+What you learn: One run, on cells the model has never seen.
+
+[19:27] Screen 76  -  Part 1 · Step 8 of 8 · 8c
+8c  How sure is that number?
+What you do: First pull the lever until 40 redrawn shifts are on the line. Type the three gaps. RUN: a 95% interval.
+What you learn: A small tray gives a wide band around the number.
+
+[19:41] Screen 77  -  Part 1 · Step 8 of 8 · 8d
+8d  Watch for drift
+What you do: Type the two gaps. RUN: a drift alarm. Then tick the alarm you expect for each change and tap "Check my matrix".
+What you learn: No labels on the line: watch inputs and scores.
+
+[19:55] Screen 78  -  Part 1 · Step 8 of 8 · 8e
+8e  Your own factory photos
+What you do: A Python cell: fill the train part and the choosing tray. RUN. Then load your own photo or a sample, and turn your Step 4 boxes into a shopping list.
+What you learn: A learning curve tells what more photos are worth.
+
+[20:12] Screen 79  -  Part 1 · Step 8 of 8 · 8f
+8f  Go or no-go
+What you do: No code. Read the acceptance sheet. Pick go, go with conditions or no-go, tick conditions, press STAMP.
+What you learn: The decision must fit the numbers.
+
+[20:22] Screen 80  -  Part 1 · Step 8 of 8 · 8g
+8g  What you built
+What you do: Tap every stage of your line to see what you built and its real number. Then scroll to the final test.
+What you learn: The whole system, with your own numbers.
+
+[20:35] Screen 81  -  Part 1 · After Step 8
+8g  The final test
+What to do: 15 questions across Steps 1 to 8. Each question says exactly what to do: type, tap or choose. Each one has ONE Check: then it shows the correct answer with an explanation (tap to open) and locks.
+Good to know: Questions you have not checked stay open. Answer them in any order.
+
+[20:55] Screen 82  -  Part 1 · After Step 8
+8g  The scorecard
+What to do: The SCORECARD on the right fills in as you check: your answer, the correct answer and a tick or a cross for every question.
+Good to know: Below it: your predictions from the whole course, the "Take it home" project and the limits of this build.
+
+[21:13] Screen 83  -  Part 1 · After Step 8
+8g  Submit
+What to do: At the end press SUBMIT THE TEST. If some questions are still open, the button asks again: "SUBMIT ANYWAY". Open questions then count as not answered.
+Good to know: After Submit the whole test is locked and you see your score.
+Watch out: Check every question before you submit. Submit cannot be undone.
+
+[21:33] Screen 84  -  Part 1 · After Step 8
+8g  Solutions and retake
+What to do: After Submit, every wrong answer gets a full step-by-step solution on the right. A RETAKE appears for only the questions you missed, with other values.
+Good to know: Read the solution first, then do the retake question.
+
+[21:48] Screen 85  -  Part 1 · After Step 8
+8g  Take it home
+What to do: The "Take it home" card holds your project as real Python files: train, flow, crew and app. Each file can be opened and copied.
+Good to know: You do not need to copy them by hand: Part 2 shows how to run the same files from the course repository in GitHub Codespaces.
+
+[22:09] Screen 86  -  Part 1 · Done
+Part 1 · Good to know  (Before Part 2)
+- Your progress lives in this browser on this laptop. Use the same one each time.
+- Keep "Review mode" OFF.
+- After you break the seal in Step 8, do not change earlier steps.
+- Stuck: read the CHECK message, open the Worked example, read the task box again.
+
+[22:30] Screen 87
+Part 2 · The Python project  (GitHub · fork · codespace · terminal)
+- The same system as real Python files, run in GitHub Codespaces.
+- Fork, create a codespace, wait for setup, run five commands.
+- The numbers shown come from one test run. Yours will differ a little.
+
+[22:47] Screen 88  -  Part 2 · Words
+Four words first  (Part 2 · words)
+- GitHub: a website that keeps code projects (repositories).
+- Fork: your own copy of a repository.
+- Codespace: a cloud computer with VS Code, in a Chrome tab.
+- Terminal: type a command, press Enter, read the answer.
+
+[23:04] Screen 89  -  Part 2 · Fork
+1  Open the repository
+What to do: Sign in to GitHub (free account). Open the repository below. Click Fork, top right.
+Good to know: Your codespace will run from your own copy.
+On screen: github.com/ai-bitmonky/panelguard-defect-inspection-lab
+
+[23:14] Screen 90  -  Part 2 · Fork
+2  Create the fork
+What to do: Keep the names as they are. Scroll down and click the green "Create fork".
+Good to know: Your copy opens: it says "forked from ai-bitmonky".
+
+[23:24] Screen 91  -  Part 2 · Codespace
+3  Open the Code menu
+What to do: On your fork, click the green "Code" button.
+Good to know: You do not need the Local tab.
+
+[23:32] Screen 92  -  Part 2 · Codespace
+4  Create the codespace
+What to do: Click the "Codespaces" tab, then "Create codespace on main".
+Good to know: A new tab opens: a cloud computer just for you.
+
+[23:41] Screen 93  -  Part 2 · Codespace
+5  Wait while it is built
+What to do: VS Code (a code editor) opens while the codespace is built. Wait. Do not close the tab.
+
+[23:49] Screen 94  -  Part 2 · Codespace
+6  Trust the folder
+What to do: If asked "Do you trust the authors...?", click "Trust Folder & Continue".
+Good to know: Without it, setup and the terminal do not run.
+
+[23:59] Screen 95  -  Part 2 · Setup
+7  Setup runs by itself
+What to do: Setup runs by itself in the terminal at the bottom: it installs the Python packages and downloads the photos.
+Good to know: About 5 to 10 minutes. Wait for a prompt ending in $.
+On screen: sh tools/takehome/setup.sh
+Watch out: If setup fails: click in the terminal, type the command above and press Enter.
+
+[24:19] Screen 96  -  Part 2 · Command 1 of 5 · train.py
+8  The terminal and your first command
+What to do: Click in the terminal. Type the first line below, Enter: you are now in the project folder. Then the train command, Enter.
+Good to know: Type it exactly. Every command goes here.
+On screen: cd tools/takehome | python train.py --elpv elpv-dataset/src/elpv_dataset/data
+
+[24:35] Screen 97  -  Part 2 · Command 1 of 5 · train.py
+9  train.py: the first lines
+What to do: train.py does Steps 1 to 3: split, scikit-learn model, Keras CNN, blend and gates. First come warnings.
+Good to know: Lines about cuda, GPU, AVX2, absl or memory only say there is no graphics chip. Ignore them.
+On screen: ... Could not find cuda drivers on your machine, GPU will not be used.
+
+[24:55] Screen 98  -  Part 2 · Command 1 of 5 · train.py
+10  train.py: reading the epochs
+What to do: "Epoch 23/30" is round 23 of 30. "50/50": all batches done. val_auc is the ranking score on validation: higher is better, 1.0 is perfect.
+Good to know: Watch val_auc: photos the model did not learn from.
+On screen: Epoch 23/30 | 50/50 - 6s - 111ms/step - auc: 0.8724 - loss: 0.4459 - val_auc: 0.8645 - val_loss: 0.4118
+
+[25:15] Screen 99  -  Part 2 · Command 1 of 5 · train.py
+11  train.py: done
+What to do: About 4 minutes. The last line: blend weight and gates. Below low: pass. From high: stop. Between: a person.
+Good to know: Writes svc.joblib, cnn.keras, settings.json. Your numbers will differ a little.
+On screen: blend weight 0.1 · gates low 0.139 (poly 0.108) high 0.786 · saved in .../tools/takehome · 247 s
+Watch out: Quick check first? Add  --epochs 2  to the command.
+
+[25:37] Screen 100  -  Part 2 · Command 2 of 5 · flow.py
+12  flow.py: a validation shift
+What to do: Type the flow command below. It sends every validation cell through the LangGraph flow (Step 5), in under a minute.
+Good to know: Run it as often as you like: it only uses validation.
+On screen: python flow.py --elpv elpv-dataset/src/elpv_dataset/data
+
+[25:53] Screen 101  -  Part 2 · Command 2 of 5 · flow.py
+13  flow.py: what the numbers mean
+What to do: "7 of 165 defects passed = 4.2 per 100": defects that got out (target: at most 5). The 95% interval shows how sure. Lanes: where 1,000 cells go.
+Good to know: "A little hopeful": the gates were tuned on this tray.
+On screen: validation (gates tuned here: a little hopeful): 7 of 165 defects passed = 4.2 per 100 · 95% interval 2.1 to 8.5 · target at most 5 | lanes per 1,000: pass 330 · person 533 · stop 137 · mono 3.7 vs poly 4.8 per 100
+
+[26:27] Screen 102  -  Part 2 · Command 3 of 5 · flow.py --trial
+14  flow.py --trial: the sealed test, ONCE
+What to do: Done tuning? Add --trial. It opens the sealed test tray, like Step 8, and writes trial.json.
+Good to know: It runs ONCE; a second run is refused. Testing again and again would tune on the test tray.
+On screen: python flow.py --elpv elpv-dataset/src/elpv_dataset/data --trial
+
+[26:45] Screen 103  -  Part 2 · Command 3 of 5 · flow.py --trial
+15  flow.py --trial: drift and the lanes
+What to do: Here: 5.5 per 100, interval 2.9 to 10.1. Drift PSI compares the photos with validation: above 0.25 means act.
+Good to know: The top end is above 5, so the target is not met for sure. Report what you get.
+On screen: TEST TRAY (sealed, once): 9 of 164 defects passed = 5.5 per 100 · 95% interval 2.9 to 10.1 · target at most 5 | lanes per 1,000: pass 310 · person 547 · stop 143 | drift PSI vs validation (act above 0.25 ...): {'bright': 0.025, 'contrast': 0.031, 'sharp': 0.029}
+
+[27:19] Screen 104  -  Part 2 · Command 4 of 5 · crew.py --dry
+16  crew.py --dry: the crew's tools
+What to do: Type the crew command below. It runs the crew tools (Step 6) on the trial logbook, with no language model, in seconds.
+Good to know: The tools print the facts; "guardrail ... True / False" shows the number checker.
+On screen: python crew.py --dry
+
+[27:36] Screen 105  -  Part 2 · Command 5 of 5 · app.py
+17  app.py: the operator console
+What to do: Type the app command below. When it prints "Running on local URL ... 7860", click "Open in Browser" (or Ports tab, globe icon next to 7860).
+Good to know: Ctrl + C in the terminal stops the console.
+On screen: python app.py --elpv elpv-dataset/src/elpv_dataset/data
+
+[27:53] Screen 106  -  Part 2 · The console
+18  The console: NO VERDICT
+What to do: Before any cell, the lamp says NO VERDICT: the safe default.
+Good to know: START / STOP LINE run and halt the line. NEXT CELL sends one. PASS and STOP answer a queued cell.
+
+[28:06] Screen 107  -  Part 2 · The console
+19  The console: a real cell
+What to do: Click NEXT CELL or START. A real cell appears with the flow's answer: PASS, CHECK or STOP.
+Good to know: "queue: N waiting" = cells waiting for a person.
+
+[28:18] Screen 108  -  Part 2 · The console
+20  The console: STOP and the shift board
+What to do: A clear defect gets STOP. SHIFT BOARD shows defects passed per 100, mono and poly, and the lanes.
+On screen: 5 cells · defects passed 0 of 0 = 0 per 100 (target at most 5) · mono 0 · poly 0 · lanes per block of 50: 5/0/0
+
+[28:38] Screen 109  -  Part 2 · Finish
+When you finish  (Part 2 · save your free hours)
+- Stop the codespace: github.com/codespaces, then the ··· menu next to it, then "Stop codespace".
+- Free hours are used only while it runs. Your files stay.
+- Idle for about 30 minutes, it stops by itself.
+- Later: open it again from github.com/codespaces.
+
+[28:57] Screen 110
+You are done  (PanelGuard · student guide v2.0)
+- Lab: Steps 0 to 8 in Chrome, the final test and Submit.
+- Python project: fork, codespace, setup, five commands, the console.
+- Results differ a little from run to run. Report the numbers you get.

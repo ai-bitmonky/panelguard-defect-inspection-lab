@@ -1,7 +1,9 @@
 """PanelGuard student guide v2.0 builder.
-Screens (tools/video/v2_content.py) -> PNG per screen -> narration (tts_v2.py, offline Kokoro) -> one H.264 file per screen
+Screens (tools/video/v2_content.py) -> PNG per screen -> one H.264 file per screen
 -> concat demuxer (-c copy) -> audio muxed with -c:v copy -> dist/PanelGuard_Student_Guide_v2.0.mp4 (+ the screen script .txt).
-Usage: python3 tools/video/build_v2.py [--frames-only] [--only 12,40] [--no-audio]
+Narration: writes tools/video/narration.json (the words per screen). If tools/video/voice/<id>.mp3 exist (make_voice.py),
+each screen lasts max(reading time, audio + 0.6 s) and its audio is laid under it; with no voice files the video is silent.
+Usage: python3 tools/video/build_v2.py [--frames-only] [--only 12,40] [--silent] [--voice-dir DIR] [--out FILE.mp4]
 """
 import os, sys, json, re, subprocess, hashlib, shutil, wave
 from PIL import Image, ImageDraw, ImageFont
@@ -10,10 +12,9 @@ sys.path.insert(0, HERE)
 import v2_content as C
 
 W, H, FPS = 1280, 720, 30
-OUTDIR = os.path.join(HERE, 'build_v2'); SC = os.path.join(OUTDIR, 'sc'); ENC = os.path.join(OUTDIR, 'enc'); TTS = os.path.join(OUTDIR, 'tts')
-for d in (OUTDIR, SC, ENC, TTS): os.makedirs(d, exist_ok=True)
+OUTDIR = os.path.join(HERE, 'build_v2'); SC = os.path.join(OUTDIR, 'sc'); ENC = os.path.join(OUTDIR, 'enc')
+for d in (OUTDIR, SC, ENC): os.makedirs(d, exist_ok=True)
 FINAL = os.path.join(ROOT, 'dist', 'PanelGuard_Student_Guide_v2.0.mp4'); SCRIPT = os.path.join(ROOT, 'dist', 'PanelGuard_Student_Guide_v2.0_script.txt')
-TTS_PY = os.environ.get('TTS_PY', '/tmp/ttsenv/bin/python')
 
 FD = '/usr/share/fonts/opentype/inter/'
 def F(w, s): return ImageFont.truetype(FD + {'r': 'Inter-Regular.otf', 'm': 'Inter-Medium.otf', 's': 'Inter-SemiBold.otf', 'b': 'Inter-Bold.otf'}[w], s)
@@ -149,18 +150,20 @@ def render_shot(s, frac):
 # ------------------------------------------------------------------ narration text
 ACR = {'EL', 'CNN', 'PCA', 'AUC', 'PSI', 'SVG', 'API', 'GPU', 'CSS', 'HTML', 'ELPV', 'MB', 'URL', 'II'}
 def speech(t):
-    t = t.replace('···', 'three dots').replace('____', 'blank').replace('×', ' times ').replace('÷', ' divided by ').replace('→', ' to ').replace('—', ', ').replace('·', ',')
+    t = t.replace('···', 'three dots').replace('a ____ blank', 'a blank').replace('____', 'blank').replace('×', ' times ').replace('÷', ' divided by ').replace('→', ' to ').replace('—', ', ').replace('·', ',')
     t = t.replace('Ctrl + C', 'Control C').replace('Ctrl + Enter', 'Control Enter').replace('3 × 3', '3 by 3')
     t = t.replace('TensorFlow.js', 'TensorFlow J S').replace('scikit-learn', 'sci-kit learn').replace('numpy', 'num-pie').replace('LangGraph', 'Lang Graph')
     t = t.replace('CrewAI', 'Crew A I').replace('MiniCrew', 'Mini Crew').replace('Grad-CAM', 'Grad-Cam').replace('predict_proba', 'predict proba').replace('OK', 'okay')
     t = t.replace('ELPV', 'E L P V').replace('val_auc', 'val A U C').replace(' auc', ' A U C').replace('e.g.', 'for example')
     t = re.sub(r'(\d+)/(\d+)', r'\1 of \2', t)
     t = t.replace('VS Code', 'V S Code').replace(' / ', ' or ').replace('START or STOP LINE', 'Start and Stop line')
-    t = re.sub(r'--(\w+)', r'dash dash \1', t); t = re.sub(r'\b(\w+)\.py\b', r'\1 dot p y', t)
+    t = re.sub(r'--(\w+)', r'dash dash \1', t); t = re.sub(r'\b(\w+)\.py\b', r'\1 dot py', t)
     t = t.replace('github.com/codespaces', 'github dot com slash codespaces').replace('svc.joblib', 'svc dot joblib').replace('cnn.keras', 'cnn dot keras').replace('settings.json', 'settings dot json').replace('trial.json', 'trial dot json')
     t = re.sub(r'\b([A-Z]{2,})\b', lambda m: m.group(1) if m.group(1) in ACR else m.group(1).lower(), t)
-    t = t.replace('"', '').replace('“', '').replace('”', '').replace('_', ' ').replace(' = ', ' equals ').replace('  ', ' ')
-    return re.sub(r'\s+', ' ', t).strip()
+    t = t.replace('"', '').replace('“', '').replace('”', '').replace('_', ' ').replace(' = ', ' is ').replace('  ', ' ')
+    t = re.sub(r'\s+', ' ', t).strip()
+    t = re.sub(r'([.!?] )([a-z])', lambda m: m.group(1) + m.group(2).upper(), t)
+    return re.sub(r'\s+([,.:;?!])', r'\1', t).replace(',,', ',').replace('.,', '.').replace(':.', '.')
 
 def say_text(s):
     if s.get('say'): return speech(s['say'])
@@ -191,6 +194,14 @@ def screen_words(s):
         return words(' '.join([s['name'], s['do'], s.get('learn') or '', s.get('watch') or '', q]))
     return words(' '.join([s['title'], s.get('sub') or ''] + s['lines']))
 
+LEAD = 0.3
+VOICE = os.path.join(HERE, 'voice')
+def screen_id(i, s):
+    tag = s['id'] if s['kind'] == 'shot' and not s.get('label') else re.sub(r'[^a-z0-9]+', '-', (s.get('name') or s.get('title')).lower()).strip('-')[:28]
+    return '%03d_%s' % (i + 1, tag)
+def audio_len(p):
+    r = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', p], capture_output=True, text=True, check=True)
+    return float(r.stdout.strip())
 def wav_len(p):
     with wave.open(p) as w: return w.getnframes() / w.getframerate()
 
@@ -209,23 +220,25 @@ def main():
         p = os.path.join(SC, '%03d.png' % i); im.save(p); pngs.append(p)
     print(n, 'screens drawn')
     if '--frames-only' in args: return
-    # ---- narration (offline Kokoro, cached by text)
-    audio = '--no-audio' not in args; lens = [0.0] * n; wavs = [None] * n
-    if audio:
-        jobs = []
-        for i, s in enumerate(S):
-            t = say_text(s); hsh = hashlib.sha1(t.encode()).hexdigest()[:12]; p = os.path.join(TTS, '%s.wav' % hsh); wavs[i] = p
-            if not os.path.exists(p): jobs.append({'text': t, 'out': p})
-        if jobs:
-            jf = os.path.join(OUTDIR, 'tts_jobs.json'); json.dump(jobs, open(jf, 'w'))
-            print('narration:', len(jobs), 'screens'); run([TTS_PY, '-I', os.path.join(HERE, 'tts_v2.py'), jf])
-        lens = [wav_len(p) for p in wavs]
-    LEAD, TAIL = 0.5, 0.9
+    # ---- narration script (the words to speak, one entry per screen) -> narration.json
+    ids = [screen_id(i, s) for i, s in enumerate(S)]
+    narr = [{'id': ids[i], 'text': say_text(s)} for i, s in enumerate(S)]
+    json.dump(narr, open(os.path.join(HERE, 'narration.json'), 'w'), indent=1, ensure_ascii=False)
+    print('narration.json: %d entries, %d characters' % (len(narr), sum(len(x['text']) for x in narr)))
+    # ---- voice files (ElevenLabs mp3 from make_voice.py) -> voice mode, else silent
+    vdir = args[args.index('--voice-dir') + 1] if '--voice-dir' in args else VOICE
+    mp3 = [os.path.join(vdir, x + '.mp3') for x in ids]
+    voice = '--silent' not in args and any(os.path.exists(p) for p in mp3)
+    lens = [0.0] * n
+    if voice:
+        miss = [ids[i] for i, p in enumerate(mp3) if not os.path.exists(p)]
+        if miss: print('WARNING: no voice file for %d screens (they stay silent): %s' % (len(miss), ', '.join(miss[:8])))
+        lens = [audio_len(p) if os.path.exists(p) else 0.0 for p in mp3]
     durs = []
     for i, s in enumerate(S):
-        d = max(6.0, 0.4 * screen_words(s), (LEAD + lens[i] + TAIL) if audio else 0)
+        d = max(6.0, 0.4 * screen_words(s), (lens[i] + 0.6) if lens[i] else 0)
         durs.append(round(d * FPS) / FPS)
-    print('total %.1f s = %.1f min' % (sum(durs), sum(durs) / 60))
+    print('%s build: total %.1f s = %.1f min' % ('VOICE' if voice else 'SILENT', sum(durs), sum(durs) / 60))
     # ---- one encoded file per screen, identical settings
     files = []
     for i, (p, d) in enumerate(zip(pngs, durs)):
@@ -240,22 +253,23 @@ def main():
     lst = os.path.join(OUTDIR, 'list.txt'); open(lst, 'w').write(''.join("file '%s'\n" % f for f in files))
     vid = os.path.join(OUTDIR, 'video.mp4'); tmp = vid[:-4] + '.tmp.mp4'
     run(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', lst, '-c', 'copy', tmp]); os.replace(tmp, vid)
-    tmpf = FINAL[:-4] + '.tmp.mp4'
-    if audio:
-        import numpy as np
-        sr = 24000; total = int(round(sum(durs) * sr)) + sr; track = np.zeros(total, dtype=np.float32); t0 = 0.0
+    final = args[args.index('--out') + 1] if '--out' in args else FINAL
+    tmpf = final[:-4] + '.tmp.mp4'
+    if voice:
+        sr = 48000; total = int(round(sum(durs) * sr)); track = bytearray(total * 2); t0 = 0.0
         for i, d in enumerate(durs):
-            with wave.open(wavs[i]) as w:
-                assert w.getframerate() == sr and w.getsampwidth() == 2
-                a = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
-            st = int(round((t0 + LEAD) * sr)); track[st:st + len(a)] += a[:max(0, total - st)]; t0 += d
-        track = np.clip(track[:int(round(sum(durs) * sr))], -1, 1)
+            if lens[i]:
+                pcm = subprocess.run(['ffmpeg', '-v', 'error', '-i', mp3[i], '-f', 's16le', '-ac', '1', '-ar', str(sr), '-'], capture_output=True, check=True).stdout
+                st = int(round((t0 + LEAD) * sr)) * 2; pcm = pcm[:max(0, len(track) - st)]
+                track[st:st + len(pcm)] = pcm          # screens never overlap: audio ends before the screen does
+            t0 += d
         aw = os.path.join(OUTDIR, 'narration.wav')
-        with wave.open(aw, 'w') as w: w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr); w.writeframes((track * 32767).astype(np.int16).tobytes())
-        run(['ffmpeg', '-y', '-loglevel', 'error', '-i', vid, '-i', aw, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '64k', '-ar', '48000', '-movflags', '+faststart', tmpf])
+        with wave.open(aw, 'w') as w: w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr); w.writeframes(bytes(track))
+        run(['ffmpeg', '-y', '-loglevel', 'error', '-i', vid, '-i', aw, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', tmpf])
     else:
         run(['ffmpeg', '-y', '-loglevel', 'error', '-i', vid, '-c', 'copy', '-movflags', '+faststart', tmpf])
-    os.replace(tmpf, FINAL)
+    os.replace(tmpf, final)
+    if final != FINAL: print('wrote', final); return
     # ---- the screen script (hand-out)
     t0 = 0.0; out = ['PanelGuard - Student Guide v2.0 - the text of every screen, in order', 'Video: PanelGuard_Student_Guide_v2.0.mp4 (%d screens, %d:%02d)' % (n, int(sum(durs)) // 60, int(sum(durs)) % 60), '']
     for i, s in enumerate(S):

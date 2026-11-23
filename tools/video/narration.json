@@ -1,0 +1,442 @@
+[
+ {
+  "id": "001_panelguard",
+  "text": "PanelGuard. Student guide, version 2.0. A student guide to the Solar Panel Defect Inspection Lab. Part 1: the lab in your browser, Steps 0 to 8. Part 2: the same system as a Python project in GitHub Codespaces. Pause the video at any screen. Every screen says what to do and why."
+ },
+ {
+  "id": "002_what-you-need",
+  "text": "What you need. Before you start. A laptop with Chrome. Not a phone: the screens need space. Internet, for the first visit to the lab. For Part 2 only: a free GitHub account. Nothing to install on the laptop."
+ },
+ {
+  "id": "003_part-1-the-lab",
+  "text": "Part 1, The lab. Runs in Chrome, nothing to install. You build a real solar-cell defect inspector, step by step, inside one web page. Python and TensorFlow J S run in the browser tab itself. Steps 0 to 8, 55 small pages. Do them in order."
+ },
+ {
+  "id": "004_open-the-lab",
+  "text": "Open Chrome and type the lab address shown on the screen. A bar at the top shows Python loading into the tab, about 40 megabytes the first time. Wait. Do not reload. The next visit is faster."
+ },
+ {
+  "id": "005_wait-for-green",
+  "text": "Wait for green. Ready when the dot next to Python turns green, top right. The TensorFlow J S dot is red here only because this recording pc has no graphics chip. The lab still works."
+ },
+ {
+  "id": "006_the-parts-of-every-page",
+  "text": "The parts of every page. One: the course list. Two: the step title and its story. Three: the strip of substeps. Four: the task box. Five: the result panel, with what to do next, results and checks. Every page has the same parts."
+ },
+ {
+  "id": "007_steps-substeps-and-locks",
+  "text": "Steps, substeps and locks. A lock means: finish the one before. A tick means done. Tap a done substep to look back. Your work saves itself in this browser on this laptop. Come back later and carry on. Watch out. Same laptop, same Chrome each time. Clearing browsing data deletes your progress."
+ },
+ {
+  "id": "008_the-task-box",
+  "text": "The task box. Each numbered line is one gap in the code and says what to type there. A hand sign marks a hands-on part. Read the task box first."
+ },
+ {
+  "id": "009_blanks-and-run",
+  "text": "Blanks and run. Each gap is a blank, drawn as a yellow box. Type your answer in its place, then press run (or Control Enter). Reset this cell brings the starter code back. Watch out. Change only the blanks."
+ },
+ {
+  "id": "010_if-a-blank-is-still-empty",
+  "text": "If a blank is still empty. Run with a blank left in: nothing runs. A red check names the line with the blank. Fill it and press run again."
+ },
+ {
+  "id": "011_if-an-answer-is-wrong",
+  "text": "If an answer is wrong. A wrong answer gives a red check in plain words: what went wrong and where to look. No limit on tries. Read, fix the gap, run again."
+ },
+ {
+  "id": "012_worked-example",
+  "text": "Worked example. Stuck? Open Worked example. Same idea, other case, other numbers. It never shows your answer."
+ },
+ {
+  "id": "013_pass-then-the-next-one-opens",
+  "text": "pass, then the next one opens. A green pass unlocks the next substep. Some pages then show a to do hands-on task: do it to finish. After a pass, tap why this works for a step-by-step explanation."
+ },
+ {
+  "id": "014_predict-before-you-run",
+  "text": "Predict before you run. Some pages ask for a prediction before run. One try. Run stays off until you answer. Then the page shows the answer and why. A wrong guess costs nothing."
+ },
+ {
+  "id": "015_more-space-on-small-screens",
+  "text": "More space on small screens. Button one folds the course list. Button two folds the result panel. Tap again to bring them back. Three: keep Review mode off. It is for teachers, and work there is not saved."
+ },
+ {
+  "id": "016_step-0-meet-the-line",
+  "text": "Step 0, Meet the line. No code, about 10 minutes. Story: you run the last camera station of a solar module line. Someone must say pass or stop for every cell. You will know the station, what defects look like, and which mistake costs more."
+ },
+ {
+  "id": "017_0a",
+  "text": "0a, Walk the station. No code. Tap the 4 glowing numbered rings: camera, power contacts, monitor, sorter. The result panel explains each part. A current makes each cell glow. Broken parts stay dark in the photo."
+ },
+ {
+  "id": "018_0b",
+  "text": "0b, See real defects. Look at each of the 6 photo cards. Guess: good or bad? Then tap the card to flip it. Cracks are thin dark lines; dead areas are dark patches. The straight lines across every cell are busbars: normal."
+ },
+ {
+  "id": "019_0c",
+  "text": "0c, Weigh the two mistakes. Drag the two orange cards, missed defect and false alarm, onto the cost each one causes. Or tap a card, then a box. The course target: stop at least 95 of every 100 defects (recall), then count good cells stopped for nothing."
+ },
+ {
+  "id": "020_0d",
+  "text": "0d, Inspect 12 cells. You are the inspector. For each of 12 real cells tap pass or stop. Your score shows at the end. You feel the job the machine must do, cell after cell."
+ },
+ {
+  "id": "021_step-1-get-the-data-ready",
+  "text": "Step 1, Get the data ready. Python with num-pie, about 30 minutes. Story: the factory saved 2,624 real cell photos, each scored by experts. You will load, count, label, split and scale them. The test tray gets sealed."
+ },
+ {
+  "id": "022_1a",
+  "text": "1a, Load the pack. Gap 1: the num-pie type for one byte, 0 to 255. Gap 2: how many photos the file holds. Run. Then tap 2 photos on the wall. Dtype says how to read the bytes; shape says how to cut them. Watch out. Type numbers without commas."
+ },
+ {
+  "id": "023_1b",
+  "text": "1b, Count the cells. First predict: the accuracy of a lazy model that says okay for every cell. One try. Then fill the cell type and the second unsure score. Run. Count first: know how rare defects are. Watch out. Text in quotes must match exactly, small letters too."
+ },
+ {
+  "id": "024_1c",
+  "text": "1c, Make the label. Type one cut value so 0.67 and 1.0 become defects and 0 and 0.33 stay okay. Run. Then drag the yellow line to two other places. The label is a choice. Write the rule down. Watch out. A cell exactly at the cut counts as a defect."
+ },
+ {
+  "id": "025_1d",
+  "text": "1d, Split the data. Train 60%, validation 20%, test 20%. Gap 1: the label array that keeps the defect share equal in each tray. Run. Then roll the dice 3 times. Each tray has its own job. The test tray is now sealed."
+ },
+ {
+  "id": "026_1e",
+  "text": "1e, Scale and flatten. Gap 1: the number that turns the brightest pixel into 1.0. Gap 2: how many numbers one flat photo has. Run. Then drag the lens onto the darkest pixel. To a model a photo is one long row of numbers."
+ },
+ {
+  "id": "027_step-2-first-inspector-with-",
+  "text": "Step 2, First inspector with sci-kit learn. Python, about 40 minutes. Story: try classic machine learning first. Goal: stop at least 95 of every 100 defects. You will have a first inspector, a cutoff and an honest report card."
+ },
+ {
+  "id": "028_2a",
+  "text": "2a, Build the features. Gap 1: PCA may learn from the train tray only: type the train index array. Run. Then measure at least 3 feature mixes with the chips and tap Use this mix. Anything that learns from data learns from train only."
+ },
+ {
+  "id": "029_2b",
+  "text": "2b, Train three inspectors. First bet: tap the model you think wins. One try. Gap 1: the number of folds in the plan. Gap 2: the train index array. Run. Folds let you compare models fairly, inside the train tray. Watch out. Features and labels must be the same cells."
+ },
+ {
+  "id": "030_2c",
+  "text": "2c, Read scores, not verdicts. Gap 1: the column number of chance of defect. Run. Then drag the gate until 95 of 100 defects are stopped. A model gives a score. You choose where to stop."
+ },
+ {
+  "id": "031_2d",
+  "text": "2d, Hit the target. First predict: tap where on the line the answer will be. One try. Gap 1: the 95% target as a fraction. Run. Fix the recall you need, then take the highest cutoff that keeps it."
+ },
+ {
+  "id": "032_2e",
+  "text": "2e, Write the report card. Gap 1: your cutoff variable from 2d. Gap 2: finish all good cells is fp +?. Run. Then sort each missed defect into a reason box. Report both: what you catch and what it costs."
+ },
+ {
+  "id": "033_step-3-train-a-cnn-with-kera",
+  "text": "Step 3, Train a CNN with Keras + TensorFlow. JavaScript with TensorFlow J S, about 60 to 90 minutes. Story: hand-made features missed thin cracks. A network learns its own filters. You will have a trained network, a blend with Step 2, and two gates. The Python Keras version is shown below each cell, read-only."
+ },
+ {
+  "id": "034_step-3-quick-or-full-trainin",
+  "text": "Step 3, Quick or Full training. Read this before 3e. In 3e you pick the length above the code: Quick is 10 epochs, Full is 30. One epoch is one pass over the 1,574 training photos. The first epoch shows the real time and a countdown. Without a graphics chip, one epoch can take several minutes. Keep the tab open until it ends. Do not reload. The model is saved in the browser."
+ },
+ {
+  "id": "035_3a",
+  "text": "3a, Shape the photos. First drag the 4 tiles into the order TensorFlow reads. Gap 1: that shape as a list of 4 numbers. Gap 2: the number that turns 255 into 1.0. Run. TensorFlow reads all photos as one 4-number tensor. Watch out. From here the code is JavaScript: square brackets, exact names."
+ },
+ {
+  "id": "036_3b",
+  "text": "3b, See what a filter sees. No code. Tap the 9 squares of a 3 times 3 filter (0, +1, −1) until the crack glows at least 2.5 times brighter than the busbars. A CNN layer is many such filters. Training finds their numbers."
+ },
+ {
+  "id": "037_3c",
+  "text": "3c, Build the network. Gaps: channels in a gray photo, the missing number in 16, 32,?, 128, and the outputs per cell. Run. Then tap the block with the most weights. Weights per layer is 3 times 3 times channels in times filters out."
+ },
+ {
+  "id": "038_3d",
+  "text": "3d, Make more photos for free. First drag the 5 changed photos into boxes: still a real cell photo, or not? Check. Gap 1: the axis to reverse for a left-right flip. Run. Only make changes the camera could really produce."
+ },
+ {
+  "id": "039_3e",
+  "text": "3e, Train it. First predict: draw the validation score from epoch 1 to 30, then Check. Fill the loss name and the defect-count variable. Pick Quick or Full, run, and watch the curves. The app keeps the best epoch on validation. Watch out. Keep the tab open until training ends."
+ },
+ {
+  "id": "040_3f",
+  "text": "3f, Score it and blend it. Gap 1: the index for the same cell's Step 2 score. Gap 2: the best false-alarm rate so far. Run. Then drag the gate on the CNN scores to 95%. Two inspectors make different mistakes; a mix can cancel some."
+ },
+ {
+  "id": "041_3g",
+  "text": "3g, Two gates, not one. First drag both gates until at most 5% of defects pass. Gaps: two shares as fractions. Run. Then set gates for a line with one checker. Two gates make three lanes: pass, a person looks, stop. Watch out. A wider middle lane sends more cells to the person."
+ },
+ {
+  "id": "042_step-4-see-what-the-model-lo",
+  "text": "Step 4, See what the model looks at. JavaScript, about 45 minutes. Story: check that the model stops cells for the right reason, the crack, not the busbars. You will have heat maps you can trust and a to-do list of its weak spots."
+ },
+ {
+  "id": "043_4a",
+  "text": "4a, Mark where you look. No code. You are the expert: paint over the defect on each of 3 real cells. Later you compare your marks with where the network looks."
+ },
+ {
+  "id": "044_4b",
+  "text": "4b, The cover-up test. First drag the gray patch until the score falls a lot. Gap 1: the step-size name. Gap 2: the score before the cover. Run. Hide a part. If the score falls, that part mattered."
+ },
+ {
+  "id": "045_4c",
+  "text": "4c, Ask the network directly. Gaps: block 3 counted from 0, the weights variable, the function that turns negatives into 0. Run (about a minute). Then press and hold on each heat map. Grad-Cam shows which places pushed the score up."
+ },
+ {
+  "id": "046_4d",
+  "text": "4d, Is the heat map honest?. First predict: put your 10 tokens on hottest or random pixels, then Check. Gaps: 10% as a fraction, and the count K. Run. Test a heat map by removing what it calls important."
+ },
+ {
+  "id": "047_4e",
+  "text": "4e, Where does it fail?. First drag the two useful chips into the table rows. Gaps: the auto-pass lane name and the other cell type, both in quotes. Run. An average can hide a weak spot. Split mistakes by group."
+ },
+ {
+  "id": "048_4f",
+  "text": "4f, Turn mistakes into a to-do list. No code. Put each real mistake into an action box, then tap Done sorting. No single right answer. In Step 8 these boxes become your data shopping list."
+ },
+ {
+  "id": "049_step-5-wire-the-flow-with-la",
+  "text": "Step 5, Wire the flow with Lang Graph. JavaScript with Lang Graph, about 60 minutes. Story: every cell must be checked, scored, routed and recorded, and unsure cells must wait for a person. You will have a working flow and one full shift through it."
+ },
+ {
+  "id": "050_5a",
+  "text": "5a, Draw the flow. No code. Drag an arrow from each station to the next one a cell visits. All 7 arrows; wrong ones are refused. Draw the flow before you code it."
+ },
+ {
+  "id": "051_5b",
+  "text": "5b, The traveller card. First put every field a station needs on the card. Type the two gaps the task box names. Run. The card is the state. The log field adds lines; other fields keep the last value."
+ },
+ {
+  "id": "052_5c",
+  "text": "5c, First two stations. Type the two gaps and run: one real cell goes through. Then tap the cell token, station by station, to end. A station returns only what it changes."
+ },
+ {
+  "id": "053_5d",
+  "text": "5d, The fork. First predict: drag 4 real cells into the lanes the fork will choose, then Check. Type the two gaps. Run. A conditional edge is a function that names the next station."
+ },
+ {
+  "id": "054_5e",
+  "text": "5e, Shoot again, but not forever. Fill gap 2. Run 1: no cap in gap 1, as the task box says: see the endless loop. Run 2: the real cap. Every loop needs a counter and a way out. Watch out. Run 1 is meant to fail. Read its message."
+ },
+ {
+  "id": "055_5f",
+  "text": "5f, Stop and wait for a person. Type the two gaps. Run: 5 cells pause. Then decide each paused cell, pass or stop. A pause needs a memory (checkpointer) and one thread id per cell."
+ },
+ {
+  "id": "056_5g",
+  "text": "5g, Run a shift. Type the two gaps for the poly gate. Run: the whole validation tray goes through. Then tap every defect that passed in the logbook. The flow guarantees the routing; quality still depends on scores and people."
+ },
+ {
+  "id": "057_step-6-add-the-crewai-qualit",
+  "text": "Step 6, Add the Crew A I quality crew. JavaScript with Mini Crew, about 60 minutes. Story: three ai workers write the shift report, and a checker tests every number. Mini Crew uses Crew A I's names in the browser; the Python Crew A I version sits beside each cell."
+ },
+ {
+  "id": "058_6a",
+  "text": "6a, Who does what. No code. Drag each tool card and job card onto the right worker. Wrong cards are refused. Each worker gets only what it needs."
+ },
+ {
+  "id": "059_6b",
+  "text": "6b, Make a tool. Type the three gaps from the task box. Run. Then call each of the 4 tools from the call panel. Numbers come from tools, never from the model."
+ },
+ {
+  "id": "060_6c",
+  "text": "6c, Hire the workers. Type the three gaps. Run. Then tap each of the 3 id badges to read what its model is given. Role, goal and backstory become the model's instructions. The brain here is scripted: no key needed."
+ },
+ {
+  "id": "061_6d",
+  "text": "6d, Give the jobs an order. First predict: tap each report line, filled or missing. Run 1 is wrong on purpose: writer first. Run 2: the right order and context. Run order and context are two different settings."
+ },
+ {
+  "id": "062_6e",
+  "text": "6e, Kick off. Type the three gaps. Run: the crew works. Then tap the glowing worker to step through the trace to the report. Agent loop: decide, call a tool, read, answer."
+ },
+ {
+  "id": "063_6f",
+  "text": "6f, Never trust, check. First find the planted wrong numbers and tap Done. Type the three gaps. Run: your checker guards the report. Check every number against the tools."
+ },
+ {
+  "id": "064_6g",
+  "text": "6g, Plug in a real model (optional). Optional. Run the crew with a real model using your own API key, or tap Skip, no key. The key stays in page memory only. Watch out. Real models work only in the downloaded single-file lab."
+ },
+ {
+  "id": "065_step-7-build-the-operator-co",
+  "text": "Step 7, Build the operator console. JavaScript, HTML, CSS, about 60 to 75 minutes. Story: the operator has about 2 seconds per cell. Everything goes behind one clear screen. You will have a console with a lamp, a line, a queue, a board and a report, tested against faults."
+ },
+ {
+  "id": "066_7a",
+  "text": "7a, Sketch the screen. No code. Drag the 7 blocks into the screen frame; the rules check each move. Then view it from 2 metres. The operator has about 2 seconds per cell."
+ },
+ {
+  "id": "067_7b",
+  "text": "7b, Show one cell. Type the two gaps. Run: one live cell and its lamp. Then try the No colour and From 2 m switches. The lamp must never guess when the answer is unknown, missing or broken."
+ },
+ {
+  "id": "068_7c",
+  "text": "7c, Run the line. Type the gap. Run. Turn the speed knob, press Start, run 30 real cells. Every cell counts once, under the lamp shown."
+ },
+ {
+  "id": "069_7d",
+  "text": "7d, The person's queue. Type the two gaps. Run. Then clear 10 queued cells with the buttons or the keys P and S. Your speed shows how many checkers the line needs."
+ },
+ {
+  "id": "070_7e",
+  "text": "7e, The shift board. First predict: match each manager question to the chart that answers it, then Check. Type the two gaps. Run. The question picks the chart."
+ },
+ {
+  "id": "071_7f",
+  "text": "7f, One button, one report. Type the two gaps. Run. Then press report in the preview, then copy. One button runs the whole crew, with the number check built in."
+ },
+ {
+  "id": "072_7g",
+  "text": "7g, Break it before the plant does. Run the starter code with its 2 planted bugs. Break it with the fault panel. Fix bug 1 and bug 2 as the task box says. Run again and fire all 4 faults. Test the screen with real faults before the plant does. Watch out. Change only the two marked lines."
+ },
+ {
+  "id": "073_step-8-line-trial-and-go-no-",
+  "text": "Step 8, Line trial and go or no-go. JavaScript and Python, about 60 minutes. Story: the sealed test tray opens once, for an honest trial. You will have a trial result, an interval, a drift alarm, a go or no-go decision and the final test."
+ },
+ {
+  "id": "074_8a",
+  "text": "8a, Freeze, then break the seal. No code. Lock all 6 lines of the freeze sheet, lock your guess range, then press and hold the seal until it breaks. Freeze first, test once. Watch out. After the seal, do not re-run earlier tuning cells."
+ },
+ {
+  "id": "075_8b",
+  "text": "8b, The line trial. Type the three gaps from the task box. Run once: every sealed cell goes through your frozen flow. Compare with your guess. One run, on cells the model has never seen."
+ },
+ {
+  "id": "076_8c",
+  "text": "8c, How sure is that number?. First pull the lever until 40 redrawn shifts are on the line. Type the three gaps. Run: a 95% interval. A small tray gives a wide band around the number."
+ },
+ {
+  "id": "077_8d",
+  "text": "8d, Watch for drift. Type the two gaps. Run: a drift alarm. Then tick the alarm you expect for each change and tap Check my matrix. No labels on the line: watch inputs and scores."
+ },
+ {
+  "id": "078_8e",
+  "text": "8e, Your own factory photos. A Python cell: fill the train part and the choosing tray. Run. Then load your own photo or a sample, and turn your Step 4 boxes into a shopping list. A learning curve tells what more photos are worth."
+ },
+ {
+  "id": "079_8f",
+  "text": "8f, Go or no-go. No code. Read the acceptance sheet. Pick go, go with conditions or no-go, tick conditions, press stamp. The decision must fit the numbers."
+ },
+ {
+  "id": "080_8g",
+  "text": "8g, What you built. Tap every stage of your line to see what you built and its real number. Then scroll to the final test. The whole system, with your own numbers."
+ },
+ {
+  "id": "081_the-final-test",
+  "text": "The final test. 15 questions across Steps 1 to 8. Each question says exactly what to do: type, tap or choose. Each one has one Check: then it shows the correct answer with an explanation (tap to open) and locks. Questions you have not checked stay open. Answer them in any order."
+ },
+ {
+  "id": "082_the-scorecard",
+  "text": "The scorecard. The scorecard on the right fills in as you check: your answer, the correct answer and a tick or a cross for every question. Below it: your predictions from the whole course, the Take it home project and the limits of this build."
+ },
+ {
+  "id": "083_submit",
+  "text": "Submit. At the end press submit the test. If some questions are still open, the button asks again: submit anyway. Open questions then count as not answered. After Submit the whole test is locked and you see your score. Watch out. Check every question before you submit. Submit cannot be undone."
+ },
+ {
+  "id": "084_solutions-and-retake",
+  "text": "Solutions and retake. After Submit, every wrong answer gets a full step-by-step solution on the right. A retake appears for only the questions you missed, with other values. Read the solution first, then do the retake question."
+ },
+ {
+  "id": "085_take-it-home",
+  "text": "Take it home. The Take it home card holds your project as real Python files: train, flow, crew and app. Each file can be opened and copied. You do not need to copy them by hand: Part 2 shows how to run the same files from the course repository in GitHub Codespaces."
+ },
+ {
+  "id": "086_part-1-good-to-know",
+  "text": "Part 1, Good to know. Before Part 2. Your progress lives in this browser on this laptop. Use the same one each time. Keep Review mode off. After you break the seal in Step 8, do not change earlier steps. Stuck: read the check message, open the Worked example, read the task box again."
+ },
+ {
+  "id": "087_part-2-the-python-project",
+  "text": "Part 2, The Python project. GitHub, fork, codespace, terminal. The same system as real Python files, run in GitHub Codespaces. Fork, create a codespace, wait for setup, run five commands. The numbers shown come from one test run. Yours will differ a little."
+ },
+ {
+  "id": "088_four-words-first",
+  "text": "Four words first. Part 2, words. GitHub: a website that keeps code projects (repositories). Fork: your own copy of a repository. Codespace: a cloud computer with V S Code, in a Chrome tab. Terminal: type a command, press Enter, read the answer."
+ },
+ {
+  "id": "089_open-the-repository",
+  "text": "Sign in to GitHub. A free account is enough. Open the repository shown on the screen, and click Fork, at the top right. Your codespace will run from your own copy."
+ },
+ {
+  "id": "090_create-the-fork",
+  "text": "Create the fork. Keep the names as they are. Scroll down and click the green Create fork. Your copy opens: it says forked from ai-bitmonky."
+ },
+ {
+  "id": "091_open-the-code-menu",
+  "text": "Open the Code menu. On your fork, click the green Code button. You do not need the Local tab."
+ },
+ {
+  "id": "092_create-the-codespace",
+  "text": "Create the codespace. Click the Codespaces tab, then Create codespace on main. A new tab opens: a cloud computer just for you."
+ },
+ {
+  "id": "093_wait-while-it-is-built",
+  "text": "Wait while it is built. V S Code (a code editor) opens while the codespace is built. Wait. Do not close the tab."
+ },
+ {
+  "id": "094_trust-the-folder",
+  "text": "Trust the folder. If asked Do you trust the authors...?, click Trust Folder & Continue. Without it, setup and the terminal do not run."
+ },
+ {
+  "id": "095_setup-runs-by-itself",
+  "text": "Setup runs by itself in the terminal at the bottom. It installs the Python packages and downloads the photos. This takes about 5 to 10 minutes. Wait for a prompt that ends with a dollar sign. Watch out: if setup fails, click in the terminal, type: s h, space, tools slash takehome slash setup dot s h, and press Enter."
+ },
+ {
+  "id": "096_the-terminal-and-your-first-",
+  "text": "Click in the terminal. Type: c d, space, tools slash takehome, and press Enter. You are now in the project folder. Then type the train command shown on the screen, and press Enter. Type it exactly. Every command goes here."
+ },
+ {
+  "id": "097_train-py-the-first-lines",
+  "text": "train dot py: the first lines. Train dot py does Steps 1 to 3: split, sci-kit learn model, Keras CNN, blend and gates. First come warnings. Lines about cuda, GPU, AVX2, absl or memory only say there is no graphics chip. Ignore them."
+ },
+ {
+  "id": "098_train-py-reading-the-epochs",
+  "text": "train dot py: reading the epochs. Epoch 23 of 30 is round 23 of 30. 50 of 50: all batches done. Val A U C is the ranking score on validation: higher is better, 1.0 is perfect. Watch val A U C: photos the model did not learn from."
+ },
+ {
+  "id": "099_train-py-done",
+  "text": "train dot py: done. About 4 minutes. The last line: blend weight and gates. Below low: pass. From high: stop. Between: a person. Writes svc dot joblib, cnn dot keras, settings dot json. Your numbers will differ a little. Watch out. Quick check first? Add dash dash epochs 2 to the command."
+ },
+ {
+  "id": "100_flow-py-a-validation-shift",
+  "text": "Type: python flow dot py, then the same E L P V photo folder as before, and press Enter. It sends every validation cell through the Lang Graph flow from Step 5, in under a minute. Run it as often as you like: it only uses validation."
+ },
+ {
+  "id": "101_flow-py-what-the-numbers-mea",
+  "text": "flow dot py: what the numbers mean. 7 of 165 defects passed is 4.2 per 100: defects that got out (target: at most 5). The 95% interval shows how sure. Lanes: where 1,000 cells go. A little hopeful: the gates were tuned on this tray."
+ },
+ {
+  "id": "102_flow-py-trial-the-sealed-tes",
+  "text": "Done tuning? Add dash dash trial at the end of the flow command. It opens the sealed test tray, like Step 8, and writes trial dot json. It runs only once. A second run is refused, because testing again and again would tune on the test tray."
+ },
+ {
+  "id": "103_flow-py-trial-drift-and-the-",
+  "text": "flow dot py dash dash trial: drift and the lanes. Here: 5.5 per 100, interval 2.9 to 10.1. Drift PSI compares the photos with validation: above 0.25 means act. The top end is above 5, so the target is not met for sure. Report what you get."
+ },
+ {
+  "id": "104_crew-py-dry-the-crew-s-tools",
+  "text": "Type: python crew dot py, dash dash dry, and press Enter. It runs the crew tools from Step 6 on the trial logbook, with no language model, in seconds. The tools print the facts. Guardrail true and false show the number checker at work."
+ },
+ {
+  "id": "105_app-py-the-operator-console",
+  "text": "Type: python app dot py, then the E L P V photo folder, and press Enter. When it prints Running on local URL, port 7860, click Open in Browser, or open the Ports tab and click the globe icon next to 7860. Control C in the terminal stops the console."
+ },
+ {
+  "id": "106_the-console-no-verdict",
+  "text": "The console: no verdict. Before any cell, the lamp says no verdict: the safe default. Start and Stop line run and halt the line. Next cell sends one. Pass and stop answer a queued cell."
+ },
+ {
+  "id": "107_the-console-a-real-cell",
+  "text": "The console: a real cell. Click next cell or start. A real cell appears with the flow's answer: pass, check or stop. Queue: N waiting is cells waiting for a person."
+ },
+ {
+  "id": "108_the-console-stop-and-the-shi",
+  "text": "The console: stop and the shift board. A clear defect gets stop. Shift board shows defects passed per 100, mono and poly, and the lanes."
+ },
+ {
+  "id": "109_when-you-finish",
+  "text": "When you finish. Part 2, save your free hours. Stop the codespace: github dot com slash codespaces, then the three dots menu next to it, then Stop codespace. Free hours are used only while it runs. Your files stay. Idle for about 30 minutes, it stops by itself. Later: open it again from github dot com slash codespaces."
+ },
+ {
+  "id": "110_you-are-done",
+  "text": "You are done. PanelGuard, student guide v2.0. Lab: Steps 0 to 8 in Chrome, the final test and Submit. Python project: fork, codespace, setup, five commands, the console. Results differ a little from run to run. Report the numbers you get."
+ }
+]

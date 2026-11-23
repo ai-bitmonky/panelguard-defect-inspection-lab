@@ -47,7 +47,7 @@ shot('p1/boot_ready.jpg', '2', 'Wait for green',
 shot('p1/boot_ready.jpg', '3', 'The parts of every page',
      '1 Course list.\n2 Step title and story.\n3 Strip of substeps.\n4 Task box.\n5 Result panel: what to do next, results, checks.',
      'Every page has the same parts.',
-     crop='full', prog=P, label='STEP', marks=[(236, 230, 1), (445, 100, 2), (870, 205, 3), (872, 300, 4), (1352, 170, 5)])
+     say='The parts of every page. One: the course list. Two: the step title and its story. Three: the strip of substeps. Four: the task box. Five: the result panel, with what to do next, results and checks. Every page has the same parts.', crop='full', prog=P, label='STEP', marks=[(236, 230, 1), (445, 100, 2), (870, 205, 3), (872, 300, 4), (1352, 170, 5)])
 shot('p1/1a_a.jpg', '4', 'Steps, substeps and locks',
      'A lock means: finish the one before. A tick means done. Tap a done substep to look back.',
      'Your work saves itself in this browser on this laptop. Come back later and carry on.',
@@ -85,7 +85,7 @@ shot('p1/how_predict.jpg', '11', 'Predict before you run',
 shot('p1/boot_ready.jpg', '12', 'More space on small screens',
      '1 folds the course list. 2 folds the result panel. Tap again to bring them back.',
      '3 Keep "Review mode" OFF. It is for teachers; work there is not saved.',
-     crop='full', prog=P, label='STEP', boxes=[(206, 64, 240, 96), (1320, 64, 1354, 96), (748, 12, 886, 42)], marks=[(223, 120, 1), (1337, 120, 2), (817, 64, 3)])
+     say='More space on small screens. Button one folds the course list. Button two folds the result panel. Tap again to bring them back. Three: keep Review mode off. It is for teachers, and work there is not saved.', crop='full', prog=P, label='STEP', boxes=[(206, 64, 240, 96), (1320, 64, 1354, 96), (748, 12, 886, 42)], marks=[(223, 120, 1), (1337, 120, 2), (817, 64, 3)])
 
 # ---------------------------------------------------------------- step intro cards + substeps
 INTRO = {
@@ -416,7 +416,7 @@ shot(F % 15, '12', 'flow.py: a validation shift',
      'Type the flow command below. It sends every validation cell through the LangGraph flow (Step 5), in under a minute.',
      'Run it as often as you like: it only uses validation.',
      crop=TERM2, prog=P2('Command 2 of 5 · flow.py'), label='TYPE', boxes=[(366, 216, 1300, 244)], quote=['python flow.py --elpv ' + ELPV], qlabel='TYPE',
-     say='Type: python flow dot p y, then the same elpv folder as before, and press Enter. It sends every validation cell through the Lang Graph flow from Step 5, in under a minute. Run it as often as you like: it only uses validation.')
+     say='Type: python flow dot py, then the same E L P V photo folder as before, and press Enter. It sends every validation cell through the Lang Graph flow from Step 5, in under a minute. Run it as often as you like: it only uses validation.')
 shot(F % 15, '13', 'flow.py: what the numbers mean',
      '"7 of 165 defects passed = 4.2 per 100": defects that got out (target: at most 5). The 95% interval shows how sure. Lanes: where 1,000 cells go.',
      '"A little hopeful": the gates were tuned on this tray.',
@@ -434,12 +434,12 @@ shot(F % 16, '16', 'crew.py --dry: the crew\'s tools',
      'Type the crew command below. It runs the crew tools (Step 6) on the trial logbook, with no language model, in seconds.',
      'The tools print the facts; "guardrail ... True / False" shows the number checker.',
      crop=TERM2, prog=P2('Command 4 of 5 · crew.py --dry'), label='TYPE', boxes=[(366, 88, 1424, 188)], quote=['python crew.py --dry'], qlabel='TYPE',
-     say='Type: python crew dot p y, dash dash dry, and press Enter. It runs the crew tools from Step 6 on the trial logbook, with no language model, in seconds. The tools print the facts. Guardrail true and false show the number checker at work.')
+     say='Type: python crew dot py, dash dash dry, and press Enter. It runs the crew tools from Step 6 on the trial logbook, with no language model, in seconds. The tools print the facts. Guardrail true and false show the number checker at work.')
 shot(F % 18, '17', 'app.py: the operator console',
      'Type the app command below. When it prints "Running on local URL ... 7860", click "Open in Browser" (or Ports tab, globe icon next to 7860).',
      'Ctrl + C in the terminal stops the console.',
      crop=TERM2, prog=P2('Command 5 of 5 · app.py'), label='TYPE', boxes=[(366, 216, 790, 244)], quote=['python app.py --elpv ' + ELPV], qlabel='TYPE',
-     say='Type: python app dot p y, then the elpv folder, and press Enter. When it prints Running on local URL, port 7860, click Open in Browser, or open the Ports tab and click the globe icon next to 7860. Control C in the terminal stops the console.')
+     say='Type: python app dot py, then the E L P V photo folder, and press Enter. When it prints Running on local URL, port 7860, click Open in Browser, or open the Ports tab and click the globe icon next to 7860. Control C in the terminal stops the console.')
 shot(F % 19, '18', 'The console: NO VERDICT',
      'Before any cell, the lamp says NO VERDICT: the safe default.',
      'START / STOP LINE run and halt the line. NEXT CELL sends one. PASS and STOP answer a queued cell.',
