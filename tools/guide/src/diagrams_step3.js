@@ -373,6 +373,16 @@ function scene3d(c, fx, mode) {
   s += t(580, 204, 'Busbars stay flat, the crack stays a crack,', { size: 15, fill: C.dim }) + t(580, 226, 'the label (defect) stays true.', { size: 15, fill: C.dim });
   return s;
 }
+function pix3d(dir) {   // where one real pixel of cell 6 goes under the mirror (fills the space before the judge question)
+  var px = D.pixels(6), r = 20, col = 5, v = px ? px[r * 64 + col] : null, r2 = dir === 'ud' ? 63 - r : r, c2 = dir === 'lr' ? 63 - col : col, g = v == null ? '#556' : 'rgb(' + v + ',' + v + ',' + v + ')';
+  var s = A.glass(560, 290, 372, 226, { col: '#2b4157' }) + t(580, 320, 'WHERE ONE PIXEL GOES', { size: 14, f: 'h', fill: C.dim, ls: '.08em' });
+  s += '<rect x="584" y="340" width="96" height="96" fill="#0a1019" stroke="#3a4757"/><rect x="' + (584 + col * 1.5) + '" y="' + (340 + r * 1.5) + '" width="9" height="9" fill="' + g + '" stroke="#ffb547" stroke-width="2"/>';
+  s += A.arrow(692, 388, 756, 388, '#ffb547', { w: 2.5 });
+  s += '<rect x="768" y="340" width="96" height="96" fill="#0a1019" stroke="#3a4757"/><rect x="' + (768 + c2 * 1.5 - 4) + '" y="' + (340 + r2 * 1.5 - (dir === 'ud' ? 4 : 0)) + '" width="9" height="9" fill="' + g + '" stroke="#3dffa0" stroke-width="2"/>';
+  s += t(632, 460, 'row ' + r + ', col ' + col, { size: 15, a: 'middle', f: 'm', fill: '#c7d4e4' }) + t(816, 460, 'row ' + r2 + ', col ' + c2, { size: 15, a: 'middle', f: 'm', fill: '#3dffa0' });
+  s += t(746, 494, 'grey ' + (v == null ? '…' : v) + ' — the value moves, it does not change', { size: 15, a: 'middle', fill: C.dim });
+  return s;
+}
 function judge3d(c, yes) {   // two answer buttons; the right one is first in the DOM
   var s = '<g class="pgd-chip"><rect x="560" y="290" width="372" height="32" rx="16" fill="#ffb547"/>' + t(746, 312, 'COULD THE CAMERA TAKE THIS PHOTO?', { size: 14, a: 'middle', w: 700, fill: '#1a1103', ls: '.04em' }) + '</g>';
   var bY = '<rect x="560" y="336" width="178" height="58" rx="12" fill="#0b1f17" stroke="#3dffa0" stroke-width="2"/>' + t(649, 372, 'YES, IT COULD', { size: 16, a: 'middle', f: 'h', fill: C.gr });
@@ -428,13 +438,13 @@ D.register('3d', {
   frames: [
   { cap: 'Mirror the photo left to right',
     note: 'Drag the mirror across the real cell. Then judge: could the camera have taken this photo?',
-    svg: function (c) { var fx = A.fx(), st = c.state, s = scene3d(c, fx); s += st.mirrored ? judge3d(c, true) : mirror3d(c, 'lr'); return s; },
+    svg: function (c) { var fx = A.fx(), st = c.state, s = scene3d(c, fx); s += st.mirrored ? judge3d(c, true) : pix3d('lr') + mirror3d(c, 'lr'); return s; },
     work: function (c) { return work3d(c, 0); },
     bind: function (c, root) { if (!c.state.mirrored) bindMirror(c, root); else { D.onTap(root.querySelector('[data-pgd-t=yes]'), onJudge(c, true, true)); D.onTap(root.querySelector('[data-pgd-t=no]'), onJudge(c, true, false, 'Look again: the busbars are still flat and the crack is still there.')); } },
     auto: function (c) { c.state.view = ''; c.state.have = ['lr']; c.state.mirrored = 0; } },
   { cap: 'Mirror it top to bottom',
     note: 'Drag the mirror down. An up-down mirror also gives a photo the camera could take.',
-    svg: function (c) { var fx = A.fx(), st = c.state, s = scene3d(c, fx); s += st.mirrored ? judge3d(c, true) : mirror3d(c, 'ud'); return s; },
+    svg: function (c) { var fx = A.fx(), st = c.state, s = scene3d(c, fx); s += st.mirrored ? judge3d(c, true) : pix3d('ud') + mirror3d(c, 'ud'); return s; },
     work: function (c) { return work3d(c, 1); },
     bind: function (c, root) { if (!c.state.mirrored) bindMirror(c, root); else { D.onTap(root.querySelector('[data-pgd-t=yes]'), onJudge(c, true, true)); D.onTap(root.querySelector('[data-pgd-t=no]'), onJudge(c, true, false, 'Look again: the busbars stay flat and the label stays true.')); } },
     auto: function (c) { c.state.have = ['lr', 'ud', 'both']; c.state.view = ''; } },

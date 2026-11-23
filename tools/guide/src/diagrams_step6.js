@@ -405,7 +405,11 @@ D.register('6b', {
       s += '<rect x="80" y="400" width="80" height="8" rx="3" fill="#efe9da"/>';
       var kx = 290, ky = 420, r = 54;
       s += '<path d="M' + kx + ' ' + (ky - r) + 'A' + r + ' ' + r + ' 0 1 1 ' + (kx - r) + ' ' + ky + '" stroke="#ffb547" stroke-width="3" stroke-dasharray="6 6" fill="none" opacity=".7"/>';
-      s += A.target('knob', '<circle cx="' + kx + '" cy="' + (ky - r) + '" r="14" fill="#ffb547" stroke="#fff" stroke-width="2.5"/>', 'turn the knob', 480, 360, { kind: 'drag', to: snapTo(kx, ky - r, kx - r, ky, 8) });
+      var lg = (((window.PGD_FACTS || {}).s7 || {}).belt || {}).cells || [];   // the real 5g logbook rows the function counts
+      s += '<g class="pgd-keep"><rect x="560" y="290" width="360" height="200" rx="6" fill="#f1ecdf" filter="url(#' + fx.sh + ')"/>' + t(576, 316, 'STEP 5 LOGBOOK · 5g shift', { size: 14, f: 'h', fill: '#2a3444' });
+      lg.slice(0, 6).forEach(function (q, i) { s += t(576, 344 + i * 21, 'cell ' + q[0] + ' · ' + q[1] + ' · ' + q[2], { size: 15, f: 'm', fill: '#1f2937' }); });
+      s += t(904, 478, '… ' + (toolRes6b().cells || '?') + ' rows', { size: 15, a: 'end', f: 'm', w: 700, fill: '#0f5a8a' }) + '</g>' + A.arrow(556, 452, 376, 452, '#5d6b80', { w: 2, dash: '6 5' });
+      s += A.target('knob', '<circle cx="' + kx + '" cy="' + (ky - r) + '" r="14" fill="#ffb547" stroke="#fff" stroke-width="2.5"/>', 'turn the knob', 440, 330, { kind: 'drag', to: snapTo(kx, ky - r, kx - r, ky, 8) });
       s += A.glass(520, 60, 400, 200, { fx: fx, col: '#2b4760' }) + t(540, 92, 'WHAT RUNS', { size: 14, f: 'h', fill: C.dim, ls: '.08em' }) + t(540, 126, 'count every row of the', { size: 17, fill: '#dbe6f2' }) + t(540, 152, 'Step 5 logbook (5g shift)', { size: 17, fill: '#dbe6f2' }) + t(540, 196, (toolRes6b().cells || '?') + ' rows', { size: 28, f: 'm', w: 700, fill: '#46e3ff' }) + t(540, 230, 'the same counter as 5g', { size: 15, fill: C.dim });
       return s;
     },
