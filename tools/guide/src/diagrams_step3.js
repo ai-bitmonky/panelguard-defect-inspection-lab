@@ -815,4 +815,5 @@ D.register('3g', {
     } }
   ]
 });
+D.S3 = { blend: blend3f, gates: g3g };   // shared with the Step 4-5 diagrams (same scores, same gates)
 })();

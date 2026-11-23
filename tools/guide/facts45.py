@@ -73,21 +73,22 @@ def cut_at(yy, s, r=0.95):
     d = np.sort(s[yy == 1])[::-1]; k = int(np.ceil(r * len(d) - 1e-9)); return d[max(0, k - 1)]
 r3 = lambda a: [round(float(v), 3) for v in np.ravel(a)]
 r4 = lambda a: [round(float(v), 4) for v in np.ravel(a)]
+r6 = lambda a: [float('%.4g' % v) for v in np.ravel(a)]
 
 S4 = {}
 PAINT = [496, 1088, 379]
 S4['paint'] = []
 for c in PAINT:
     img = xv[VAL[c]]; base, cov = cover_up(img); cam = grad_cam(img); order, up = hot_order(cam)
-    S4['paint'].append({'id': c, 'score': round(base, 4), 'cover': r3(cov), 'cam': r4(cam), 'hot': [int(v) for v in order[:410]], 'prob': float(pv[VAL[c]]), 'kind': str(kv[VAL[c]])})
+    S4['paint'].append({'id': c, 'score': round(base, 4), 'cover': r3(cov), 'cam': r6(cam), 'hot': [int(v) for v in order[:410]], 'prob': float(pv[VAL[c]]), 'kind': str(kv[VAL[c]])})
     print('paint', c, 'score', round(base, 3), 'max drop', round(float(cov.max()), 3), 'cam max', round(float(cam.max()), 4))
 # 4c: Grad-CAM parts for cell 496 (the 64 block-3 maps and their weights)
 A, w, raw = grad_cam(xv[VAL[496]], parts=True)
 contrib = (A * w).sum(axis=(0, 1))
 top = np.argsort(-np.abs(contrib))[:6]
 hr, hc = np.unravel_index(np.argmax(np.maximum(raw, 0)), raw.shape)
-S4['parts'] = {'id': 496, 'w': r4(w), 'top': [int(k) for k in top], 'maps': [r3(A[:, :, k]) for k in top], 'raw': r4(raw), 'hot': [int(hr), int(hc)],
-               'terms': sorted([[int(k), round(float(A[hr, hc, k]), 4), round(float(w[k]), 4)] for k in range(64)], key=lambda q: -abs(q[1] * q[2])),
+S4['parts'] = {'id': 496, 'w': r6(w), 'top': [int(k) for k in top], 'maps': [r3(A[:, :, k]) for k in top], 'raw': r6(raw), 'hot': [int(hr), int(hc)],
+               'terms': sorted([[int(k), round(float(A[hr, hc, k]), 4), float('%.4g' % w[k])] for k in range(64)], key=lambda q: -abs(q[1] * q[2])),
                'nPos': int((w > 0).sum()), 'nNeg': int((w < 0).sum()), 'shape': [16, 16, 64]}
 # 4c picks (the lab's probe: CNN score, cut at 95% recall)
 cutv = float(cut_at(yv, p_cnn)); D = np.where(yv == 1)[0]
@@ -97,7 +98,7 @@ fa = sorted(np.where(yv == 0)[0], key=lambda i: -p_cnn[i])
 S4['cut'] = round(cutv, 4); S4['picks'] = []
 for tag, i in (('caught defect', caught[0]), ('missed defect', missed[0]), ('false alarm', fa[0])):
     img = xv[i]; base, cov = cover_up(img); cam = grad_cam(img)
-    S4['picks'].append({'id': int(idv[i]), 'tag': tag, 'score': round(float(p_cnn[i]), 4), 'y': int(yv[i]), 'prob': float(pv[i]), 'kind': str(kv[i]), 'cam': r4(cam), 'cover': r3(cov)})
+    S4['picks'].append({'id': int(idv[i]), 'tag': tag, 'score': round(float(p_cnn[i]), 4), 'y': int(yv[i]), 'prob': float(pv[i]), 'kind': str(kv[i]), 'cam': r6(cam), 'cover': r3(cov)})
     print('pick', tag, int(idv[i]), round(float(p_cnn[i]), 3))
 # 4d: deletion check on every real validation defect
 K = round(0.1 * 4096); hot_imgs, rand_imgs = [], []

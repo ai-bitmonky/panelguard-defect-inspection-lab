@@ -1,13 +1,14 @@
 // Dev helper (not a test): screenshot guide frames. node shot.mjs <id> [w] [h] [frames e.g. 0,1,2] [tab]
 import { chromium } from 'playwright'; import { mirrorCDN } from '../../tests/cdn.mjs'; import path from 'path'; import { fileURLToPath } from 'url';
 const here = path.dirname(fileURLToPath(import.meta.url));
-const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v2.1.html');
+const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v2.2.html');
 const [id = '1a', w = '1366', h = '768', fr = '0', tab = 'diagram'] = process.argv.slice(2);
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
 const ctx = await browser.newContext({ viewport: { width: +w, height: +h } }); await mirrorCDN(ctx); const page = await ctx.newPage();
 const errors = []; page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 300)); }); page.on('pageerror', (e) => errors.push('PAGEERROR ' + e.message));
 await page.goto('file://' + DIST);
 await page.waitForFunction(() => window.PG && window.PG.pack && window.PG.pack(), null, { timeout: 120000 });
+if (process.env.UNLOCK) await page.evaluate(() => { window.__pgdUnlock = true; });
 await page.evaluate(([i, t]) => window.PGDiagram.open(i, t), [id, tab]);
 await page.waitForTimeout(400);
 for (const f of fr.split(',')) {

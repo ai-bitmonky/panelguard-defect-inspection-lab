@@ -55,12 +55,13 @@ function cellURL(id) {
     x.putImageData(im, 0, 0); return (URLS[id] = cv.toDataURL('image/png'));
   } catch (e) { return ''; }
 }
-function fullURL(id) {   // the 300 x 300 photo when the lab ships it, else the 64 x 64 one
+function fullURL(id) {   // the 300 x 300 photo when the lab ships it (or the guide's own 240 px copy in facts.photos), else the 64 x 64 one
+  var ph = (window.PGD_FACTS || {}).photos; if (ph && ph[id]) return 'data:image/jpeg;base64,' + ph[id];
   var key = 'data/full/cell' + ('000' + id).slice(-4) + '.png';
   var e = window.PG_EMBED && window.PG_EMBED[key];
   return e && e.b64 ? 'data:image/png;base64,' + e.b64 : cellURL(id);
 }
-function hasFull(id) { var e = window.PG_EMBED && window.PG_EMBED['data/full/cell' + ('000' + id).slice(-4) + '.png']; return !!(e && e.b64); }
+function hasFull(id) { var ph = (window.PGD_FACTS || {}).photos; if (ph && ph[id]) return true; var e = window.PG_EMBED && window.PG_EMBED['data/full/cell' + ('000' + id).slice(-4) + '.png']; return !!(e && e.b64); }
 var packWaiters = [];
 function whenPack(fn) { if (pack()) return fn(); packWaiters.push(fn); }
 (function poll() { if (pack()) { var w = packWaiters; packWaiters = []; w.forEach(function (f) { try { f(); } catch (e) { log('pack waiter', e && e.message); } }); } setTimeout(poll, packWaiters.length ? 300 : 1500); })();
@@ -84,11 +85,12 @@ var FH = "Orbitron,'Segoe UI',Arial,sans-serif", FB = "Rajdhani,'Segoe UI',Arial
 var uidN = 0;
 function uid(p) { return (p || 'g') + (++uidN); }
 var A = {
+  MIN: 14,   // smallest stage font: at 1366 x 768 the stage scales to ~0.88, so 14 stays above 12 px on screen
   W: W, H: H, COL: COL, FH: FH, FB: FB, FM: FM, uid: uid, esc: esc, fmt: fmt, pct: pct,
   t: function (x, y, s, o) {   // text. o: {size, fill, w (weight), a (anchor), f ('h'|'m'|'b'), ls, cls, op}
     o = o || {};
     var f = o.f === 'h' ? FH : o.f === 'm' ? FM : FB;
-    return '<text x="' + x + '" y="' + y + '" font-family="' + f + '" font-size="' + (o.size || 18) + '" fill="' + (o.fill || COL.ink) + '" font-weight="' + (o.w || (o.f === 'h' ? 700 : 600)) + '"' +
+    return '<text x="' + x + '" y="' + y + '" font-family="' + f + '" font-size="' + Math.max(A.MIN, o.size || 18) + '" fill="' + (o.fill || COL.ink) + '" font-weight="' + (o.w || (o.f === 'h' ? 700 : 600)) + '"' +
       (o.a ? ' text-anchor="' + o.a + '"' : '') + (o.ls ? ' letter-spacing="' + o.ls + '"' : '') + (o.op != null ? ' opacity="' + o.op + '"' : '') + (o.cls ? ' class="' + o.cls + '"' : '') + '>' + esc(s) + '</text>';
   },
   /* the shared stage background: same canvas on every frame and every diagram */
@@ -235,7 +237,7 @@ function val() {
   return o;
 }
 /* has the student answered this substep's prediction (or passed it)? */
-function predDone(id) { var p = liveSub(id).pred; return !!(liveRes(id) || (p && p.locked)); }
+function predDone(id) { if (window.__pgdUnlock) return true; var p = liveSub(id).pred; return !!(liveRes(id) || (p && p.locked)); }
 
 /* ---------------- the Work it out strip ----------------
    rows: { h: 'heading' } | { t: 'plain line' } | { k: 'label', v: '1,234', op: '÷'|'×'|'−'|'+'|'=', res: true, col } | { tag: 'your value'|'typical value' } | { bar: share 0..1, col, mark } */
