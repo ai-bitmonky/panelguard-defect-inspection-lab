@@ -4,3 +4,5 @@ tools/shots/
 tools/lg/node_modules/
 tools/audit/shots/
 tools/audit/shots_sizes/
+tools/audit/shots_small/
+tools/audit/shots_v12/
