@@ -8,11 +8,11 @@ import json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SRC = os.path.join(HERE, 'src')
-VERSION = '2.3'
+VERSION = '3.0'
 BASE = os.path.join(HERE, 'base', 'PanelGuard_Refined_Student_Lab_base.html')
 OUT = os.path.join(ROOT, 'dist', 'PanelGuard_Refined_Student_Lab_v%s.html' % VERSION)
 # load order: data first, then the engine, the diagram files (one per step group), the shell last
-JS = ['legacy.js', 'engine.js', 'diagrams_step0.js', 'diagrams_step1.js', 'diagrams_step2.js', 'diagrams_step3.js', 'diagrams_step4.js', 'diagrams_step5.js', 'diagrams_step6.js', 'diagrams_step7.js', 'shell.js']
+JS = ['legacy.js', 'engine.js', 'diagrams_step0.js', 'diagrams_step1.js', 'diagrams_step2.js', 'diagrams_step3.js', 'diagrams_step4.js', 'diagrams_step5.js', 'diagrams_step6.js', 'diagrams_step7.js', 'diagrams_step8.js', 'shell.js']
 
 
 def read(p):

@@ -1,7 +1,7 @@
 // Dev helper (not a test): screenshot guide frames. node shot.mjs <id> [w] [h] [frames e.g. 0,1,2] [tab]
 import { chromium } from 'playwright'; import { mirrorCDN } from '../../tests/cdn.mjs'; import path from 'path'; import { fileURLToPath } from 'url';
 const here = path.dirname(fileURLToPath(import.meta.url));
-const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v' + (process.env.GV || '2.3') + '.html');
+const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v' + (process.env.GV || '3.0') + '.html');
 const [id = '1a', w = '1366', h = '768', fr = '0', tab = 'diagram'] = process.argv.slice(2);
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true });
 const ctx = await browser.newContext({ viewport: { width: +w, height: +h } }); await mirrorCDN(ctx); const page = await ctx.newPage();

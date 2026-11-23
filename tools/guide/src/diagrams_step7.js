@@ -509,4 +509,5 @@ D.register('7g', {
     work: function () { return [{ h: 'The fault drill' }, { v: '3 of 4', k: 'faults that the starter console shows WRONG' }, { v: '4 of 4', k: 'faults that the fixed console shows safely' }, { t: 'Break it on purpose before the plant does: both bugs are invisible on the happy path.' }]; } }
   ]
 });
+window.PGD_S7 = { hmi: hmi, lampBox: lampBox, shape: shape, LC: LC, LW: LW };   // reused by the Step 8 diagrams
 })();
