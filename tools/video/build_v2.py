@@ -74,13 +74,14 @@ def load_src(s):
     p = os.path.join(HERE, s['img'])
     if not os.path.exists(p) and os.environ.get('ALLOW_MISSING'): src = Image.new('RGB', (1366, 768), (60, 60, 60))
     else: src = Image.open(p).convert('RGB')
-    for (x0, y0, x1, y1) in MASKS.get(os.path.basename(p), []):     # hide one word that must not appear (a commit author name)
-        ImageDraw.Draw(src).rectangle([x0, y0, x1, y1], fill=(255, 255, 255))
+    for (x0, y0, x1, y1) in MASKS.get(s['img'], []):     # hide a word that must not appear in any frame (a commit author, a model-name placeholder)
+        ImageDraw.Draw(src).rectangle([x0, y0, x1, y1], fill=src.getpixel((x0, (y0 + y1) // 2)))
     c = s.get('crop', 'main'); box = CROPS[c] if isinstance(c, str) else c
     if box is None: box = (0, 0) + src.size
     return src, box
 
-MASKS = {'gh_01.jpg': [(40, 366, 124, 394)], 'gh_02.jpg': [(40, 366, 124, 394)], 'gh_07.jpg': [(121, 336, 204, 363)], 'gh_23.jpg': [(121, 255, 204, 282)]}
+MASKS = {'frames/gh_01.jpg': [(40, 366, 124, 394)], 'frames/gh_02.jpg': [(40, 366, 124, 394)], 'frames/gh_07.jpg': [(121, 336, 204, 363)], 'frames/gh_23.jpg': [(121, 255, 204, 282)],
+         'p1/6g_a.jpg': [(441, 619, 842, 641)], 'p1/6g_b.jpg': [(441, 538, 842, 560)]}
 
 def render_shot(s, frac):
     im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
@@ -165,7 +166,7 @@ def say_text(s):
     if s.get('say'): return speech(s['say'])
     if s['kind'] == 'shot':
         sub = not s.get('label')
-        h = s.get('heads') or (('What you do', 'What you learn') if sub else ('', ''))
+        h = s.get('heads') or ('', '')
         parts = [('%s, %s.' % (s['id'], s['name'])) if sub else (s['name'] + '.')]
         parts.append((h[0] + '. ' if h[0] else '') + s['do'])
         if s.get('learn'): parts.append((h[1] + '. ' if h[1] else '') + s['learn'])
@@ -219,7 +220,7 @@ def main():
             jf = os.path.join(OUTDIR, 'tts_jobs.json'); json.dump(jobs, open(jf, 'w'))
             print('narration:', len(jobs), 'screens'); run([TTS_PY, '-I', os.path.join(HERE, 'tts_v2.py'), jf])
         lens = [wav_len(p) for p in wavs]
-    LEAD, TAIL = 0.6, 1.2
+    LEAD, TAIL = 0.5, 0.9
     durs = []
     for i, s in enumerate(S):
         d = max(6.0, 0.4 * screen_words(s), (LEAD + lens[i] + TAIL) if audio else 0)
@@ -251,7 +252,7 @@ def main():
         track = np.clip(track[:int(round(sum(durs) * sr))], -1, 1)
         aw = os.path.join(OUTDIR, 'narration.wav')
         with wave.open(aw, 'w') as w: w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr); w.writeframes((track * 32767).astype(np.int16).tobytes())
-        run(['ffmpeg', '-y', '-loglevel', 'error', '-i', vid, '-i', aw, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '96k', '-ar', '48000', '-movflags', '+faststart', tmpf])
+        run(['ffmpeg', '-y', '-loglevel', 'error', '-i', vid, '-i', aw, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '64k', '-ar', '48000', '-movflags', '+faststart', tmpf])
     else:
         run(['ffmpeg', '-y', '-loglevel', 'error', '-i', vid, '-c', 'copy', '-movflags', '+faststart', tmpf])
     os.replace(tmpf, FINAL)

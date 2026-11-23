@@ -45,35 +45,35 @@ shot('p1/boot_ready.jpg', '2', 'Wait for green',
      'The TensorFlow.js dot is red here only because this recording PC has no graphics chip. The lab still works.',
      crop='full', prog=P, label='STEP', boxes=[(895, 12, 1362, 42)], marks=[(905, 58, 1)])
 shot('p1/boot_ready.jpg', '3', 'The parts of every page',
-     '1 Course list. 2 Step title and story. 3 Strip of substeps. 4 Task box. 5 Result panel: what to do next, results, checks.',
+     '1 Course list.\n2 Step title and story.\n3 Strip of substeps.\n4 Task box.\n5 Result panel: what to do next, results, checks.',
      'Every page has the same parts.',
-     crop='full', prog=P, label='STEP', marks=[(128, 230, 1), (310, 100, 2), (560, 205, 3), (300, 290, 4), (1300, 124, 5)])
+     crop='full', prog=P, label='STEP', marks=[(236, 230, 1), (445, 100, 2), (870, 205, 3), (872, 300, 4), (1352, 170, 5)])
 shot('p1/1a_a.jpg', '4', 'Steps, substeps and locks',
      'A lock means: finish the one before. A tick means done. Tap a done substep to look back.',
      'Your work saves itself in this browser on this laptop. Come back later and carry on.',
      watch='Same laptop, same Chrome each time. Clearing browsing data deletes your progress.',
-     prog=P, label='STEP', boxes=[(285, 228, 860, 282)], marks=[(452, 238, 1)])
+     prog=P, label='STEP', crop=(255, 54, 893, 768), boxes=[(285, 228, 860, 282)], marks=[(452, 238, 1)])
 shot('p1/1a_a.jpg', '5', 'The task box',
      'Each numbered line is one gap in the code and says what to type there. A hand sign marks a hands-on part.',
      'Read the task box first.',
-     prog=P, label='STEP', boxes=[(276, 308, 870, 512)], marks=[(300, 384, 1), (300, 440, 2)])
+     prog=P, label='STEP', crop=(255, 54, 893, 768), boxes=[(276, 308, 870, 512)], marks=[(276, 384, 1), (276, 440, 2)])
 shot('p1/1a_c.jpg', '6', 'Blanks and RUN',
      'Each gap is a ____ blank, drawn as a yellow box. Type your answer in its place, then press RUN (or Ctrl + Enter).',
      '"Reset this cell" brings the starter code back.',
      watch='Change only the blanks.',
-     crop='full', prog=P, label='STEP', marks=[(328, 680, 1)], boxes=[(285, 662, 375, 698)])
+     crop=(255, 54, 893, 768), prog=P, label='STEP', marks=[(400, 680, 1)], boxes=[(285, 662, 375, 698)])
 shot('p1/how_blank_work.jpg', '7', 'If a blank is still empty',
      'RUN with a blank left in: nothing runs. A red CHECK names the line with the blank.',
      'Fill it and press RUN again.',
-     crop='full', prog=P, label='STEP', boxes=[(910, 102, 1352, 164), (275, 360, 750, 382)], marks=[(925, 100, 1), (290, 370, 2)])
+     crop='main', prog=P, label='STEP', boxes=[(910, 102, 1352, 164), (275, 360, 760, 382)], marks=[(910, 100, 1), (270, 370, 2)])
 shot('p1/how_wrong_top.jpg', '8', 'If an answer is wrong',
      'A wrong answer gives a red CHECK in plain words: what went wrong and where to look.',
      'No limit on tries. Read, fix the gap, RUN again.',
-     crop='full', prog=P, label='STEP', boxes=[(910, 102, 1352, 164), (910, 174, 1352, 278)], marks=[(925, 100, 1), (925, 174, 2)])
+     crop='main', prog=P, label='STEP', boxes=[(910, 102, 1352, 164), (910, 174, 1352, 278)], marks=[(910, 100, 1), (910, 176, 2)])
 shot('p1/how_example.jpg', '9', 'Worked example',
      'Stuck? Open "Worked example". Same idea, other case, other numbers.',
      'It never shows your answer.',
-     crop='full', prog=P, label='STEP', marks=[(300, 100, 1)])
+     crop=(255, 54, 893, 768), prog=P, label='STEP', marks=[(268, 64, 1)], boxes=[(286, 50, 862, 296)])
 shot('p1/2c_after.jpg', '10', 'PASS, then the next one opens',
      'A green PASS unlocks the next substep. Some pages then show a TO DO hands-on task: do it to finish.',
      'After a pass, tap "WHY THIS WORKS" for a step-by-step explanation.',
@@ -155,7 +155,7 @@ SUBS = [
   'A cell exactly AT the cut counts as a defect.'),
  ('1d', 'Split the data', 'a',
   'Train 60%, validation 20%, test 20%. Gap 1: the label array that keeps the defect share equal in each tray. RUN. Then roll the dice 3 times.',
-  'Train to learn, validation to choose, test once at the end. The test tray is now sealed.', None),
+  'Each tray has its own job. The test tray is now sealed.', None),
  ('1e', 'Scale and flatten', 'a',
   'Gap 1: the number that turns the brightest pixel into 1.0. Gap 2: how many numbers one flat photo has. RUN. Then drag the lens onto the darkest pixel.',
   'To a model a photo is one long row of numbers.', None),
@@ -165,7 +165,7 @@ SUBS = [
   'Anything that learns from data learns from train only.', None),
  ('2b', 'Train three inspectors', 'a',
   'First bet: tap the model you think wins. One try. Gap 1: the number of folds in the plan. Gap 2: the train index array. RUN.',
-  'Compare models on folds of the train tray.',
+  'Folds let you compare models fairly, inside the train tray.',
   'Features and labels must be the same cells.'),
  ('2c', 'Read scores, not verdicts', 'a',
   'Gap 1: the column number of "chance of defect". RUN. Then drag the gate until 95 of 100 defects are stopped.',
@@ -182,15 +182,15 @@ SUBS = [
   'TensorFlow reads all photos as one 4-number tensor.',
   'From here the code is JavaScript: square brackets, exact names.'),
  ('3b', 'See what a filter sees', 'a',
-  'No code. Set the numbers of one 3 × 3 filter by hand until it lights up the crack but not the busbars.',
+  'No code. Tap the 9 squares of a 3 × 3 filter (0, +1, −1) until the crack glows at least 2.5 times brighter than the busbars.',
   'A CNN layer is many such filters. Training finds their numbers.', None),
  ('3c', 'Build the network', 'a',
   'Gaps: channels in a gray photo, the missing number in 16, 32, ?, 128, and the outputs per cell. RUN. Then tap the block with the most weights.',
   'Weights per layer = 3 × 3 × channels in × filters out.', None),
  ('3d', 'Make more photos for free', 'a',
-  'First sort the 5 changed photos. Gap 1: the axis to reverse for a left-right flip (the task box lists the axes). RUN.',
+  'First drag the 5 changed photos into boxes: still a real cell photo, or not? Check. Gap 1: the axis to reverse for a left-right flip. RUN.',
   'Only make changes the camera could really produce.', None),
- ('3e', 'Train it', 'c',
+ ('3e', 'Train it', 'a',
   'First predict: draw the validation score from epoch 1 to 30, then Check. Fill the loss name and the defect-count variable. Pick Quick or Full, RUN, and watch the curves.',
   'The app keeps the best epoch on validation.',
   'Keep the tab open until training ends.'),
@@ -239,7 +239,7 @@ SUBS = [
   'Run 1 is meant to fail. Read its message.'),
  ('5f', 'Stop and wait for a person', 'a',
   'Type the two gaps. RUN: 5 cells pause. Then decide each paused cell, pass or stop.',
-  'A pause needs interrupt, a memory and a thread id per cell.', None),
+  'A pause needs a memory (checkpointer) and one thread id per cell.', None),
  ('5g', 'Run a shift', 'a',
   'Type the two gaps for the poly gate. RUN: the whole validation tray goes through. Then tap every defect that passed in the logbook.',
   'The flow guarantees the routing; quality still depends on scores and people.', None),
@@ -255,14 +255,14 @@ SUBS = [
   'Role, goal and backstory become the model\'s instructions. The brain here is scripted: no key needed.', None),
  ('6d', 'Give the jobs an order', 'a',
   'First predict: tap each report line, filled or missing. Run 1 is wrong on purpose: writer first. Run 2: the right order and context.',
-  'Order is the task list. Context is what a job may read.', None),
+  'Run order and context are two different settings.', None),
  ('6e', 'Kick off', 'a',
   'Type the three gaps. RUN: the crew works. Then tap the glowing worker to step through the trace to the report.',
   'Agent loop: decide, call a tool, read, answer.', None),
  ('6f', 'Never trust, check', 'a',
   'First find the planted wrong numbers and tap "Done". Type the three gaps. RUN: your checker guards the report.',
   'Check every number against the tools.', None),
- ('6g', 'Plug in a real model (optional)', 'a',
+ ('6g', 'Plug in a real model (optional)', 'b',
   'Optional. Run the crew with a real model using your own API key, or tap "Skip — no key".',
   'The key stays in page memory only.',
   'Real models work only in the downloaded single-file lab.'),
@@ -272,7 +272,7 @@ SUBS = [
   'The operator has about 2 seconds per cell.', None),
  ('7b', 'Show one cell', 'a',
   'Type the two gaps. RUN: one live cell and its lamp. Then try the "No colour" and "From 2 m" switches.',
-  'Unknown is never PASS. It is NO VERDICT.', None),
+  'The lamp must never guess when the answer is unknown, missing or broken.', None),
  ('7c', 'Run the line', 'a',
   'Type the gap. RUN. Turn the speed knob, press Start, run 30 real cells.',
   'Every cell counts once, under the lamp shown.', None),
@@ -284,10 +284,10 @@ SUBS = [
   'The question picks the chart.', None),
  ('7f', 'One button, one report', 'a',
   'Type the two gaps. RUN. Then press REPORT in the preview, then COPY.',
-  'No checked report, no report.', None),
+  'One button runs the whole crew, with the number check built in.', None),
  ('7g', 'Break it before the plant does', 'a',
   'Run the starter code with its 2 planted bugs. Break it with the fault panel. Fix BUG 1 and BUG 2 as the task box says. Run again and fire all 4 faults.',
-  'When in doubt, the screen says NO VERDICT.',
+  'Test the screen with real faults before the plant does.',
   'Change only the two marked lines.'),
  # ---- Step 8
  ('8a', 'Freeze, then break the seal', 'a',
@@ -296,10 +296,10 @@ SUBS = [
   'After the seal, do not re-run earlier tuning cells.'),
  ('8b', 'The line trial', 'a',
   'Type the three gaps from the task box. RUN once: every sealed cell goes through your frozen flow. Compare with your guess.',
-  'The test tray gives the honest number. Report it.', None),
+  'One run, on cells the model has never seen.', None),
  ('8c', 'How sure is that number?', 'a',
   'First pull the lever until 40 redrawn shifts are on the line. Type the three gaps. RUN: a 95% interval.',
-  'A small tray gives a wide band. Trust only the top end.', None),
+  'A small tray gives a wide band around the number.', None),
  ('8d', 'Watch for drift', 'a',
   'Type the two gaps. RUN: a drift alarm. Then tick the alarm you expect for each change and tap "Check my matrix".',
   'No labels on the line: watch inputs and scores.', None),
@@ -314,6 +314,10 @@ SUBS = [
   'The whole system, with your own numbers.', None),
 ]
 
+CODE = ['1a', '1b', '1c', '1d', '1e', '2a', '2b', '2c', '2d', '2e', '3a', '3c', '3d', '3e', '3f', '3g', '4b', '4c', '4d', '4e', '5b', '5c', '5d', '5e', '5f', '5g', '6b', '6c', '6d', '6e', '6f', '7b', '7c', '7d', '7e', '7f', '7g', '8b', '8c', '8d', '8e']
+EXTRA = {k: dict(crop=(255, 54, 893, 640)) for k in CODE}
+EXTRA['3e'] = dict(crop=(255, 54, 893, 768))
+EXTRA['6g'] = dict(boxes=[(564, 643, 676, 673)])
 STEP_OF = {}
 for t in SUBS: STEP_OF.setdefault(int(t[0][0]), []).append(t)
 
@@ -323,15 +327,15 @@ for st in range(9):
     if st == 3:
         card(STEP3_EXTRA[0], STEP3_EXTRA[1], sub='Read this before 3e', prog='Part 1 · Step 3 of 8', kind='step')
     for (id_, name, view, do, learn, watch) in STEP_OF[st]:
-        shot('p1/%s_%s.jpg' % (id_, view), id_, name, do, learn, watch, prog=P1(id_))
+        shot('p1/%s_%s.jpg' % (id_, view), id_, name, do, learn, watch, prog=P1(id_), **EXTRA.get(id_, {}))
     if st == 8:
         PE = 'Part 1 · After Step 8'
         shot('p1/8g_test.jpg', '8g', 'The final test',
              '15 questions across Steps 1 to 8. Each question says exactly what to do: type, tap or choose. Each one has ONE Check: then it shows the correct answer with an explanation (tap to open) and locks.',
-             'Questions you have not checked stay open. Answer them in any order.', prog=PE, label='TEST')
+             'Questions you have not checked stay open. Answer them in any order.', prog=PE, label='TEST', crop=(255, 54, 1366, 575))
         shot('p1/8g_score.jpg', '8g', 'The scorecard',
              'The SCORECARD on the right fills in as you check: your answer, the correct answer and a tick or a cross for every question.',
-             'Below it: your predictions from the whole course, the "Take it home" project and the limits of this build.', prog=PE, label='TEST')
+             'Below it: your predictions from the whole course, the "Take it home" project and the limits of this build.', prog=PE, label='TEST', crop=(895, 54, 1366, 768))
         shot('p1/8g_submit.jpg', '8g', 'Submit',
              'At the end press SUBMIT THE TEST. If some questions are still open, the button asks again: "SUBMIT ANYWAY". Open questions then count as not answered.',
              'After Submit the whole test is locked and you see your score.',
@@ -386,7 +390,7 @@ shot(F % 9, '6', 'Trust the folder',
 shot(F % 10, '7', 'Setup runs by itself',
      'Setup runs by itself in the terminal at the bottom: it installs the Python packages and downloads the photos.',
      'About 5 to 10 minutes. Wait for a prompt ending in $.',
-     watch='If setup fails: click in the terminal, type  sh tools/takehome/setup.sh  and press Enter.',
+     watch='If setup fails: click in the terminal, type the command above and press Enter.', quote='sh tools/takehome/setup.sh', qlabel='IF SETUP FAILS, TYPE',
      crop='full', prog=P2('Setup'), label='WAIT', boxes=[(366, 428, 900, 488)], marks=[(350, 456, 1)],
      say='Setup runs by itself in the terminal at the bottom. It installs the Python packages and downloads the photos. This takes about 5 to 10 minutes. Wait for a prompt that ends with a dollar sign. Watch out: if setup fails, click in the terminal, type: s h, space, tools slash takehome slash setup dot s h, and press Enter.')
 shot(F % 11, '8', 'The terminal and your first command',
