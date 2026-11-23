@@ -1,0 +1,26 @@
+name: Build student image
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .devcontainer/Dockerfile
+      - tools/takehome/requirements.txt
+      - .github/workflows/image.yml
+permissions:
+  contents: read
+  packages: write
+jobs:
+  image:
+    if: github.repository == 'ai-bitmonky/panelguard-defect-inspection-lab'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to the GitHub container registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Build
+        run: docker build -f .devcontainer/Dockerfile -t ghcr.io/ai-bitmonky/panelguard-lab:latest .
+      - name: Check the image
+        run: docker run --rm ghcr.io/ai-bitmonky/panelguard-lab:latest python -c "import tensorflow, sklearn, langgraph, crewai, gradio, os; print('packages ok'); print(len(os.listdir('/opt/elpv-dataset/src/elpv_dataset/data/images')), 'photos')"
+      - name: Push
+        run: docker push ghcr.io/ai-bitmonky/panelguard-lab:latest
