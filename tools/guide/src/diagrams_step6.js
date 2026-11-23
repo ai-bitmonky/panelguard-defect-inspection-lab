@@ -686,6 +686,10 @@ function frame6e(k) {
           var b = bubble(x, ys[col2], w, (j + 1) + ' · ' + kind, txt, col, { delay: j * 0.15, max: e[0] === 'answer' ? 2 : 1, mono: e[0] === 'tool_call' || e[0] === 'tool_result' }); s += b.svg; ys[col2] += b.h + 6;
         });
       }
+      if (!shown) {   // before the turn: the job card this worker is about to run (real task text), and the trace so far
+        var J = (F6().jobs || [])[k] || {}, bb = bubble(Math.max(16, Math.min(960 - 520 - 16, DESK6E[k][0] - 260)), 30, 520, 'JOB ' + (k + 1) + ' · ' + WNAME[k], J.desc || '', WCOL[k], { max: 3 }), bb2 = bubble(Math.max(16, Math.min(960 - 520 - 16, DESK6E[k][0] - 260)), 40 + bb.h, 520, 'EXPECTED OUTPUT', J.expected || '', '#5d6b80', { max: 3 });
+        s += bb.svg + bb2.svg + t(480, 300, k ? 'trace so far: ' + K.trace.filter(function (e) { return e[1] < k; }).length + ' of ' + K.trace.length + ' steps' : 'trace: empty', { size: 15, a: 'middle', f: 'm', fill: C.dim });
+      }
       var bx = DESK6E[k][0] + 5, by = DESK6E[k][1] + 162;
       if (!shown) s += A.target('baton', baton(bx, by), k ? 'pass the baton' : 'start the crew', bx, by + 40, {});
       else if (k < 2) s += A.target('baton', baton(DESK6E[k + 1][0] + 5, by), 'pass the baton', DESK6E[k + 1][0] + 5, by + 40, {});
