@@ -388,7 +388,7 @@ D.register('6b', {
       s += vend(40, 30, fx, { name: nameOK6b() ? 'shift_stats' : null, desc: (F6().toolDesc || {}).shift_stats, lit: true });
       s += '<path d="M370 120C440 120 450 150 520 150" stroke="#46e3ff" stroke-width="2" stroke-dasharray="5 5" fill="none"/>' + A.glass(520, 40, 200, 176, { fx: fx, col: '#2b4760' }) + t(540, 70, 'THE MODEL SEES', { size: 14, f: 'h', fill: '#46e3ff', ls: '.08em' }) + t(540, 100, '• the name', { size: 16, fill: '#dbe6f2' }) + t(540, 126, '• the description', { size: 16, fill: '#dbe6f2' }) + t(540, 160, 'NOT the function', { size: 16, w: 700, fill: '#ff8aa0' }) + t(540, 184, 'NOT the logbook', { size: 16, w: 700, fill: '#ff8aa0' });
       s += t(736, 50, 'THE 3 READY-MADE TOOLS', { size: 14, f: 'h', fill: C.dim, ls: '.06em' }) + ledger6b(fx, 732, 64);
-      s += A.target('ticket', '<g class="pgd-keep"><rect x="520" y="300" width="190" height="62" rx="6" fill="#efe9da" stroke="#b9b09c"/>' + t(544, 326, 'REQUEST', { size: 14, f: 'h', fill: '#2a3444' }) + t(544, 350, 'arguments: none {}', { size: 15, f: 'm', fill: '#4a5668' }) + '</g>', 'feed the request', 610, 400, { kind: 'drag', to: snapTo(610, 331, 130, 410, 16) });
+      s += A.target('ticket', '<g class="pgd-keep"><rect x="520" y="300" width="190" height="62" rx="6" fill="#efe9da" stroke="#b9b09c"/>' + t(544, 326, 'REQUEST', { size: 14, f: 'h', fill: '#2a3444' }) + t(544, 350, 'arguments: none {}', { size: 15, f: 'm', fill: '#4a5668' }) + '</g>', 'feed the request', 610, 400, { kind: 'drag', cls: 'pgd-solid', to: snapTo(610, 331, 130, 410, 16) });
       return s;
     },
     work: function (c) { var K = crew6(); return clean([{ h: 'What the model is given' }, { v: nameOK6b() ? 'shift_stats' : '? (gap 1)', k: 'the name the workers call' }, { v: ((F6().toolDesc || {}).shift_stats || '').length + ' characters', k: 'the description: when to call it' }, { t: 'The arguments are an empty object: this tool needs nothing, it always reads the last shift.' }, srcTag(K.you.tools)]); },
@@ -539,7 +539,7 @@ D.register('6c', {
       s += A.target('brain', '<g><rect x="380" y="448" width="200" height="66" rx="12" fill="url(#' + fx.mt + ')" stroke="#ffb547" stroke-width="2"/>' + t(480, 476, 'BRAIN', { size: 15, a: 'middle', f: 'h', fill: '#ffb547' }) + t(480, 500, 'what is inside?', { size: 14, a: 'middle', fill: '#dbe6f2' }) + '</g>', 'open the brain', 700, 482, {});
       return s;
     },
-    work: function (c) { var K = crew6(); return clean([{ h: 'Prompt length (characters)' }].concat([0, 1, 2].map(function (k) { return { v: String(K.workers[k].chars || F6().prompts[k].length), k: WNAME[k].toLowerCase() + ' · tools: ' + K.workers[k].tools.join(', ') }; })).concat([srcTag(K.you.workers), refNote(K.you.workers)])); },
+    work: function (c) { var K = crew6(); return clean([{ h: 'Prompt length (characters)' }].concat([0, 1, 2].map(function (k) { return { v: String(K.workers[k].chars || F6().prompts[k].length), k: WNAME[k].toLowerCase() + ' · tools: ' + (k === 1 && !unlocked('6c') ? K.workers[k].tools[0] + ', ? (6c)' : K.workers[k].tools.join(', ')) }; })).concat([srcTag(K.you.workers), refNote(K.you.workers)])); },
     on: { brain: function (c) { c.next(); } } },
   { cap: 'The brain here is scripted rules, not a language model',
     note: 'Rule 1: call each of my tools once, in order. Rule 2: fill the sentence pattern for my role. No key, no network.',
@@ -575,7 +575,7 @@ function report6d(txt, x, y, w, fx, locked) {
     s += t(x + 16, yy, k[0], { size: 15, f: 'h', fill: '#2a3444' });
     if (locked) { s += A.lock(x + 170, yy, 'answer the 6d prediction first'); return; }
     s += '<rect x="' + (x + 166) + '" y="' + (yy - 18) + '" width="' + (w - 182) + '" height="26" rx="4" fill="' + (miss ? '#ff4d6a' : '#3dffa0') + '" fill-opacity=".18" stroke="' + (miss ? '#c01a36' : '#0f7a48') + '" stroke-opacity=".5"/>' +
-      t(x + 176, yy, miss ? 'not known' : (function (z) { var M = Math.floor((w - 196) / 8.6); return z.length > M ? z.slice(0, M - 1) + '…' : z; })(line.replace(k[1], '').replace(/^Work the action list: /, '')), { size: 14, f: 'm', w: 700, fill: miss ? '#b0102e' : '#0f5a3a' });
+      t(x + 176, yy, miss ? 'not known' : (function (z) { var M = Math.floor((w - 196) / 8.6); return z.length > M ? z.slice(0, M - 1) + '…' : z; })(line.replace(k[1], '').replace(/^[:\s]+/, '')), { size: 14, f: 'm', w: 700, fill: miss ? '#b0102e' : '#0f5a3a' });
   });
   return s + '</g>';
 }
@@ -748,7 +748,7 @@ D.register('6g', {
       s += cart6g(79, 139, 'scripted');
       s += t(40, 470, 'Same crew, same jobs, same tools, same checker. Only the brain changes.', { size: 16, fill: '#dbe6f2' });
       s += t(780, 50, 'ON THE BENCH', { size: 14, a: 'middle', f: 'h', fill: C.dim, ls: '.08em' });
-      s += A.target('cart', cart6g(690, 120, 'real'), 'swap it in', 780, 350, { kind: 'drag', to: snapTo(780, 215, 169, 234, 16) });
+      s += A.target('cart', cart6g(690, 120, 'real'), 'swap it in', 780, 350, { kind: 'drag', cls: 'pgd-solid', to: snapTo(780, 215, 169, 234, 16) });
       return s;
     },
     work: function () { return [{ h: 'What changes' }, { v: 'the brain', k: 'scripted rules → a real language model' }, { h: 'What stays' }, { v: '4 tools', k: 'shift_stats, slice_table, worst_cases, action_list' }, { v: 'the checker', k: 'your 6f check, as the report job’s gate' }, { v: 'the prompts', k: 'same badges and jobs' }]; },

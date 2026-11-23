@@ -151,7 +151,7 @@ function frame7b(set, cap, note) {
       if (last && last.id != null && !last.cam) s += A.cell(last.id, 660, 400, 100, { full: true }) + t(772, 440, 'the real photo', { size: 14, fill: C.dim });
       var nx = Q.map(function (q, i) { return i; }).filter(function (i) { return done.indexOf(i) < 0; })[0];
       Q.forEach(function (q, i) { if (done.indexOf(i) >= 0 || i === nx) return; var y = 40 + i * 84; s += card7b(q, 30, y); });
-      if (nx != null) { var yy = 40 + nx * 84; s += A.target('card', card7b(Q[nx], 30, yy) + '<rect x="30" y="' + yy + '" width="250" height="64" rx="8" fill="none" stroke="#ffb547" stroke-width="3"/>', 'feed it in', 296, yy + 36, { kind: 'drag', la: 'start', to: snapTo(155, yy + 32, 445, 235, 16) }); }
+      if (nx != null) { var yy = 40 + nx * 84; s += A.target('card', card7b(Q[nx], 30, yy) + '<rect x="30" y="' + yy + '" width="250" height="64" rx="8" fill="none" stroke="#ffb547" stroke-width="3"/>', 'feed it in', 296, yy + 36, { kind: 'drag', la: 'start', cls: 'pgd-solid', to: snapTo(155, yy + 32, 445, 235, 16) }); }
       return s;
     },
     work: function (c) {
@@ -357,7 +357,7 @@ function frame7e(j) {
         s += '<rect x="490" y="232" width="440" height="40" rx="8" fill="#0b121b" opacity=".85"/>' + A.lock(500, 258, 'your 3 questions: answer the 7e prediction first');
         return s;
       }
-      s += '<g id="q7e">' + A.target('q', qcard(q, 330, 236), 'pin it', 480, 330, { kind: 'drag', to: snapTo(480, 267, { lanes: 250, target: 710, mono: 250, pie: 710 }[q[2]], { lanes: 140, target: 140, mono: 390, pie: 390 }[q[2]], 16) }) + '</g>';
+      s += '<g id="q7e">' + A.target('q', qcard(q, 330, 236), 'pin it', 480, 330, { kind: 'drag', cls: 'pgd-solid', to: snapTo(480, 267, { lanes: 250, target: 710, mono: 250, pie: 710 }[q[2]], { lanes: 140, target: 140, mono: 390, pie: 390 }[q[2]], 16) }) + '</g>';
       if (c.state.msg) s += '<rect x="200" y="494" width="560" height="30" rx="6" fill="#2a0d14"/>' + t(480, 515, c.state.msg, { size: 15, a: 'middle', w: 700, fill: '#ff8aa0' });
       return s;
     },
