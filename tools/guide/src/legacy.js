@@ -265,7 +265,7 @@ function diagram(id){
   foot='The lab joins data preparation, learned models, a workflow, humans, evidence-based reporting, and monitoring.';break;}
  default:throw new Error('Missing contextual diagram '+id);
  }
- const d=DATA[id];return `<svg xmlns="http://www.w3.org/2000/svg" class="pgd-svg" width="960" height="570" viewBox="0 0 960 570" role="img" aria-labelledby="${uid}-title ${uid}-desc"><title id="${uid}-title">${esc(id+' — '+d.name)}</title><desc id="${uid}-desc">${esc(d.nodes.map(n=>n.join(': ')).join('. '))}</desc>${R(0,0,960,570,C.paper,'none')}${s}${guideFooter(foot)}</svg>`;
+ const d=DATA[id];return `<svg xmlns="http://www.w3.org/2000/svg" class="pgd-svg" width="960" height="570" viewBox="0 0 960 570" role="img" aria-labelledby="${uid}-title ${uid}-desc"><title id="${uid}-title">${esc(id+' — '+d.name)}</title><desc id="${uid}-desc">${esc(d.nodes.map(n=>n.join(': ')).join('. '))}</desc>${R(0,0,960,570,'none','none')}${s}${guideFooter(foot)}</svg>`;
 }
 
 // Optional guide: no teaching content is mounted in the exercise workspace.

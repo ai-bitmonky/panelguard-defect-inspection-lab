@@ -613,8 +613,8 @@ function walk() {
   for (var i = 0; i < v.y.length; i++) (v.y[i] === 1 ? d : good).push(i);
   d.sort(function (a, b) { return v.svc[a] - v.svc[b]; });
   var w = { v: v, d: d, nDef: d.length, nOk: good.length, you: v.youSvc };
-  w.at = function (g) {   // gate just below defect g (0-based): g defects pass
-    var cut = v.svc[d[g]], gp = 0; good.forEach(function (i) { if (v.svc[i] < cut) gp++; });
+  w.at = function (g) {   // gate just below defect g (0-based): g defects pass. g = 0: the gate sits below every cell
+    var cut = g ? v.svc[d[g]] : -1, gp = 0; good.forEach(function (i) { if (v.svc[i] < cut) gp++; });
     return { g: g, cut: cut, goodPass: gp, goodStop: w.nOk - gp, rec: (w.nDef - g) / w.nDef, far: (w.nOk - gp) / w.nOk };
   };
   w.between = function (g) { var lo = g ? v.svc[d[g - 1]] : -1, hi = v.svc[d[g]], n = 0; good.forEach(function (i) { if (v.svc[i] >= lo && v.svc[i] < hi) n++; }); return n; };
@@ -643,7 +643,7 @@ function belt2d(c, w, g, o) {
     if (show) s += t(x + 41, SL.by - 32, w.v.svc[w.d[k]].toFixed(3), { size: 14, a: 'middle', f: 'm', fill: C.dim });
   }
   s += pile(862, SL.by + SL.bh - 8, 3, { col: '#a83a50' }) + pile(884, SL.by + SL.bh - 8, 3, { col: '#4d6a86' });
-  s += t(914, SL.by + SL.bh + 36, '+' + (w.nDef - SL.n) + ' defects →', { size: 15, a: 'end', f: 'm', fill: '#ff8aa0' });
+  s += t(888, SL.by - 32, '+' + (w.nDef - SL.n), { size: 15, a: 'middle', f: 'm', w: 700, fill: '#ff8aa0' }) + t(888, SL.by - 14, 'more', { size: 14, a: 'middle', fill: '#ff8aa0' });
   // the gate: a light curtain with two posts
   s += '<g class="' + (o.shake ? 'pgd-shake' : '') + '"><rect x="' + (gx - 5) + '" y="' + (SL.by - 52) + '" width="10" height="' + (SL.bh + 72) + '" rx="3" fill="' + (fx ? 'url(#' + fx.mt + ')' : '#2a3340') + '" stroke="#5d6b80"/>' +
     '<rect x="' + (gx - 1.5) + '" y="' + (SL.by - 4) + '" width="3" height="' + (SL.bh + 8) + '" fill="#ffb547"' + (fx ? ' filter="url(#' + fx.gl + ')"' : '') + '/>' +
@@ -699,6 +699,7 @@ D.register('2d', {
         { v: w.nOk + ' ÷ ' + w.nOk, k: 'good cells stopped ÷ all good cells' }, { op: '=', v: '100%', k: 'false-alarm rate', res: true },
         { t: 'Every defect is caught, but every good cell is stopped too. Lift the gate to pass the lowest scores.' }, srcTag(w.you), refNote(w.you)]);
     },
+    auto: function (c) { c.state.g = 1; },
     on: { lift: function (c) { c.state.g = 1; c.next(); } } },
 
   { cap: 'Lift the gate past the lowest defects, one at a time',
@@ -718,6 +719,7 @@ D.register('2d', {
         { v: fmt(at.goodStop) + ' ÷ ' + w.nOk, k: 'good cells still stopped ÷ all good cells' }, { op: '=', v: p1(at.far), k: 'false-alarm rate', res: true },
         { bar: at.rec, col: C.cy, mark: 0.95 }, srcTag(w.you), refNote(w.you)]);
     },
+    auto: function (c) { c.state.g = walk().maxPass; },
     on: { next: function (c) { var w = walk(); c.state.g++; if (c.state.g >= w.maxPass) c.next(); else c.redraw(true); } } },
 
   { cap: 'Eight defects may slip. One more breaks the target.',
