@@ -584,4 +584,235 @@ D.register('3e', {
     } }
   ]
 });
+/* ============================ 3f  Score it and blend it ============================ */
+function blend3f() {
+  var v = D.val(); if (!v) return null;
+  var L = D.liveRes('3f'), w = L && L.bestW != null ? L.bestW : F3().bestW, you = v.youCnn || !!L;
+  var b = v.cnn.map(function (q, i) { return w * q + (1 - w) * v.svc[i]; }), M = D.M;
+  function row(sc) { return M.rates(v.y, sc, M.cutAt(v.y, sc, 0.95)); }
+  var ws = L && L.ws ? L.ws : F3().ws;
+  var I = []; for (var i = 0; i < v.y.length; i++) I.push(i);
+  function top(f, key) { var o = I.filter(f).sort(function (a, c) { return key(c) - key(a); }); return o[0]; }
+  var pick = [top(function (i) { return v.y[i] === 1; }, function (i) { return v.cnn[i] - v.svc[i]; }), top(function (i) { return v.y[i] === 0; }, function (i) { return v.svc[i] - v.cnn[i]; }),
+    top(function (i) { return v.y[i] === 1; }, function (i) { return v.svc[i] - v.cnn[i]; }), top(function (i) { return v.y[i] === 0; }, function (i) { return v.cnn[i] - v.svc[i]; })];
+  return { v: v, w: w, b: b, you: you, base: row(v.svc), cnn: row(v.cnn), blend: row(b), ws: ws, pick: pick, n: v.y.length };
+}
+var LN = { x0: 120, x1: 880, ys: 116, yb: 262, yc: 408 };
+function lx(q) { return LN.x0 + q * (LN.x1 - LN.x0); }
+function lines3f(c, fx, B, o) {
+  o = o || {}; var s = '';
+  [[LN.ys, 'STEP 2', C.vi], [LN.yc, 'CNN', C.cy]].concat(o.blend ? [[LN.yb, 'BLEND', C.am]] : []).forEach(function (L) {
+    s += '<line x1="' + LN.x0 + '" x2="' + LN.x1 + '" y1="' + L[0] + '" y2="' + L[0] + '" stroke="' + L[2] + '" stroke-width="3" stroke-opacity=".8"/>';
+    for (var k = 0; k <= 10; k++) s += '<line x1="' + lx(k / 10) + '" x2="' + lx(k / 10) + '" y1="' + L[0] + '" y2="' + (L[0] + 6) + '" stroke="' + L[2] + '" stroke-opacity=".6"/>' + (k % 2 ? '' : t(lx(k / 10), L[0] + 24, (k / 10).toFixed(1), { size: 13.5, a: 'middle', f: 'm', fill: C.dim }));
+    s += t(LN.x0 - 14, L[0] + 6, L[1], { size: 15, a: 'end', f: 'h', fill: L[2] });
+  });
+  return s;
+}
+function pair3f(B, i, k, f) {   // one real cell: its Step 2 dot, its CNN dot, moving to the blend by f (0..1)
+  var v = B.v, xs = lx(v.svc[i]), xc = lx(v.cnn[i]), xb = lx(B.b[i]), col = v.y[i] ? C.rd : C.gr;
+  var ax = xs + (xb - xs) * f, ay = LN.ys + (LN.yb - LN.ys) * f, bx = xc + (xb - xc) * f, by = LN.yc + (LN.yb - LN.yc) * f, s = '';
+  s += '<line class="pg3f-l" x1="' + ax + '" y1="' + ay + '" x2="' + bx + '" y2="' + by + '" stroke="' + col + '" stroke-opacity=".55" stroke-width="2" stroke-dasharray="5 4"/>';
+  s += '<circle class="pg3f-a" cx="' + ax + '" cy="' + ay + '" r="8" fill="' + col + '" stroke="#fff" stroke-width="1.5"/><circle class="pg3f-b" cx="' + bx + '" cy="' + by + '" r="8" fill="' + col + '" stroke="#fff" stroke-width="1.5"/>';
+  return s;
+}
+function photos3f(B) {   // the 4 real cells, with both scores
+  var s = '';
+  B.pick.forEach(function (i, k) {
+    var v = B.v, x = 40 + k * 230, y = 452;
+    s += A.cell(v.id[i], x, y, 62, { r: 3 }) + '<rect x="' + x + '" y="' + y + '" width="62" height="62" rx="3" fill="none" stroke="' + (v.y[i] ? C.rd : C.gr) + '" stroke-width="2"/>';
+    s += t(x + 72, y + 16, (v.y[i] ? 'defect' : 'good') + ' · cell ' + v.id[i], { size: 14, w: 700, fill: v.y[i] ? '#ff8aa0' : C.gr });
+    s += t(x + 72, y + 37, 'Step 2 ' + v.svc[i].toFixed(2), { size: 14, f: 'm', fill: C.vi }) + t(x + 72, y + 56, 'CNN ' + v.cnn[i].toFixed(2), { size: 14, f: 'm', fill: C.cy });
+  });
+  return s;
+}
+D.register('3f', {
+  init: function () { return { poured: 0 }; },
+  frames: [
+  { cap: 'Two inspectors score the same cells',
+    note: 'Each validation cell has a Step 2 score and a CNN score. They often disagree. Pour them together: each cell lands at the mix of its two scores.',
+    svg: function (c) {
+      var B = blend3f(), fx = A.fx(); if (!B) return A.stage();
+      var s = A.stage() + fx.defs + lines3f(c, fx, B) + t(40, 40, 'THE SAME 4 REAL CELLS ON TWO SCORE LINES', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+      B.pick.forEach(function (i, k) { s += '<g class="pg3f" data-i="' + i + '">' + pair3f(B, i, k, 0) + '</g>'; });
+      s += photos3f(B);
+      s += A.target('pour', '<rect x="420" y="232" width="120" height="60" rx="30" fill="#2b2410" stroke="#ffb547" stroke-width="2.5"/><path d="M455 252h50l-8 22h-34z" fill="#ffb547"/>', 'hold to pour together', 480, 222, { kind: 'hold' });
+      return s;
+    },
+    work: function (c) {
+      var B = blend3f(); if (!B) return [];
+      var r = [{ h: 'Same cell, two scores' }];
+      B.pick.forEach(function (i) { r.push({ v: B.v.svc[i].toFixed(2) + ' vs ' + B.v.cnn[i].toFixed(2), k: 'cell ' + B.v.id[i] + ' (' + (B.v.y[i] ? 'defect' : 'good') + '): Step 2 vs CNN' }); });
+      r.push(srcTag(B.you)); var rn = refNote(B.you); if (rn) r.push(rn); return r;
+    },
+    bind: function (c, root) {
+      var B = blend3f(), el = root.querySelector('[data-pgd-t=pour]'); if (!B || !el) return;
+      var gs = root.querySelectorAll('.pg3f');
+      D.onHold(el, { ms: 1300, progress: function (f) { gs.forEach(function (g, k) { var i = +g.getAttribute('data-i'); g.innerHTML = pair3f(B, i, k, f); }); }, done: function () { c.state.poured = 1; c.next(); } });
+    },
+    auto: function (c) { c.state.poured = 1; } },
+  { cap: 'The blend: each cell at the mix of its two scores',
+    note: 'With weight w for the CNN, blend = w × CNN + (1 − w) × Step 2, for the same cell. Then each line gets its own gate at 95% recall.',
+    svg: function (c) {
+      var B = blend3f(), fx = A.fx(); if (!B) return A.stage();
+      var s = A.stage() + fx.defs + lines3f(c, fx, B, { blend: 1 }) + t(40, 40, 'THREE SCORE LINES, EACH WITH ITS 95% GATE', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+      B.pick.forEach(function (i, k) { s += pair3f(B, i, k, 0) + '<circle class="pgd-pop" cx="' + lx(B.b[i]) + '" cy="' + LN.yb + '" r="9" fill="' + (B.v.y[i] ? C.rd : C.gr) + '" stroke="#ffb547" stroke-width="2.5"/>'; });
+      [[LN.ys, B.base, C.vi], [LN.yb, B.blend, C.am], [LN.yc, B.cnn, C.cy]].forEach(function (L) {
+        var gx = lx(L[1].cut); s += '<rect x="' + (gx - 3) + '" y="' + (L[0] - 26) + '" width="6" height="52" rx="3" fill="#ffb547"/>' + A.tag(LN.x1 + 6, L[0] - 30, L[1].fp + ' false alarms', L[2], { a: 'end', size: 13 });
+      });
+      s += photos3f(B);
+      var lo = [B.base, B.blend, B.cnn], m = 0; lo.forEach(function (r, k) { if (r.fp < lo[m].fp) m = k; });
+      var ys = [LN.ys, LN.yb, LN.yc][m];
+      s += A.target('fewest', '<rect x="' + (LN.x0 - 90) + '" y="' + (ys - 30) + '' + '" width="' + (LN.x1 - LN.x0 + 100) + '" height="60" rx="12" fill="none" stroke="#ffb547" stroke-width="2.5"/>', 'tap the line with the fewest false alarms', 480, ys - 40);
+      return s;
+    },
+    work: function (c) {
+      var B = blend3f(); if (!B) return [];
+      var i = B.pick[0], v = B.v;
+      return clean([{ h: 'Blend of cell ' + v.id[i] }, { v: B.w + ' × ' + v.cnn[i].toFixed(3), k: 'CNN part' }, { op: '+', v: (1 - B.w).toFixed(1) + ' × ' + v.svc[i].toFixed(3), k: 'Step 2 part, same cell' }, { op: '=', v: B.b[i].toFixed(3), k: 'blend score', res: true },
+        { h: 'Good cells stopped at 95% recall' }, { v: String(B.base.fp), k: 'Step 2 alone', col: C.vi }, { v: String(B.cnn.fp), k: 'CNN alone', col: C.cy }, { v: String(B.blend.fp), k: 'blend', col: C.am }, srcTag(B.you), refNote(B.you)]);
+    },
+    on: { fewest: function (c) { c.next(); } } },
+  { cap: 'Two different inspectors cancel some mistakes',
+    note: 'The blend weight was chosen on validation: the mix with the fewest false alarms at 95% recall. Per 1,000 cells, fewer good cells are stopped than with either inspector alone.',
+    svg: function (c) {
+      var B = blend3f(), fx = A.fx(); if (!B) return A.stage();
+      var s = A.stage() + fx.defs;
+      s += A.glass(28, 22, 470, 498, { fx: fx, col: '#22384d' }) + t(48, 54, 'FALSE ALARMS AT 95% RECALL, BY MIX', { size: 13.5, f: 'h', fill: C.dim, ls: '.08em' });
+      var ch = A.chart({ x: 100, y: 84, w: 370, h: 330, xd: [0, 1], yd: [0.4, 0.65], xt: [0, 0.2, 0.4, 0.6, 0.8, 1], yt: [0.4, 0.45, 0.5, 0.55, 0.6, 0.65], fx: function (v) { return v.toFixed(1); }, fy: function (v) { return Math.round(v * 100) + '%'; }, xl: 'CNN weight w (0 = Step 2 only, 1 = CNN only)' });
+      s += ch.svg;
+      var pts = B.ws.map(function (q) { return ch.X(q[0]).toFixed(1) + ',' + ch.Y(q[1]).toFixed(1); });
+      s += '<polyline class="pgd-draw" style="--len:600" points="' + pts.join(' ') + '" fill="none" stroke="' + C.am + '" stroke-width="3"/>';
+      B.ws.forEach(function (q) { var best = Math.abs(q[0] - B.w) < 1e-9; s += '<circle cx="' + ch.X(q[0]) + '" cy="' + ch.Y(q[1]) + '" r="' + (best ? 8 : 4) + '" fill="' + (best ? '#fff' : C.am) + '"' + (best ? ' class="pgd-pop"' : '') + '/>'; });
+      var bq = B.ws.filter(function (q) { return Math.abs(q[0] - B.w) < 1e-9; })[0];
+      if (bq) s += A.tag(ch.X(bq[0]), ch.Y(bq[1]) + 34, 'w ' + B.w + ' · ' + p1(bq[1]), '#fff', { a: 'middle', size: 14 });
+      s += t(ch.X(0) + 8, ch.Y(B.ws[0][1]) - 10, 'Step 2', { size: 14, fill: C.vi }) + t(ch.X(1) - 8, ch.Y(B.ws[B.ws.length - 1][1]) - 10, 'CNN', { size: 14, a: 'end', fill: C.cy });
+      // per 1,000 cells
+      s += A.glass(518, 22, 414, 498, { fx: fx, col: '#7a5a2a' }) + t(538, 54, 'GOOD CELLS STOPPED PER 1,000', { size: 13.5, f: 'h', fill: C.am, ls: '.08em' });
+      var rows = [['Step 2', B.base, C.vi], ['CNN', B.cnn, C.cy], ['Blend', B.blend, C.am]], mx = 450;
+      rows.forEach(function (r, k) {
+        var v = Math.round(1000 * r[1].fp / B.n), y = 96 + k * 120, w = v / mx * 300;
+        s += t(538, y, r[0], { size: 17, w: 700, fill: r[2] }) + '<rect class="pgd-in' + (k ? String(k + 1) : '') + '" x="538" y="' + (y + 14) + '" width="' + w.toFixed(1) + '" height="40" rx="6" fill="' + r[2] + '" fill-opacity=".85"/>' + t(538 + w + 10, y + 42, String(v), { size: 24, f: 'm', w: 700, fill: '#fff' });
+        s += t(538, y + 76, 'false-alarm rate ' + p1(r[1].far) + ' · recall ' + p1(r[1].rec), { size: 14, f: 'm', fill: C.dim });
+      });
+      s += t(538, 476, 'Chosen on validation: a little hopeful.', { size: 15, fill: C.dim }) + t(538, 500, 'Step 8 checks it once on the sealed test tray.', { size: 15, fill: C.dim });
+      return s;
+    },
+    work: function (c) {
+      var B = blend3f(); if (!B) return [];
+      var k = 1000 / B.n;
+      return clean([{ h: 'Per 1,000 cells' }, { v: B.base.fp + ' × ' + k.toFixed(3), k: 'Step 2 good cells stopped' }, { op: '=', v: String(Math.round(B.base.fp * k)), k: 'per 1,000' }, { v: B.blend.fp + ' × ' + k.toFixed(3), k: 'blend good cells stopped' }, { op: '=', v: String(Math.round(B.blend.fp * k)), k: 'per 1,000', res: true },
+        { t: 'Saved: <b>' + (Math.round(B.base.fp * k) - Math.round(B.blend.fp * k)) + '</b> re-checks per 1,000 cells, same 95% recall.' }, srcTag(B.you), refNote(B.you)]);
+    } }
+  ]
+});
+/* ============================ 3g  Two gates, not one ============================ */
+function g3g() {
+  var B = blend3f(); if (!B) return null;
+  var y = B.v.y, sc = B.b, G = D.M.gatesFor(y, sc), L = D.liveRes('3g');
+  return { B: B, y: y, s: sc, G: G, you: B.you || !!L, lanes: function (lo, hi) { return D.M.twoGates(y, sc, lo, hi); } };
+}
+var AXG = { x0: 80, x1: 880, y: 150 };
+function gx(v) { return AXG.x0 + v * (AXG.x1 - AXG.x0); }
+function gv(x) { return Math.max(0, Math.min(1, (x - AXG.x0) / (AXG.x1 - AXG.x0))); }
+function strip3g(G) {   // every validation cell as a dot over its blend score
+  var s = '', B = 40, cnt = {}, w = (AXG.x1 - AXG.x0) / B;
+  G.s.forEach(function (v, i) { var b = Math.min(B - 1, Math.floor(v * B)), k = (cnt[b] = (cnt[b] || 0) + 1) - 1, cx = gx((b + 0.5) / B) + ((k % 3) - 1) * 5.5, cy = AXG.y - 8 - Math.floor(k / 3) * 5.5; if (cy < 34) return; s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="2.4" fill="' + (G.y[i] ? '#ff4d6a' : '#6f93b8') + '"/>'; });
+  s += '<line x1="' + AXG.x0 + '" x2="' + AXG.x1 + '" y1="' + AXG.y + '" y2="' + AXG.y + '" stroke="#5d6b80" stroke-width="2"/>';
+  for (var k = 0; k <= 10; k++) s += '<line x1="' + gx(k / 10) + '" x2="' + gx(k / 10) + '" y1="' + AXG.y + '" y2="' + (AXG.y + 6) + '" stroke="#5d6b80"/>' + t(gx(k / 10), AXG.y + 24, (k / 10).toFixed(1), { size: 14, a: 'middle', f: 'm', fill: C.dim });
+  s += t(AXG.x0, 30, 'BLEND SCORES OF ALL ' + G.y.length + ' VALIDATION CELLS', { size: 13.5, f: 'h', fill: C.dim, ls: '.08em' }) + t(AXG.x1, 30, '● defect  ● good', { size: 14, a: 'end', fill: C.dim }).replace('● defect', '<tspan fill="#ff4d6a">●</tspan> defect').replace('● good', '<tspan fill="#6f93b8">●</tspan> good');
+  return s;
+}
+function lanes3g(G, lo, hi, fx) {
+  var L = G.lanes(lo, hi), n = L.n, k = 1000 / n, s = '', x0 = AXG.x0, xl = gx(lo), xh = gx(Math.max(lo, hi)), x1 = AXG.x1, y = 196, h = 190;
+  function lane(a, b, col, title, cells, defs, ok, id) {
+    var w = Math.max(0, b - a); if (w < 2) return '';
+    var o = '<path d="M' + (a + 2) + ' ' + y + 'H' + (b - 2) + 'L' + (b - 8) + ' ' + (y + h) + 'H' + (a + 8) + 'Z" fill="' + col + '" fill-opacity=".1" stroke="' + col + '" stroke-opacity=".7" stroke-width="1.5"/>';
+    for (var r = 0; r < 6; r++) o += '<line x1="' + (a + 10) + '" x2="' + (b - 10) + '" y1="' + (y + 18 + r * 30) + '" y2="' + (y + 18 + r * 30) + '" stroke="' + col + '" stroke-opacity=".12"/>';
+    if (w > 110) o += t((a + b) / 2, y + 34, title, { size: 15, a: 'middle', f: 'h', fill: col, ls: '.06em' }) + t((a + b) / 2, y + 84, String(Math.round(cells * k)), { size: 34, a: 'middle', f: 'm', w: 700, fill: '#fff', cls: id }) + t((a + b) / 2, y + 108, 'per 1,000 cells', { size: 14, a: 'middle', fill: C.dim }) +
+      t((a + b) / 2, y + 142, defs + ' defects', { size: 15, a: 'middle', f: 'm', fill: '#ff8aa0' }) + t((a + b) / 2, y + 164, ok + ' good', { size: 15, a: 'middle', f: 'm', fill: '#8fb0cf' });
+    return o;
+  }
+  s += lane(x0, xl, C.gr, 'AUTO PASS', L.defPass + L.okPass, L.defPass, L.okPass);
+  s += lane(xl, xh, C.am, 'A PERSON CHECKS', L.defHuman + L.okHuman, L.defHuman, L.okHuman);
+  s += lane(xh, x1, C.rd, 'AUTO STOP', L.defStop + L.okStop, L.defStop, L.okStop);
+  return { svg: s, L: L };
+}
+function gate3g(x, col, lab) { return '<rect x="' + (x - 4) + '" y="40" width="8" height="350" rx="4" fill="' + col + '" opacity=".9"/><rect x="' + (x - 26) + '" y="' + (AXG.y - 16) + '" width="52" height="32" rx="9" fill="' + col + '" stroke="#fff" stroke-width="2"/>' + t(x, AXG.y + 6, lab, { size: 13, a: 'middle', f: 'h', fill: '#1a1103' }); }
+function sum3g(G, L, fx, o) {
+  o = o || {}; var s = A.glass(28, 404, 904, 120, { fx: fx, col: '#22384d' });
+  var pr = L.passRate, bad = pr > 0.05 + 1e-9;
+  s += A.gauge(110, 466, 34, Math.min(1, pr / 0.1), { col: bad ? C.rd : C.gr, val: p1(pr), vs: 15 });
+  s += t(156, 452, L.defPass + ' of ' + L.nDef + ' defects pass unchecked', { size: 17, w: 700, fill: bad ? '#ff8aa0' : '#fff' }) + t(156, 478, 'rule: at most 5 of every 100', { size: 15, fill: C.dim });
+  var prec = L.defStop + L.okStop ? L.defStop / (L.defStop + L.okStop) : null;
+  s += t(560, 452, 'auto-stop pile: ' + (prec == null ? 'empty' : p1(prec) + ' real defects'), { size: 17, w: 700, fill: prec != null && prec < 0.95 ? '#ff8aa0' : '#fff' }) + t(560, 478, 'rule: at least 95 of every 100', { size: 15, fill: C.dim });
+  return s;
+}
+D.register('3g', {
+  init: function () { return { lo: 0, hi: 1 }; },
+  frames: [
+  { cap: 'The low gate: below it, cells pass with no check',
+    note: 'Drag the low gate up the score line. Cells below it pass with no check, so at most 5 of every 100 defects may sit below it.',
+    svg: function (c) {
+      var G = g3g(), fx = A.fx(); if (!G) return A.stage();
+      var st = c.state, R = lanes3g(G, st.lo, st.hi, fx), s = A.stage() + fx.defs + strip3g(G) + '<g id="g3gl">' + R.svg + '</g>' + '<g id="g3gs">' + sum3g(G, R.L, fx) + '</g>';
+      s += gate3g(gx(st.hi), C.rd, 'HIGH');
+      s += A.target('lo', gate3g(gx(st.lo), C.gr, 'LOW'), 'drag the low gate up', gx(st.lo) + 40, 78, { kind: 'drag', la: 'start', to: snapTo(gx(st.lo), 215, gx(G.G.low), 215, 8) });
+      return s;
+    },
+    work: function (c) {
+      var G = g3g(); if (!G) return [];
+      var L = G.lanes(c.state.lo, c.state.hi);
+      return clean([{ h: 'Low gate at ' + c.state.lo.toFixed(2) }, { v: L.defPass + ' ÷ ' + L.nDef, k: 'defects below the gate ÷ all defects' }, { op: '=', v: p1(L.passRate), k: 'pass unchecked (rule: 5% or less)', res: true },
+        { t: '5% of ' + L.nDef + ' = ' + (0.05 * L.nDef).toFixed(2) + ' → at most ' + Math.floor(0.05 * L.nDef) + ' defects below the low gate.' }, srcTag(G.you), refNote(G.you)]);
+    },
+    bind: function (c, root) {
+      var G = g3g(), st = c.state, fx = A.fx(), sx = gx(st.lo), el = root.querySelector('[data-pgd-t=lo]');
+      var drag = D.onDrag(root, el, { start: { x: sx, y: AXG.y }, step: 8, live: true,
+        clamp: function (p) { return { x: Math.max(AXG.x0, Math.min(gx(st.hi) - 10, p.x)), y: AXG.y }; },
+        move: function (p) { el.setAttribute('transform', 'translate(' + (p.x - sx) + ' 0)'); var v = gv(p.x), R = lanes3g(G, v, st.hi, fx); root.querySelector('#g3gl').innerHTML = R.svg; root.querySelector('#g3gs').innerHTML = sum3g(G, R.L, fx); st.lo = v; c.rework(); },
+        drop: function (p, live) { var v = gv(p.x); if (live) return; if (v <= G.G.low + 1e-9 && v >= G.G.low - 0.04) { st.lo = G.G.low; c.next(); } } });
+      void drag;
+    },
+    auto: function (c) { var G = g3g(); c.state.lo = G.G.low; } },
+  { cap: 'The high gate: above it, cells stop with no check',
+    note: 'Drag the high gate down. Cells above it stop with no check, so that pile must be at least 95 of every 100 real defects.',
+    svg: function (c) {
+      var G = g3g(), fx = A.fx(); if (!G) return A.stage();
+      var st = c.state, R = lanes3g(G, st.lo, st.hi, fx), s = A.stage() + fx.defs + strip3g(G) + '<g id="g3gl">' + R.svg + '</g>' + '<g id="g3gs">' + sum3g(G, R.L, fx) + '</g>';
+      s += gate3g(gx(st.lo), C.gr, 'LOW');
+      s += A.target('hi', gate3g(gx(st.hi), C.rd, 'HIGH'), 'drag the high gate down', gx(st.hi) - 40, 78, { kind: 'drag', la: 'end', to: snapTo(gx(st.hi), 215, gx(G.G.high), 215, 8) });
+      return s;
+    },
+    work: function (c) {
+      var G = g3g(); if (!G) return [];
+      var L = G.lanes(c.state.lo, c.state.hi), pile = L.defStop + L.okStop;
+      return clean([{ h: 'High gate at ' + c.state.hi.toFixed(2) }, { v: L.defStop + ' ÷ ' + pile, k: 'real defects in the auto-stop pile ÷ all cells in it' }, { op: '=', v: pile ? p1(L.defStop / pile) : '–', k: 'rule: 95% or more', res: true },
+        { t: 'Lower the gate and the pile grows, but more good cells slip in.' }, srcTag(G.you), refNote(G.you)]);
+    },
+    bind: function (c, root) {
+      var G = g3g(), st = c.state, fx = A.fx(), sx = gx(st.hi), el = root.querySelector('[data-pgd-t=hi]');
+      D.onDrag(root, el, { start: { x: sx, y: AXG.y }, step: 8, live: true,
+        clamp: function (p) { return { x: Math.max(gx(st.lo) + 10, Math.min(AXG.x1, p.x)), y: AXG.y }; },
+        move: function (p) { el.setAttribute('transform', 'translate(' + (p.x - sx) + ' 0)'); var v = gv(p.x), R = lanes3g(G, st.lo, v, fx); root.querySelector('#g3gl').innerHTML = R.svg; root.querySelector('#g3gs').innerHTML = sum3g(G, R.L, fx); st.hi = v; c.rework(); },
+        drop: function (p, live) { var v = gv(p.x); if (live) return; if (v >= G.G.high - 1e-9 && v <= G.G.high + 0.04) { st.hi = G.G.high; c.next(); } } });
+    },
+    auto: function (c) { var G = g3g(); c.state.hi = G.G.high; } },
+  { cap: 'Three lanes: the model takes the sure cells, a person the rest',
+    note: 'With both gates set by the rules, most defects are stopped automatically or sent to a person. Only a few pass unchecked, and the person sees fewer cells than all of them.',
+    svg: function (c) {
+      var G = g3g(), fx = A.fx(); if (!G) return A.stage();
+      var st = c.state, R = lanes3g(G, st.lo, st.hi, fx), s = A.stage() + fx.defs + strip3g(G) + '<g class="pgd-fade">' + R.svg + '</g>' + sum3g(G, R.L, fx);
+      s += gate3g(gx(st.lo), C.gr, 'LOW') + gate3g(gx(st.hi), C.rd, 'HIGH');
+      s += A.tag(gx(st.lo), 66, st.lo.toFixed(3), C.gr, { a: 'middle', size: 14 }) + A.tag(gx(st.hi), 66, st.hi.toFixed(3), C.rd, { a: 'middle', size: 14 });
+      return s;
+    },
+    work: function (c) {
+      var G = g3g(); if (!G) return [];
+      var L = G.lanes(c.state.lo, c.state.hi), k = 1000 / L.n, one = G.B.blend;
+      return clean([{ h: 'Per 1,000 cells' }, { v: String(Math.round(1000 * L.autoPass)), k: 'auto pass' }, { v: String(Math.round(1000 * L.human)), k: 'a person checks' }, { v: String(Math.round(1000 * L.autoStop)), k: 'auto stop' },
+        { op: '=', v: L.defPass + ' of ' + L.nDef + ' (' + p1(L.passRate) + ')', k: 'defects that pass unchecked', res: true },
+        { h: 'One gate instead (3f)' }, { v: String(Math.round(one.fp * k)), k: 'good cells stopped per 1,000, with no person to look' }, srcTag(G.you), refNote(G.you)]);
+    } }
+  ]
+});
 })();

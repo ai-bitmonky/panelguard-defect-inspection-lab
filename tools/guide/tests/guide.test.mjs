@@ -5,12 +5,13 @@
 //  4. the 9 new diagrams: every frame driven by MOUSE (1366x768) and by KEYBOARD (1920x1080), to the end and back via the dots;
 //     a screenshot of every frame at both sizes -> tools/guide/shots/g_<id>_f<k>_<w>.png
 //  5. print view renders every frame of a new diagram; reduced motion stops the animations
-// Run: cd tools/guide/tests && node guide.test.mjs   (env ONLY=1a,0b  limits part 4; PARTS=1,2,3,4,5)
+// Run: cd tools/guide/tests && node guide.test.mjs   (env ONLY=1a,0b  limits parts 4-5; PARTS=1,2,3,4,5; MODES=mouse|keyboard)
 import { chromium } from 'playwright'; import { mirrorCDN } from '../../tests/cdn.mjs'; import path from 'path'; import { fileURLToPath } from 'url'; import fs from 'fs';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v2.1.html');
 const SHOTS = path.resolve(here, '../shots'); fs.mkdirSync(SHOTS, { recursive: true });
-const NEW = ['0a', '0b', '0c', '0d', '1a', '1b', '1c', '1d', '1e'];
+const NEW = ['0a', '0b', '0c', '0d', '1a', '1b', '1c', '1d', '1e', '2a', '2b', '2c', '2d', '2e', '3a', '3b', '3c', '3d', '3e', '3f', '3g'];
+const MODES = (process.env.MODES || 'mouse,keyboard').split(',');
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : NEW;
 const PARTS = (process.env.PARTS || '1,2,3,4,5').split(',').map(Number);
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a), fails = [];
@@ -110,7 +111,7 @@ if (PARTS.some((p) => p <= 3)) {
     const ids = await page.evaluate(() => [...document.querySelectorAll('.pgd-list [data-lesson]')].map((b) => b.dataset.lesson));
     expect(ids.length === 55, `step list has 55 substeps (${ids.length})`);
     const soon = await page.evaluate(() => [...document.querySelectorAll('.pgd-list .pgd-soon')].length);
-    expect(soon === 46, `46 substeps tagged "new diagram coming" (${soon})`);
+    expect(soon === 55 - NEW.length, `${55 - NEW.length} substeps tagged "new diagram coming" (${soon})`);
     let bad = [];
     for (const id of ids) {
       const e0 = errors.length;
@@ -124,7 +125,8 @@ if (PARTS.some((p) => p <= 3)) {
       if (errors.length > e0) bad.push(id + ' errors: ' + errors.slice(e0).join(' | '));
     }
     expect(bad.length === 0, 'all 55 substeps x all tabs render with zero console errors' + (bad.length ? ' — ' + bad.slice(0, 8).join('; ') : ''));
-    await page.click('.pgd-list [data-lesson="2b"]'); await page.click('#pgd-tab-diagram'); await page.waitForTimeout(200); await page.screenshot({ path: `${SHOTS}/g_legacy_2b_1366.png` });
+    await page.click('.pgd-list [data-lesson="4b"]'); await page.click('#pgd-tab-diagram'); await page.waitForTimeout(200); await page.screenshot({ path: `${SHOTS}/g_legacy_4b_1366.png` });
+    await page.click('.pgd-list [data-lesson="2b"]');
     await page.click('#pgd-tab-code'); await page.waitForTimeout(100); await page.screenshot({ path: `${SHOTS}/g_code_2b_1366.png` });
     await page.click('#pgd-tab-overview'); await page.waitForTimeout(100); await page.screenshot({ path: `${SHOTS}/g_overview_2b_1366.png` });
     await page.click('#pgd-tab-practice'); await page.waitForTimeout(100); await page.screenshot({ path: `${SHOTS}/g_practice_2b_1366.png` });
@@ -154,7 +156,7 @@ if (PARTS.includes(2)) {
 
 /* ---------- 4: the new diagrams, mouse at 1366 and keyboard at 1920 ---------- */
 if (PARTS.includes(4)) {
-  for (const [mode, w, h] of [['mouse', 1366, 768], ['keyboard', 1920, 1080]]) {
+  for (const [mode, w, h] of [['mouse', 1366, 768], ['keyboard', 1920, 1080]].filter((m) => MODES.includes(m[0]))) {
     const { ctx, page, errors } = await openPage(w, h);
     for (const id of ONLY) { const e0 = errors.length; await drive(page, id, mode, w); if (errors.length > e0) expect(false, `${id} ${mode}: console errors ${errors.slice(e0).join(' | ')}`); }
     expect(errors.length === 0, `part 4 ${mode}: zero console errors` + (errors.length ? ': ' + JSON.stringify(errors.slice(0, 4)) : ''));
@@ -171,7 +173,7 @@ if (PARTS.includes(5)) {
     const r = await page.evaluate((i) => ({ printed: window.__printed, frames: document.querySelectorAll('.pgd-print .pgd-pframe').length, n: document.querySelector('#pgd-panel')._pgd.n,
       empty: [...document.querySelectorAll('.pgd-print .pgd-pstage')].filter((s) => s.innerHTML.length < 800).length }), id);
     expect(r.frames === r.n && r.empty === 0 && r.printed > 0, `${id} print: ${r.frames}/${r.n} frames as static pictures (empty ${r.empty})`);
-    if (id === '1a' || id === '0b') { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
+    if (id === '1a' || id === '0b' || id === '2d' || id === '3g') { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
     await page.evaluate(() => { document.body.classList.remove('pgd-printing'); });
   }
   await page.emulateMedia({ reducedMotion: 'reduce' });

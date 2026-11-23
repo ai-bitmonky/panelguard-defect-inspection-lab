@@ -65,6 +65,12 @@ function station(c, on, tgt) {
     if (on >= 4) s += '<g class="pgd-in"><rect x="858" y="186" width="50" height="30" rx="6" fill="#0b2418" stroke="' + C.gr + '"/>' + t(883, 206, 'PASS', { size: 12, a: 'middle', f: 'h', fill: C.gr }) +
       '<rect x="858" y="224" width="50" height="30" rx="6" fill="#2a0e15" stroke="' + C.rd + '"/>' + t(883, 244, 'STOP', { size: 12, a: 'middle', f: 'h', fill: C.rd }) + '</g>';
   }
+  // the floor: the line of real cells waiting for the station (left) and the cells already photographed (right)
+  var waitIds = [447, 1, 23, 74, 245], doneIds = [96, 11, 143, 49, 905];
+  s += t(34, 466, 'NEXT ON THE LINE', { size: 12, f: 'h', fill: '#5d6b80', ls: '.16em' }) + t(926, 466, 'ALREADY PHOTOGRAPHED', { size: 12, a: 'end', f: 'h', fill: '#5d6b80', ls: '.16em' });
+  waitIds.forEach(function (id, k) { var x = 34 + k * 58; s += '<g opacity="' + (0.35 + 0.12 * k) + '"><rect x="' + (x - 2) + '" y="476" width="52" height="52" rx="4" fill="#0f1a33" stroke="#2c3c66"/>' + A.cell(id, x, 478, 48, { r: 2 }) + '</g>'; });
+  s += A.arrow(326, 502, 360, 502, '#3a4757', { w: 2, head: 8 }) + A.arrow(560, 502, 594, 502, '#3a4757', { w: 2, head: 8 });
+  doneIds.forEach(function (id, k) { var x = 638 + k * 58; s += '<g opacity="' + (0.85 - 0.12 * k) + '"><rect x="' + (x - 2) + '" y="476" width="52" height="52" rx="4" fill="#0b1018" stroke="#33455c"/>' + A.cell(id, x, 478, 48, { r: 2, full: true }) + '</g>'; });
   // the energy path, numbered as it is walked
   var steps = [[110, 214, 'current in'], [450, 446 + 34, 'light out'], [450, 222, 'photo'], [810, 316, 'decision']];
   steps.forEach(function (q, i) { if (on > i) s += '<g class="' + (on === i + 1 ? 'pgd-in' : '') + '"><circle cx="' + (q[0] - 62) + '" cy="' + (q[1] - 6) + '" r="12" fill="' + C.cy + '"/>' + t(q[0] - 62, q[1] - 1, String(i + 1), { size: 14, a: 'middle', f: 'h', fill: '#04121a' }) + t(q[0] - 44, q[1], q[2], { size: 18, w: 700, fill: C.cy }) + '</g>'; });
@@ -323,8 +329,16 @@ function boxOf(id, stop) { var d = D.meta(id).prob >= 0.5; return d ? (stop ? 'c
 function tally(ch) { var n = { caught: 0, missed: 0, fa: 0, ok: 0 }; GAME.forEach(function (id) { if (ch[id] != null) n[boxOf(id, ch[id])]++; }); return n; }
 function fourBoxes(c, o) {
   var s = A.stage(), ch = c.state.ch, n = tally(ch);
-  // the rack of 12
-  GAME.forEach(function (id, i) {
+  // the rack of 12; once all are sorted it becomes a strip of your 12 calls (ring: green = matches the experts, red = does not)
+  if (Object.keys(ch).length >= 12 && !o.sort) {
+    s += t(40, 28, 'YOUR 12 CALLS', { size: 12, f: 'h', fill: C.dim, ls: '.14em' });
+    GAME.forEach(function (id, i) {
+      var x = 40 + i * 74, y = 38, b = boxOf(id, ch[id]), right = b === 'caught' || b === 'ok';
+      s += A.cell(id, x + 6, y, 52, { full: true }) + '<rect x="' + (x + 6) + '" y="' + y + '" width="52" height="52" rx="3" fill="none" stroke="' + (right ? C.gr : C.rd) + '" stroke-width="2.5"/>' +
+        t(x + 32, y + 72, ch[id] ? 'STOP' : 'PASS', { size: 12, a: 'middle', f: 'h', fill: ch[id] ? C.rd : C.gr }) + t(x + 32, y + 90, right ? '✓' : '✗', { size: 14, a: 'middle', w: 700, fill: right ? C.gr : C.rd });
+    });
+  }
+  else GAME.forEach(function (id, i) {
     var x = 40 + i * 74, y = 34;
     if (ch[id] != null) { s += '<rect x="' + x + '" y="' + y + '" width="64" height="64" rx="4" fill="none" stroke="#1b2533" stroke-dasharray="4 4"/>'; return; }
     var img = A.cell(id, x, y, 64, { full: true });

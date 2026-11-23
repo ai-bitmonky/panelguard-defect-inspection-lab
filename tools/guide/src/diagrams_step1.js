@@ -91,6 +91,9 @@ D.register('1a', {
       var PX = 560, PY = 90, PS = 320, cid = A.uid('fold');
       s += '<defs><clipPath id="' + cid + '"><rect id="' + cid + 'r" x="' + PX + '" y="' + PY + '" width="' + PS + '" height="' + (PS * c.state.rows / 64) + '"/></clipPath></defs>';
       s += '<rect x="' + PX + '" y="' + PY + '" width="' + PS + '" height="' + PS + '" fill="#0a1019" stroke="#263346" stroke-dasharray="5 5"/>';
+      s += px(1, PX, PY, PS, { op: 0.24 });   // a faint ghost of the photo the rows will build
+      for (var rr = 1; rr < 16; rr++) s += '<line x1="' + PX + '" y1="' + (PY + rr * PS / 16) + '" x2="' + (PX + PS) + '" y2="' + (PY + rr * PS / 16) + '" stroke="#46e3ff" stroke-opacity=".08"/>';
+      s += t(PX + PS / 2, PY + PS + 30, '64 empty rows wait for the line of bytes', { size: 15, a: 'middle', fill: C.dim });
       s += px(1, PX, PY, PS, { clip: cid });
       for (var k = 1; k < 8; k++) s += '<line x1="' + PX + '" y1="' + (PY + k * PS / 8) + '" x2="' + (PX - 8) + '" y2="' + (PY + k * PS / 8) + '" stroke="#46e3ff" stroke-opacity=".4"/>';
       s += t(PX - 14, PY + 14, 'row 0', { size: 14, f: 'm', fill: C.dim, a: 'end' }) + t(PX - 14, PY + PS, 'row 63', { size: 14, f: 'm', fill: C.dim, a: 'end' });
