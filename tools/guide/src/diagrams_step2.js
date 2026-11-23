@@ -196,6 +196,311 @@ D.register('2a', {
   ]
 });
 
+
+/* ============================ 2b  Train three inspectors ============================ */
+var GLYPH = {   // a small picture of how each model draws its line between OK and defect
+  'Logistic regression': function (x, y, col) { return '<path d="M' + (x - 26) + ' ' + (y + 18) + 'L' + (x + 26) + ' ' + (y - 18) + '" stroke="' + col + '" stroke-width="3"/>' + dots(x, y); },
+  'Random forest': function (x, y, col) { return '<path d="M' + (x - 26) + ' ' + (y + 4) + 'H' + (x - 6) + 'V' + (y - 16) + 'H' + (x + 10) + 'V' + (y + 2) + 'H' + (x + 26) + '" stroke="' + col + '" stroke-width="3" fill="none"/>' + dots(x, y); },
+  'SVC (RBF)': function (x, y, col) { return '<ellipse cx="' + (x + 4) + '" cy="' + (y - 2) + '" rx="17" ry="12" stroke="' + col + '" stroke-width="3" fill="none"/>' + dots(x, y); }
+};
+function dots(x, y) { var s = '', P = [[-20, -14, 0], [-14, 8, 0], [16, 16, 0], [22, -16, 0], [-2, 14, 0], [2, -4, 1], [10, 0, 1], [-4, -10, 1]]; P.forEach(function (p) { s += '<circle cx="' + (x + p[0]) + '" cy="' + (y + p[1]) + '" r="3" fill="' + (p[2] ? '#ff4d6a' : '#8fb0cf') + '"/>'; }); return s; }
+var MCOL = ['#46e3ff', '#3dffa0', '#a98bff'];
+function models2b() {
+  var r = D.liveRes('2b'), F = F2();
+  if (r && r.models && r.models.length === 3 && r.models[0].folds.length === 5) return { m: r.models.map(function (q) { var mu = q.mean, sd = Math.sqrt(q.folds.reduce(function (a, v) { return a + (v - mu) * (v - mu); }, 0) / q.folds.length); return { name: q.name, folds: q.folds, mean: q.mean, sd: sd, sec: q.sec }; }), you: true };
+  return { m: F.models || [], you: false };
+}
+function wedge(cx, cy, r0, r1, a0, a1) {
+  var p = function (r, a) { return (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy + r * Math.sin(a)).toFixed(1); };
+  return 'M' + p(r0, a0) + 'L' + p(r1, a0) + 'A' + r1 + ' ' + r1 + ' 0 0 1 ' + p(r1, a1) + 'L' + p(r0, a1) + 'A' + r0 + ' ' + r0 + ' 0 0 0 ' + p(r0, a0) + 'Z';
+}
+var TC = { x: 190, y: 250, r0: 58, r1: 150 };
+function tray2b(c, fx, opts) {
+  var F = F2(), st = c.state, s = '', A0 = -Math.PI / 2 - Math.PI / 5;
+  s += '<ellipse cx="' + TC.x + '" cy="' + (TC.y + 168) + '" rx="150" ry="16" fill="#000" opacity=".5"/>';
+  s += '<circle cx="' + TC.x + '" cy="' + TC.y + '" r="' + (TC.r1 + 10) + '" fill="' + (fx ? 'url(#' + fx.mt + ')' : '#1d2632') + '" stroke="#3a4757"/>';
+  for (var k = 0; k < 5; k++) {
+    var a0 = A0 + k * 2 * Math.PI / 5 + 0.02, a1 = a0 + 2 * Math.PI / 5 - 0.04, am = (a0 + a1) / 2, chk = st.cur === k, done = st.done.indexOf(k) >= 0;
+    var off = chk ? 18 : 0, dx = off * Math.cos(am), dy = off * Math.sin(am), id = 'w2b' + k;
+    var g = '<g transform="translate(' + dx.toFixed(1) + ' ' + dy.toFixed(1) + ')"' + (chk && st.acted ? ' class="pgd-pop"' : '') + '>';
+    g += '<path d="' + wedge(TC.x, TC.y, TC.r0, TC.r1, a0, a1) + '" fill="' + (chk ? '#3a2a0c' : '#0f1a27') + '" stroke="' + (chk ? '#ffb547' : done ? '#2f6b55' : '#2b4157') + '" stroke-width="' + (chk ? 3 : 1.5) + '"/>';
+    (F.foldCells ? F.foldCells[k] : []).slice(0, 3).forEach(function (cid, j) {
+      var rr = 92 + (j === 1 ? 26 : 0), aa = am + (j - 1) * 0.28, px = TC.x + rr * Math.cos(aa) - 13, py = TC.y + rr * Math.sin(aa) - 13;
+      g += A.cell(cid, px, py, 26, { r: 2 });
+    });
+    var lx = TC.x + (TC.r1 + 26) * Math.cos(am), ly = TC.y + (TC.r1 + 26) * Math.sin(am);
+    g += t(lx, ly + 5, 'fold ' + (k + 1), { size: 15, a: 'middle', f: 'm', w: 700, fill: chk ? '#ffb547' : done ? C.gr : C.dim }) + '</g>';
+    if (opts && opts.tap && !done && !chk) s += A.target('f' + k, '<path d="' + wedge(TC.x, TC.y, TC.r0, TC.r1, a0, a1) + '" fill="#ffb547" fill-opacity=".08" stroke="#ffb547" stroke-width="3"/>', k === opts.first ? opts.label : '', TC.x, 462, { inner: g, cls: k === opts.first ? '' : 'pgd-nochip' });
+    else s += g;
+  }
+  s += '<circle cx="' + TC.x + '" cy="' + TC.y + '" r="' + (TC.r0 - 4) + '" fill="#0a121c" stroke="#2b4157"/>' + t(TC.x, TC.y - 4, fmt(F.nTrain || 1574), { size: 19, a: 'middle', f: 'm', w: 700 }) + t(TC.x, TC.y + 18, 'train cells', { size: 14, a: 'middle', fill: C.dim });
+  s += t(30, 40, 'THE TRAIN TRAY IN 5 FOLDS', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+  s += '<rect x="30" y="482" width="14" height="14" rx="3" fill="#3a2a0c" stroke="#ffb547" stroke-width="2"/>' + t(52, 494, 'check fold', { size: 15, fill: C.am }) + '<rect x="150" y="482" width="14" height="14" rx="3" fill="#0f1a27" stroke="#2b4157" stroke-width="2"/>' + t(172, 494, 'the other 4 folds: learn', { size: 15, fill: C.dim });
+  return s;
+}
+function booths2b(c, fx, M, named, o) {
+  o = o || {}; var s = '';
+  M.forEach(function (m, i) {
+    var x = 382 + i * 188, y = 30, win = o.win === i, dim = o.win != null && !win;
+    s += '<g opacity="' + (dim ? .45 : 1) + '">' + A.glass(x, y, 172, 150, { fx: fx, col: win ? '#ffb547' : MCOL[i] });
+    s += '<rect x="' + (x + 14) + '" y="' + (y + 14) + '" width="144" height="78" rx="8" fill="#060b12" stroke="#1b2a3b"/>';
+    s += named ? GLYPH[m.name] ? GLYPH[m.name](x + 86, y + 53, MCOL[i]) : '' : '<circle cx="' + (x + 86) + '" cy="' + (y + 53) + '" r="24" fill="none" stroke="' + MCOL[i] + '" stroke-dasharray="4 4"/>' + t(x + 86, y + 62, '?', { size: 26, a: 'middle', f: 'h', fill: MCOL[i] });
+    s += t(x + 86, y + 118, named ? m.name : 'Inspector ' + (i + 1), { size: 16, a: 'middle', w: 700, fill: MCOL[i] });
+    if (o.cur != null && !dim) s += t(x + 86, y + 140, 'checks fold ' + (o.cur + 1), { size: 14, a: 'middle', fill: C.dim });
+    if (win) s += '<rect x="' + (x + 46) + '" y="' + (y - 12) + '" width="80" height="24" rx="12" fill="#ffb547"/>' + t(x + 86, y + 5, 'BEST', { size: 13, a: 'middle', f: 'h', fill: '#1a1103' });
+    s += '</g>';
+  });
+  return s;
+}
+function board2b(c, fx, M, named, shown, o) {
+  o = o || {}; var s = '', x0 = 382, y0 = 204;
+  s += A.glass(372, 192, 560, 330, { fx: fx, col: '#22384d' });
+  s += t(x0 + 6, y0 + 22, 'SCOREBOARD · RANKING SCORE (1.0 = PERFECT)', { size: 13.5, f: 'h', fill: C.dim, ls: '.08em' });
+  for (var k = 0; k < 5; k++) s += t(x0 + 160 + k * 58, y0 + 50, 'fold ' + (k + 1), { size: 14, a: 'middle', f: 'm', fill: shown.indexOf(k) >= 0 ? C.am : C.dim2 });
+  s += t(x0 + 482, y0 + 50, 'mean ± spread', { size: 14, a: 'middle', fill: C.dim });
+  M.forEach(function (m, i) {
+    var y = y0 + 84 + i * 40;
+    s += '<rect x="' + (x0 + 2) + '" y="' + (y - 24) + '" width="544" height="34" rx="6" fill="' + (o.win === i ? 'rgba(255,181,71,.12)' : i % 2 ? 'rgba(255,255,255,.02)' : 'none') + '"/>';
+    s += '<circle cx="' + (x0 + 14) + '" cy="' + (y - 7) + '" r="5" fill="' + MCOL[i] + '"/>' + t(x0 + 26, y - 2, named ? ({ 'Logistic regression': 'Logistic reg.', 'SVC (RBF)': 'SVC (RBF)' }[m.name] || m.name) : 'Inspector ' + (i + 1), { size: 15, w: 700, fill: MCOL[i] });
+    for (var k2 = 0; k2 < 5; k2++) {
+      var on = shown.indexOf(k2) >= 0, nw = o.just === k2;
+      s += on ? t(x0 + 160 + k2 * 58, y - 2, m.folds[k2].toFixed(3), { size: 14.5, a: 'middle', f: 'm', w: 700, fill: '#e6eef8', cls: nw ? 'pgd-pop' : '' }) : t(x0 + 160 + k2 * 58, y - 2, '·', { size: 15, a: 'middle', fill: C.dim2 });
+    }
+    if (shown.length === 5) s += t(x0 + 482, y - 2, m.mean.toFixed(3) + ' ± ' + m.sd.toFixed(3), { size: 15, a: 'middle', f: 'm', w: 700, fill: o.win === i ? '#ffb547' : '#fff', cls: 'pgd-pop' });
+  });
+  // the dot plot: every fold score as a dot, the mean as a bar
+  var ch = A.chart({ x: x0 + 70, y: y0 + 216, w: 440, h: 64, xd: [0.75, 0.9], yd: [0, 3], xt: [0.75, 0.8, 0.85, 0.9], fx: function (v) { return v.toFixed(2); } });
+  s += ch.svg.replace(/<rect[^>]*opacity=".55"\/>/, '');
+  M.forEach(function (m, i) {
+    var y = ch.Y(2.5 - i);
+    s += t(x0 + 60, y + 5, named ? m.name.split(' ')[0] : '#' + (i + 1), { size: 13.5, a: 'end', fill: MCOL[i] });
+    shown.forEach(function (k) { s += '<circle cx="' + ch.X(m.folds[k]).toFixed(1) + '" cy="' + y + '" r="5" fill="' + MCOL[i] + '" fill-opacity=".75"' + (o.just === k ? ' class="pgd-pop"' : '') + '/>'; });
+    if (shown.length === 5) s += '<line x1="' + ch.X(m.mean - m.sd) + '" x2="' + ch.X(m.mean + m.sd) + '" y1="' + y + '" y2="' + y + '" stroke="' + MCOL[i] + '" stroke-width="2"/><rect x="' + (ch.X(m.mean) - 2) + '" y="' + (y - 10) + '" width="4" height="20" fill="#fff"/>';
+  });
+  return s;
+}
+function work2b(c, M, you, named) {
+  var st = c.state, F = F2(), k = st.cur, r = [];
+  if (k == null) r = [{ h: 'Five folds' }, { v: fmt(F.nTrain) + ' ÷ 5 ≈ ' + F.foldSizes[0], k: 'cells per fold (' + F.foldDef[0] + ' or ' + F.foldDef[2] + ' defects each)' }, { t: 'One fold is held back to check. The other four teach. Every fold takes one turn.' }];
+  else {
+    r = [{ h: 'Fold ' + (k + 1) + ' checks' }, { v: fmt(F.nTrain - F.foldSizes[k]), k: 'cells learn (4 folds)' }, { v: String(F.foldSizes[k]), k: 'cells check (fold ' + (k + 1) + ')' }];
+    M.forEach(function (m, i) { r.push({ v: m.folds[k].toFixed(3), k: (named ? m.name : 'Inspector ' + (i + 1)) + ' on fold ' + (k + 1), col: MCOL[i] }); });
+  }
+  r.push(srcTag(you)); if (!you) r.push({ t: '<i>Reference run of the lab’s own 2b code.</i>' });
+  return r;
+}
+D.register('2b', {
+  init: function () { return { cur: null, done: [], acted: 0 }; },
+  frames: [
+  { cap: 'Split the train tray into 5 folds',
+    note: 'Cross-validation cuts the train tray into 5 folds. Each turn, one fold checks and the other four teach. All three inspectors see the same folds.',
+    svg: function (c) { var R = models2b(), nm = D.predDone('2b'), fx = A.fx(); return A.stage() + fx.defs + tray2b(c, fx, { tap: 1, first: 0, label: 'tap a fold to check with' }) + booths2b(c, fx, R.m, nm) + board2b(c, fx, R.m, nm, []); },
+    work: function (c) { var R = models2b(); return work2b(c, R.m, R.you, D.predDone('2b')); },
+    bind: function (c, root) { root.querySelectorAll('.pgd-target').forEach(function (el) { D.onTap(el, function () { var k = +el.getAttribute('data-pgd-t').slice(1); c.state.cur = k; c.state.done = [k]; c.state.acted = 1; c.next(); }); }); },
+    auto: function (c) { c.state.cur = 0; c.state.done = [0]; } },
+  { cap: 'Turn the tray: every fold takes a turn',
+    note: 'Each fold checks once. Each inspector gets 5 scores, one per fold, all on cells it did not learn from.',
+    svg: function (c) {
+      var R = models2b(), nm = D.predDone('2b'), fx = A.fx(), st = c.state, left = [0, 1, 2, 3, 4].filter(function (k) { return st.done.indexOf(k) < 0; });
+      var s = A.stage() + fx.defs + tray2b(c, fx, { tap: 1, first: left[0], label: 'next fold' }) + booths2b(c, fx, R.m, nm, { cur: st.cur }) + board2b(c, fx, R.m, nm, st.done, { just: st.cur });
+      // flows: the check fold to the booths
+      var am = -Math.PI / 2 - Math.PI / 5 + (st.cur + 0.5) * 2 * Math.PI / 5, fx0 = TC.x + 120 * Math.cos(am), fy0 = TC.y + 120 * Math.sin(am);
+      [0, 1, 2].forEach(function (i) { s += '<path d="M' + fx0.toFixed(0) + ' ' + fy0.toFixed(0) + 'C' + (fx0 + 120) + ' ' + (fy0 - 60) + ' ' + (420 + i * 188) + ' 230 ' + (468 + i * 188) + ' 182" stroke="#ffb547" stroke-opacity=".55" stroke-width="2" fill="none" class="pgd-flowonce"/>'; });
+      return s;
+    },
+    work: function (c) { var R = models2b(); return work2b(c, R.m, R.you, D.predDone('2b')); },
+    bind: function (c, root) { root.querySelectorAll('.pgd-target').forEach(function (el) { D.onTap(el, function () { var k = +el.getAttribute('data-pgd-t').slice(1), st = c.state; st.cur = k; st.done.push(k); st.acted = 1; if (st.done.length >= 5) c.next(); else c.redraw(true); }); }); },
+    auto: function (c) { c.state.done = [0, 1, 2, 3, 4]; c.state.cur = 4; } },
+  { cap: 'Mean ± spread: one fair score per inspector',
+    note: 'The mean of the 5 fold scores says how good an inspector is. The spread says how much it changes from fold to fold.',
+    svg: function (c) {
+      var R = models2b(), nm = D.predDone('2b'), fx = A.fx(), st = c.state, best = 0;
+      R.m.forEach(function (m, i) { if (m.mean > R.m[best].mean) best = i; });
+      var s = A.stage() + fx.defs + tray2b(c, fx, {}) + booths2b(c, fx, R.m, nm) + board2b(c, fx, R.m, nm, [0, 1, 2, 3, 4]);
+      s += A.target('best', '<rect x="380" y="' + (264 + best * 40) + '" width="548" height="38" rx="8" fill="none" stroke="#ffb547" stroke-width="3"/>', 'tap the best mean', 760, 190 + 0, { la: 'middle' });
+      c._best = best; return s;
+    },
+    work: function (c) {
+      var R = models2b(), nm = D.predDone('2b'), m = R.m[2], r = [{ h: 'Mean of 5 folds' }];
+      R.m.forEach(function (q, i) { r.push({ v: '(' + q.folds.map(function (v) { return v.toFixed(3); }).join(' + ') + ') ÷ 5', k: nm ? q.name : 'Inspector ' + (i + 1), col: MCOL[i] }, { op: '=', v: q.mean.toFixed(3) + ' ± ' + q.sd.toFixed(3), k: 'mean ± spread', res: i === 2 }); });
+      r.push(srcTag(R.you)); void m; return r;
+    },
+    on: { best: function (c) { c.next(); } } },
+  { cap: 'The best inspector learns once from the whole tray',
+    note: 'The inspector with the highest mean is trained again on all 1,574 train cells. The validation tray is still unseen: it is used next, to choose the cutoff.',
+    svg: function (c) {
+      var R = models2b(), nm = D.predDone('2b'), fx = A.fx(), best = 0;
+      R.m.forEach(function (m, i) { if (m.mean > R.m[best].mean) best = i; });
+      var s = A.stage() + fx.defs + booths2b(c, fx, R.m, nm, { win: best }) + board2b(c, fx, R.m, nm, [0, 1, 2, 3, 4], { win: best });
+      // the whole tray flows into the winner
+      s += '<circle cx="' + TC.x + '" cy="' + TC.y + '" r="' + (TC.r1 + 10) + '" fill="' + 'url(#' + fx.mt + ')' + '" stroke="#ffb547" stroke-width="2"/>';
+      for (var k = 0; k < 5; k++) { var a0 = -Math.PI / 2 - Math.PI / 5 + k * 2 * Math.PI / 5 + .02; s += '<path d="' + wedge(TC.x, TC.y, TC.r0, TC.r1, a0, a0 + 2 * Math.PI / 5 - .04) + '" fill="#13283a" stroke="#3dffa0" stroke-width="1.5"/>'; F2().foldCells[k].slice(0, 3).forEach(function (cid, j) { var am = a0 + Math.PI / 5, rr = 92 + (j === 1 ? 26 : 0), aa = am + (j - 1) * 0.28; s += A.cell(cid, TC.x + rr * Math.cos(aa) - 13, TC.y + rr * Math.sin(aa) - 13, 26, { r: 2 }); }); }
+      s += '<circle cx="' + TC.x + '" cy="' + TC.y + '" r="54" fill="#0a121c" stroke="#3dffa0"/>' + t(TC.x, TC.y - 4, fmt(F2().nTrain), { size: 19, a: 'middle', f: 'm', w: 700, fill: C.gr }) + t(TC.x, TC.y + 18, 'all 5 folds', { size: 14, a: 'middle', fill: C.dim });
+      s += t(30, 46, 'FINAL TRAINING: THE WHOLE TRAIN TRAY', { size: 14, f: 'h', fill: C.gr, ls: '.08em' });
+      s += '<path d="M' + (TC.x + 150) + ' ' + (TC.y - 60) + 'C 330 120 ' + (420 + best * 188) + ' 220 ' + (468 + best * 188) + ' 182" stroke="#3dffa0" stroke-width="3" fill="none" class="pgd-flow"/>';
+      s += t(30, 494, nm ? 'Best: ' + R.m[best].name + ', mean ' + R.m[best].mean.toFixed(3) : 'Best: inspector ' + (best + 1) + ' (name shows after your 2b bet)', { size: 16, fill: '#ffb547' });
+      return s;
+    },
+    work: function (c) {
+      var R = models2b(), nm = D.predDone('2b'), best = 0; R.m.forEach(function (m, i) { if (m.mean > R.m[best].mean) best = i; });
+      return clean([{ h: 'Train the winner once' }, { v: fmt(F2().nTrain), k: 'train cells, all 5 folds' }, { v: R.m[best].mean.toFixed(3), k: 'its mean fold score', res: true },
+        nm ? { t: '<b>' + R.m[best].name + '</b> took ' + R.m[best].sec + ' s for its 5 folds.' } : { t: 'The names show after you place your bet in 2b.' },
+        { t: 'The validation tray is still unseen. Next it gives each cell a score.' }, srcTag(R.you)]);
+    } }
+  ]
+});
+
+
+/* ============================ 2c  Read scores, not verdicts ============================ */
+function picks2c() {
+  var v = D.val(); if (!v) return null;
+  var n = v.y.length, I = []; for (var i = 0; i < n; i++) I.push(i);
+  function best(f, key) { var b = null; I.forEach(function (i) { if (f(i) && (b == null || key(i) < key(b))) b = i; }); return b; }
+  var sA = best(function (i) { return v.y[i] === 1 && v.svc[i] >= 0.51; }, function (i) { return v.svc[i]; });
+  var sB = best(function (i) { return v.y[i] === 1; }, function (i) { return -v.svc[i]; });
+  var miss = best(function (i) { return v.y[i] === 1 && v.svc[i] < 0.5; }, function (i) { return Math.abs(v.svc[i] - 0.4); });
+  var fa = best(function (i) { return v.y[i] === 0 && v.svc[i] >= 0.5; }, function (i) { return Math.abs(v.svc[i] - 0.55); });
+  var g1 = best(function (i) { return v.y[i] === 0 && v.kind[i] === 'm'; }, function (i) { return v.svc[i]; });
+  var g2 = best(function (i) { return v.y[i] === 0 && v.kind[i] === 'p'; }, function (i) { return v.svc[i]; });
+  return { v: v, order: [sA, g1, sB, miss, fa, g2], sA: sA, sB: sB, you: v.youSvc };
+}
+function card2c(P, i, x, y, flipped, o) {
+  o = o || {}; var v = P.v, sc = v.svc[i], stop = sc >= 0.5, s = '', fx = o.fx;
+  s += '<g' + (fx ? ' filter="url(#' + fx.sh + ')"' : '') + '><rect x="' + x + '" y="' + y + '" width="120" height="176" rx="10" fill="#0d1622" stroke="#2b4157"/></g>';
+  s += A.cell(v.id[i], x + 12, y + 12, 96, { full: true });
+  s += t(x + 60, y + 124, 'cell ' + v.id[i], { size: 13.5, a: 'middle', f: 'm', fill: C.dim });
+  var cls = o.just ? ' class="pgd-flip"' : '';
+  if (!flipped) s += '<g' + cls + '><rect x="' + (x + 14) + '" y="' + (y + 134) + '" width="92" height="32" rx="6" fill="none" stroke="' + (stop ? C.rd : C.gr) + '" stroke-width="2.5" transform="rotate(-4 ' + (x + 60) + ' ' + (y + 150) + ')"/>' +
+    t(x + 60, y + 157, stop ? 'STOP' : 'PASS', { size: 20, a: 'middle', f: 'h', fill: stop ? C.rd : C.gr, ls: '.1em' }).replace('<text ', '<text transform="rotate(-4 ' + (x + 60) + ' ' + (y + 150) + ')" ') + '</g>';
+  else s += '<g' + cls + '><rect x="' + (x + 10) + '" y="' + (y + 134) + '" width="100" height="34" rx="6" fill="#071019" stroke="' + C.cy + '"/>' +
+    '<rect x="' + (x + 14) + '" y="' + (y + 160) + '" width="' + (92 * sc).toFixed(1) + '" height="4" rx="2" fill="' + C.cy + '"/>' + t(x + 60, y + 156, sc.toFixed(3), { size: 19, a: 'middle', f: 'm', w: 700, fill: '#fff' }) + '</g>';
+  if (o.truth) s += '<rect x="' + (x + 12) + '" y="' + (y + 12) + '" width="96" height="96" fill="none" stroke="' + (v.y[i] ? C.rd : C.gr) + '" stroke-width="2"/>' + t(x + 104, y + 28, v.y[i] ? 'defect' : 'good', { size: 13, a: 'end', w: 700, fill: v.y[i] ? '#ff8aa0' : C.gr });
+  return s;
+}
+function line2c(P, flipped, y0) {
+  var s = '', X = function (v) { return 90 + v * 780; };
+  s += A.glass(28, y0 - 54, 904, 170, { col: '#22384d' });
+  s += t(46, y0 - 26, 'THE SCORE LINE · CHANCE OF DEFECT', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+  s += '<line x1="' + X(0) + '" x2="' + X(1) + '" y1="' + y0 + '" y2="' + y0 + '" stroke="#5d6b80" stroke-width="2"/>';
+  for (var k = 0; k <= 10; k++) s += '<line x1="' + X(k / 10) + '" x2="' + X(k / 10) + '" y1="' + y0 + '" y2="' + (y0 + 7) + '" stroke="#5d6b80"/>' + t(X(k / 10), y0 + 26, (k / 10).toFixed(1), { size: 15, a: 'middle', f: 'm', fill: C.dim });
+  s += '<rect x="' + X(0.5) + '" y="' + (y0 - 30) + '" width="' + (X(1) - X(0.5)) + '" height="30" fill="#ff4d6a" opacity=".08"/><rect x="' + X(0) + '" y="' + (y0 - 30) + '" width="' + (X(0.5) - X(0)) + '" height="30" fill="#3dffa0" opacity=".06"/>';
+  s += '<line x1="' + X(0.5) + '" x2="' + X(0.5) + '" y1="' + (y0 - 34) + '" y2="' + (y0 + 4) + '" stroke="#fff" stroke-dasharray="4 3"/>' + t(X(0.5) + 6, y0 - 38, 'verdict line 0.5', { size: 14, fill: '#fff' });
+  t; var lab = [];
+  flipped.forEach(function (i, n) { var x = X(P.v.svc[i]); lab.push(x); s += '<circle class="' + (n === flipped.length - 1 ? 'pgd-pop' : '') + '" cx="' + x.toFixed(1) + '" cy="' + (y0 - 12) + '" r="8" fill="' + (P.v.y[i] ? C.rd : C.gr) + '" stroke="#fff" stroke-width="1.5"/>' + t(x, y0 + 56, String(P.v.id[i]), { size: 13, a: 'middle', f: 'm', fill: C.dim }); });
+  if (flipped.indexOf(P.sA) >= 0 && flipped.indexOf(P.sB) >= 0) {
+    var xa = X(P.v.svc[P.sA]), xb = X(P.v.svc[P.sB]);
+    s += '<path d="M' + xa + ' ' + (y0 + 70) + 'V' + (y0 + 78) + 'H' + xb + 'V' + (y0 + 70) + '" stroke="#ffb547" fill="none" stroke-width="2"/>' + t((xa + xb) / 2, y0 + 100, 'both STOP · ' + (P.v.svc[P.sB] - P.v.svc[P.sA]).toFixed(3) + ' apart', { size: 16, a: 'middle', w: 700, fill: C.am });
+  }
+  return s;
+}
+function hist2c(P, y0, o) {
+  o = o || {}; var v = P.v, B = 20, d = [], g = [], s = '';
+  for (var k = 0; k < B; k++) { d.push(0); g.push(0); }
+  v.svc.forEach(function (sc, i) { var b = Math.min(B - 1, Math.floor(sc * B)); (v.y[i] ? d : g)[b]++; });
+  var X = function (q) { return 90 + q * 780; }, mx = Math.max(Math.max.apply(null, d), Math.max.apply(null, g)), top = Math.ceil(mx / 25) * 25, md = top, mg = top, hd = 88, hg = 88, bw = 780 / B;
+  s += A.glass(28, y0 - 104, 904, 236, { col: '#22384d' });
+  s += t(46, y0 - 78, 'ALL ' + v.y.length + ' VALIDATION SCORES', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+  for (k = 0; k < B; k++) {
+    var h1 = d[k] / md * hd, h2 = g[k] / mg * hg;
+    s += '<rect x="' + (X(k / B) + 2) + '" y="' + (y0 - h1) + '" width="' + (bw - 4) + '" height="' + h1 + '" rx="2" fill="#ff4d6a" opacity=".85"/>';
+    s += '<rect x="' + (X(k / B) + 2) + '" y="' + (y0 + 2) + '" width="' + (bw - 4) + '" height="' + h2 + '" rx="2" fill="#5f84a8" opacity=".9"/>';
+  }
+  s += '<line x1="' + X(0) + '" x2="' + X(1) + '" y1="' + (y0 + 1) + '" y2="' + (y0 + 1) + '" stroke="#e6eef8" stroke-width="1.5"/>';
+  for (k = 0; k <= 10; k++) s += t(X(k / 10), y0 + hg + 24, (k / 10).toFixed(1), { size: 14, a: 'middle', f: 'm', fill: C.dim });
+  s += t(X(1) - 4, y0 - hd + 4, 'defects (' + d.reduce(function (a, b) { return a + b; }, 0) + ')', { size: 15, a: 'end', w: 700, fill: '#ff8aa0' }) + t(X(1) - 4, y0 + hg - 4, 'good cells (' + g.reduce(function (a, b) { return a + b; }, 0) + ')', { size: 15, a: 'end', w: 700, fill: '#8fb0cf' });
+  [-top, -top / 2, top / 2, top].forEach(function (q) { var yy = y0 + (q < 0 ? q : q) / top * hd * (q < 0 ? 1 : 1); yy = q < 0 ? y0 + q / top * hd : y0 + q / top * hg; s += '<line x1="84" x2="90" y1="' + yy + '" y2="' + yy + '" stroke="#5d6b80"/>' + t(80, yy + 5, String(Math.abs(q)), { size: 13, a: 'end', f: 'm', fill: C.dim }); });
+  s += '<line x1="90" x2="90" y1="' + (y0 - hd) + '" y2="' + (y0 + hg) + '" stroke="#5d6b80"/>' + t(40, y0 + 5, 'cells', { size: 13, fill: C.dim });
+  if (o.gate != null) {
+    var gx = X(o.gate), r = D.M.rates(v.y, v.svc, o.gate);
+    s += '<rect x="' + gx + '" y="' + (y0 - hd - 6) + '" width="' + (X(1) - gx) + '" height="' + (hd + hg + 14) + '" fill="#ff4d6a" opacity=".07"/>';
+    s += '<line x1="' + gx + '" x2="' + gx + '" y1="' + (y0 - hd - 10) + '" y2="' + (y0 + hg + 6) + '" stroke="#ffb547" stroke-width="3"/>' + t(gx + 8, y0 - hd + 8, 'STOP at 0.5 and above', { size: 15, w: 700, fill: C.am });
+    s += A.tag(gx + 12, y0 - 40, r.tp + ' defects caught', C.rd).replace('<g class="pgd-tag">', '<g class="pgd-tag pgd-pop">');
+    s += A.tag(gx - 12, y0 - 64, r.fn + ' defects missed', '#ff8aa0', { a: 'end' });
+  }
+  return s;
+}
+D.register('2c', {
+  init: function () { return { flipped: [] }; },
+  frames: [
+  { cap: 'The model’s verdict: STOP or PASS',
+    note: 'A plain verdict only says STOP or PASS. Flip two STOP cards to see what is behind them.',
+    svg: function (c) {
+      var P = picks2c(), fx = A.fx(); if (!P) return A.stage();
+      var s = A.stage() + fx.defs + t(40, 40, 'VALIDATION CELLS ON THE BELT · VERDICT = SCORE ≥ 0.5', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+      s += A.belt(30, 246, 900, 34, { fx: fx });
+      var st = c.state, next = st.flipped.indexOf(P.sA) < 0 ? P.sA : P.sB;
+      P.order.forEach(function (i, k) {
+        var x = 42 + k * 150, card = card2c(P, i, x, 62, st.flipped.indexOf(i) >= 0, { fx: fx, just: st.flipped[st.flipped.length - 1] === i });
+        if (i === next) s += A.target('flip', '<rect x="' + (x - 4) + '" y="58" width="128" height="184" rx="12" fill="none" stroke="#ffb547" stroke-width="3"/>', 'flip this STOP', x + 60, 40 + 252 + 20, { inner: card });
+        else s += card;
+      });
+      s += line2c(P, st.flipped, 420);
+      return s;
+    },
+    work: function (c) {
+      var P = picks2c(); if (!P) return [];
+      var r = [{ h: 'Verdict' }, { t: 'The plain verdict is STOP when the defect score is 0.5 or more. It hides <b>how sure</b> the model is.' }];
+      c.state.flipped.forEach(function (i) { r.push({ v: P.v.svc[i].toFixed(3), k: 'defect score of cell ' + P.v.id[i] + ' → ' + (P.v.svc[i] >= 0.5 ? 'STOP' : 'PASS') }); });
+      r.push(srcTag(P.you)); return r;
+    },
+    on: { flip: function (c) { var P = picks2c(), st = c.state; if (st.flipped.indexOf(P.sA) < 0) { st.flipped.push(P.sA); c.redraw(true); } else { st.flipped.push(P.sB); c.next(); } } },
+    auto: function (c) { var P = picks2c(); c.state.flipped = [P.sA, P.sB]; } },
+  { cap: 'Same verdict, very different scores',
+    note: 'Both cards said STOP. One is just over 0.5, the other is almost 1. A score keeps that difference; a verdict throws it away.',
+    svg: function (c) {
+      var P = picks2c(), fx = A.fx(); if (!P) return A.stage();
+      var s = A.stage() + fx.defs + t(40, 40, 'VALIDATION CELLS ON THE BELT', { size: 14, f: 'h', fill: C.dim, ls: '.1em' }) + A.belt(30, 246, 900, 34, { fx: fx });
+      P.order.forEach(function (i, k) { s += card2c(P, i, 42 + k * 150, 62, c.state.flipped.indexOf(i) >= 0, { fx: fx }); });
+      s += line2c(P, c.state.flipped, 420);
+      s += A.target('all', '<rect x="730" y="294" width="196" height="40" rx="20" fill="#0b121b" stroke="#ffb547" stroke-width="2.5"/>', 'flip the rest', 828, 314, { cls: 'pgd-nochip', inner: t(828, 320, 'FLIP THE REST', { size: 15, a: 'middle', f: 'h', fill: C.am }) });
+      return s;
+    },
+    work: function (c) {
+      var P = picks2c(); if (!P) return [];
+      var a = P.v.svc[P.sA], b = P.v.svc[P.sB];
+      return [{ h: 'Two STOPs' }, { v: b.toFixed(3), k: 'cell ' + P.v.id[P.sB] + ': almost sure' }, { op: '−', v: a.toFixed(3), k: 'cell ' + P.v.id[P.sA] + ': just over the line' }, { op: '=', v: (b - a).toFixed(3), k: 'apart, same verdict', res: true }, srcTag(P.you)];
+    },
+    on: { all: function (c) { var P = picks2c(); c.state.flipped = P.order.slice(); c.next(); } },
+    auto: function (c) { var P = picks2c(); c.state.flipped = P.order.slice(); } },
+  { cap: 'Scores of all 525 validation cells',
+    note: 'Defects (top) mostly score high, good cells (bottom) mostly low, but they overlap. Some defects score low and some good cells score high.',
+    svg: function (c) {
+      var P = picks2c(), fx = A.fx(); if (!P) return A.stage();
+      var s = A.stage() + fx.defs + t(40, 40, 'THE SAME CELLS, NOW IN SCORE ORDER', { size: 14, f: 'h', fill: C.dim, ls: '.1em' }) + A.belt(30, 246, 900, 34, { fx: fx });
+      P.order.slice().sort(function (a, b) { return P.v.svc[a] - P.v.svc[b]; }).forEach(function (i, k) { s += '<g class="pgd-in">' + card2c(P, i, 42 + k * 150, 62, true, { fx: fx, truth: true }) + '</g>'; });
+      s += hist2c(P, 408);
+      s += A.target('gate', '<rect x="474" y="296" width="12" height="236" rx="6" fill="#ffb547" fill-opacity=".25" stroke="#ffb547" stroke-width="2.5"/>', 'tap the verdict line', 480, 308, { la: 'start' });
+      return s;
+    },
+    work: function (c) {
+      var P = picks2c(); if (!P) return [];
+      var v = P.v, nd = v.y.filter(function (q) { return q; }).length, lo = 0; v.svc.forEach(function (q, i) { if (v.y[i] && q < 0.5) lo++; });
+      return [{ h: 'What the scores show' }, { v: String(v.y.length), k: 'validation cells, one score each' }, { v: nd + ' defects', k: 'red bars, above the line' }, { v: (v.y.length - nd) + ' good cells', k: 'blue bars, below the line' }, { t: 'They overlap: no single cut separates them perfectly.' }, srcTag(P.you)];
+    },
+    on: { gate: function (c) { c.next(); } } },
+  { cap: 'The 0.5 verdict misses many defects. You choose the gate.',
+    note: 'With the plain verdict line at 0.5, many real defects pass. Because we have scores, we can move the gate lower to catch more (that is 2d).',
+    svg: function (c) {
+      var P = picks2c(), fx = A.fx(); if (!P) return A.stage();
+      var r = D.M.rates(P.v.y, P.v.svc, 0.5), s = A.stage() + fx.defs;
+      s += A.glass(28, 22, 904, 136, { fx: fx, col: '#7a5a2a' });
+      s += t(50, 56, 'WITH THE PLAIN VERDICT (0.5)', { size: 14, f: 'h', fill: C.am, ls: '.1em' });
+      s += A.gauge(130, 112, 34, r.rec, { col: C.rd, target: 0.95, tl: '95%', val: p1(r.rec), vs: 16 });
+      s += t(190, 100, r.tp + ' of ' + (r.tp + r.fn) + ' defects stopped', { size: 20, w: 700 }) + t(190, 130, r.fn + ' defects pass unseen: far from the 95% goal', { size: 17, fill: '#ff8aa0' });
+      s += t(912, 100, r.fp + ' good cells stopped', { size: 18, a: 'end', fill: C.am }) + t(912, 130, 'of ' + (r.fp + r.tn), { size: 16, a: 'end', fill: C.dim });
+      s += hist2c(P, 330, { gate: 0.5 });
+      s += t(480, 510, 'Lower the gate to stop more defects → 2d', { size: 17, a: 'middle', fill: '#fff' });
+      return s;
+    },
+    work: function (c) {
+      var P = picks2c(); if (!P) return [];
+      var r = D.M.rates(P.v.y, P.v.svc, 0.5);
+      return [{ h: 'Gate at 0.5' }, { v: r.tp + ' ÷ ' + (r.tp + r.fn), k: 'defects stopped ÷ all defects' }, { op: '=', v: p1(r.rec), k: 'recall: the target is 95%', res: true }, { v: String(r.fn), k: 'defects that pass' },
+        { t: 'A score lets <b>you</b> place the gate where the factory needs it.' }, srcTag(P.you)];
+    } }
+  ]
+});
+
 /* ============================ 2d  Hit the target ============================ */
 /* the defects of the validation tray, lowest score first; the gate sits just below defect g (g defects pass) */
 function walk() {

@@ -79,6 +79,8 @@ models = {'Logistic regression': LogisticRegression(C=0.1, max_iter=2000),
 folds = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
 fold_sizes = [int(len(te)) for _, te in folds.split(F[itr], y[itr])]
 S2['foldSizes'] = fold_sizes
+S2['foldCells'] = [[int(cid[itr[i]]) for i in te[:4]] for _, te in folds.split(F[itr], y[itr])]   # 4 real cells of each fold
+S2['foldDef'] = [int(y[itr[te]].sum()) for _, te in folds.split(F[itr], y[itr])]
 S2['models'] = []
 for name, m in models.items():
     t = time.time(); s = cross_val_score(Pipeline([('scale', StandardScaler()), ('model', m)]), F[itr], y[itr], cv=folds, scoring='roc_auc')
