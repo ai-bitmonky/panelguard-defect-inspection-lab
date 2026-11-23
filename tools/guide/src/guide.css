@@ -179,6 +179,7 @@ details[open]>summary::before{transform:rotate(90deg)}
 
 /* targets + motion inside the stage */
 .pgd-target{cursor:pointer;outline:none}
+.pgd-target .pgd-ring *{pointer-events:visible}
 .pgd-target .pgd-ring{filter:drop-shadow(0 0 7px rgba(255,181,71,.85))}
 .pgd-target .pgd-ring>*{animation:pgdPulse 1.6s ease-in-out infinite}
 .pgd-target:focus-visible .pgd-chip rect,.pgd-target:hover .pgd-chip rect{fill:#ffd08a}

@@ -329,13 +329,14 @@ function fourBoxes(c, o) {
     var img = A.cell(id, x, y, 64, { full: true });
     if (o.sort && c.state.sel === id) {
       s += '<rect x="' + (x - 4) + '" y="' + (y - 4) + '" width="72" height="72" rx="6" fill="none" stroke="#fff" stroke-width="2"/>' + img;
-    } else if (o.sort) s += A.target('c' + id, '<rect x="' + (x - 3) + '" y="' + (y - 3) + '" width="70" height="70" rx="5" fill="none" stroke="#ffb547" stroke-width="2"/>', i === 0 || (c.state.sel == null && firstOpen(ch) === id) ? 'tap a cell' : '', x + 32, y + 92, { inner: img, cls: i === 0 || firstOpen(ch) === id ? '' : 'pgd-nochip' });
+    } else if (o.sort && c.state.sel != null) s += '<g opacity=".4">' + img + '</g>';
+    else if (o.sort) { var lead = firstOpen(ch) === id; s += A.target('c' + id, '<rect x="' + (x - 3) + '" y="' + (y - 3) + '" width="70" height="70" rx="5" fill="none" stroke="#ffb547" stroke-width="2"/>', lead ? 'tap a cell' : 'cell ' + id, Math.max(90, x + 32), y + 98, { inner: img, cls: lead ? '' : 'pgd-nochip' }); }
     else s += img;
   });
   // answer chips under the chosen cell (only when the lab has no answers yet)
   if (o.sort && c.state.sel != null) {
     var k = GAME.indexOf(c.state.sel), x0 = Math.max(80, Math.min(880, 40 + k * 74 + 32));
-    s += A.target('pass', '<rect x="' + (x0 - 92) + '" y="112" width="84" height="36" rx="8" fill="#0b2418" stroke="' + C.gr + '" stroke-width="2"/>', 'PASS', x0 - 50, 0, { inner: t(x0 - 50, 136, 'PASS', { size: 15, a: 'middle', f: 'h', fill: C.gr }), cls: 'pgd-nochip' });
+    s += A.target('pass', '<rect x="' + (x0 - 92) + '" y="112" width="84" height="36" rx="8" fill="#0b2418" stroke="' + C.gr + '" stroke-width="2"/>', 'PASS', x0 - 50, 0, { inner: t(x0 - 50, 136, 'PASS', { size: 15, a: 'middle', f: 'h', fill: C.gr }), cls: 'pgd-nochip' }) + t(x0, 170, 'your call?', { size: 15, a: 'middle', fill: C.am, w: 700 });
     s += A.target('stop', '<rect x="' + (x0 + 8) + '" y="112" width="84" height="36" rx="8" fill="#2a0e15" stroke="' + C.rd + '" stroke-width="2"/>', 'STOP', x0 + 50, 0, { inner: t(x0 + 50, 136, 'STOP', { size: 15, a: 'middle', f: 'h', fill: C.rd }), cls: 'pgd-nochip' });
   }
   // headers
