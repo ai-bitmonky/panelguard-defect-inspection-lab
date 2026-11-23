@@ -1,18 +1,18 @@
 """Build the lab with the NEW Diagram guide.
 Takes tools/guide/base/PanelGuard_Refined_Student_Lab_base.html, removes the old guide UI script (script B: DATA + SVGs + overlay)
 and its style block, keeps the old guide's text data (script A: window.PGTeach), injects the new guide from tools/guide/src,
-and writes dist/PanelGuard_Refined_Student_Lab_v2.0.html. The lab itself is not changed.
+and writes dist/PanelGuard_Refined_Student_Lab_v<VERSION>.html. The lab itself is not changed.
 Run: python3 -I tools/guide/build_guide.py [--out path]"""
 import json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SRC = os.path.join(HERE, 'src')
-VERSION = '2.0'
+VERSION = '2.1'
 BASE = os.path.join(HERE, 'base', 'PanelGuard_Refined_Student_Lab_base.html')
 OUT = os.path.join(ROOT, 'dist', 'PanelGuard_Refined_Student_Lab_v%s.html' % VERSION)
 # load order: data first, then the engine, the diagram files (one per step group), the shell last
-JS = ['legacy.js', 'engine.js', 'diagrams_step0.js', 'diagrams_step1.js', 'shell.js']
+JS = ['legacy.js', 'engine.js', 'diagrams_step0.js', 'diagrams_step1.js', 'diagrams_step2.js', 'diagrams_step3.js', 'shell.js']
 
 
 def read(p):

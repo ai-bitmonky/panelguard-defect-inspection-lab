@@ -191,9 +191,9 @@ A.gauge = function (cx, cy, r, frac, o) {
   function pt(f, rr) { var a = a0 + (a1 - a0) * f; return (cx + rr * Math.cos(a)).toFixed(1) + ' ' + (cy + rr * Math.sin(a)).toFixed(1); }
   function arc(f0, f1, col, wdt, op) { var big = (f1 - f0) * (a1 - a0) > Math.PI ? 1 : 0; return '<path d="M' + pt(f0, r) + 'A' + r + ' ' + r + ' 0 ' + big + ' 1 ' + pt(f1, r) + '" stroke="' + col + '" stroke-width="' + wdt + '" fill="none" stroke-linecap="round"' + (op ? ' opacity="' + op + '"' : '') + '/>'; }
   var s = arc(0, 1, '#18222f', sw) + (frac > 0.001 ? arc(0, Math.min(1, frac), o.col || COL.cy, sw) : '');
-  if (o.target != null) { var a = a0 + (a1 - a0) * o.target; s += '<path d="M' + (cx + (r - sw) * Math.cos(a)) + ' ' + (cy + (r - sw) * Math.sin(a)) + 'L' + (cx + (r + sw) * Math.cos(a)) + ' ' + (cy + (r + sw) * Math.sin(a)) + '" stroke="#fff" stroke-width="2.5"/>' + A.t(cx + (r + sw + 14) * Math.cos(a), cy + (r + sw + 14) * Math.sin(a) + 5, o.tl || '', { size: 13, a: 'middle', f: 'm', fill: '#fff' }); }
+  if (o.target != null) { var a = a0 + (a1 - a0) * o.target; s += '<path d="M' + (cx + (r - sw) * Math.cos(a)) + ' ' + (cy + (r - sw) * Math.sin(a)) + 'L' + (cx + (r + sw) * Math.cos(a)) + ' ' + (cy + (r + sw) * Math.sin(a)) + '" stroke="#fff" stroke-width="2.5"/>' + A.t(cx + (r + sw + 20) * Math.cos(a), cy + (r + sw + 20) * Math.sin(a) + 5, o.tl || '', { size: 14, a: 'middle', f: 'm', fill: '#fff' }); }
   if (o.val) s += A.t(cx, cy + 8, o.val, { size: o.vs || 26, a: 'middle', f: 'm', w: 700, fill: o.vc || '#fff', cls: o.vcls });
-  if (o.label) s += A.t(cx, cy + r * 0.62 + 10, o.label, { size: 14, a: 'middle', fill: COL.dim });
+  if (o.label) s += A.t(cx, cy + r + 18, o.label, { size: 16, a: 'middle', fill: COL.dim });
   return s;
 };
 /* a finished chart frame: axes with real ticks. o: {x,y,w,h, xd:[min,max], yd:[min,max], xt:[...], yt:[...], fx(v)->label, fy(v)->label, xl, yl, grid}
@@ -201,18 +201,18 @@ A.gauge = function (cx, cy, r, frac, o) {
 A.chart = function (o) {
   var X = function (v) { return o.x + (v - o.xd[0]) / (o.xd[1] - o.xd[0]) * o.w; }, Y = function (v) { return o.y + o.h - (v - o.yd[0]) / (o.yd[1] - o.yd[0]) * o.h; };
   var s = '<rect x="' + o.x + '" y="' + o.y + '" width="' + o.w + '" height="' + o.h + '" fill="#08101a" opacity=".55"/>';
-  (o.yt || []).forEach(function (v) { s += '<line x1="' + o.x + '" x2="' + (o.x + o.w) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="#16273a"' + (o.grid === false ? ' opacity="0"' : '') + '/>' + A.t(o.x - 8, Y(v) + 5, o.fy ? o.fy(v) : String(v), { size: 13, a: 'end', f: 'm', fill: COL.dim }); });
-  (o.xt || []).forEach(function (v) { s += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="' + (o.y + o.h) + '" y2="' + (o.y + o.h + 6) + '" stroke="#5d6b80"/>' + A.t(X(v), o.y + o.h + 22, o.fx ? o.fx(v) : String(v), { size: 13, a: 'middle', f: 'm', fill: COL.dim }); });
+  (o.yt || []).forEach(function (v) { s += '<line x1="' + o.x + '" x2="' + (o.x + o.w) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="#16273a"' + (o.grid === false ? ' opacity="0"' : '') + '/>' + A.t(o.x - 8, Y(v) + 5, o.fy ? o.fy(v) : String(v), { size: 15, a: 'end', f: 'm', fill: COL.dim }); });
+  (o.xt || []).forEach(function (v) { s += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="' + (o.y + o.h) + '" y2="' + (o.y + o.h + 6) + '" stroke="#5d6b80"/>' + A.t(X(v), o.y + o.h + 22, o.fx ? o.fx(v) : String(v), { size: 15, a: 'middle', f: 'm', fill: COL.dim }); });
   s += '<path d="M' + o.x + ' ' + o.y + 'V' + (o.y + o.h) + 'H' + (o.x + o.w) + '" stroke="#5d6b80" stroke-width="1.5" fill="none"/>';
-  if (o.xl) s += A.t(o.x + o.w / 2, o.y + o.h + 44, o.xl, { size: 14, a: 'middle', fill: COL.dim });
-  if (o.yl) s += '<text x="' + (o.x - 46) + '" y="' + (o.y + o.h / 2) + '" font-family="' + FB + '" font-size="14" font-weight="600" fill="' + COL.dim + '" text-anchor="middle" transform="rotate(-90 ' + (o.x - 46) + ' ' + (o.y + o.h / 2) + ')">' + esc(o.yl) + '</text>';
+  if (o.xl) s += A.t(o.x + o.w / 2, o.y + o.h + 46, o.xl, { size: 16, a: 'middle', fill: COL.dim });
+  if (o.yl) s += '<text x="' + (o.x - 46) + '" y="' + (o.y + o.h / 2) + '" font-family="' + FB + '" font-size="16" font-weight="600" fill="' + COL.dim + '" text-anchor="middle" transform="rotate(-90 ' + (o.x - 46) + ' ' + (o.y + o.h / 2) + ')">' + esc(o.yl) + '</text>';
   return { svg: s, X: X, Y: Y };
 };
 /* a lock badge: a value the student unlocks in the lab (prediction or code gap) */
 A.lock = function (x, y, label) {
-  return '<g class="pgd-lock"><rect x="' + (x - 6) + '" y="' + (y - 17) + '" width="' + (label.length * 7.6 + 34) + '" height="24" rx="12" fill="#0b121b" stroke="#5d6b80" stroke-dasharray="3 3"/>' +
+  return '<g class="pgd-lock"><rect x="' + (x - 6) + '" y="' + (y - 17) + '" width="' + (label.length * 8.4 + 36) + '" height="26" rx="13" fill="#0b121b" stroke="#5d6b80" stroke-dasharray="3 3"/>' +
     '<path d="M' + (x + 3) + ' ' + (y - 6) + 'v-3a4 4 0 0 1 8 0v3" stroke="#8d9bb0" stroke-width="1.6" fill="none"/><rect x="' + (x + 1) + '" y="' + (y - 6) + '" width="12" height="9" rx="2" fill="#8d9bb0"/>' +
-    A.t(x + 20, y, label, { size: 13, fill: COL.dim }) + '</g>';
+    A.t(x + 20, y, label, { size: 15, fill: COL.dim }) + '</g>';
 };
 
 /* ---------------- shared maths (same rules as the lab's jskernel.js) ---------------- */

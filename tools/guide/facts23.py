@@ -52,8 +52,8 @@ S2['nTrain'] = int(len(itr)); S2['nVal'] = int(len(iva)); S2['defTrain'] = int(y
 CR, OK = 6, 447
 ci, oi = int(np.where(cid == CR)[0][0]), int(np.where(cid == OK)[0][0])
 H4 = A.reshape(-1, 4, 4, 9)
-# the 16 x 16 box where the cracked cell differs most from the good one
-diff = np.abs(H4[ci] - H4[oi]).sum(axis=2); br, bc = np.unravel_index(int(diff.argmax()), diff.shape)
+# the 16 x 16 box the crack of cell 6 runs through (rows 0-15, columns 16-31; the same crack zone as the lab's 3b masks)
+br, bc = 0, 1
 S2['cells'] = {'crack': CR, 'good': OK, 'box': [int(br), int(bc)]}
 for nm, k in (('crack', ci), ('good', oi)):
     S2[nm] = {'dirs': [round(float(v), 3) for v in H4[k, br, bc]],
