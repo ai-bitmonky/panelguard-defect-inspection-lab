@@ -13,3 +13,12 @@ What you built in the browser, as a small Python project. Same steps, same rules
 
 The honest rules: learn on train, choose on validation, test once. Unknown, missing or broken = NO VERDICT, and a person looks.
 Limits: split by cell (not by module), 64 x 64 photos, noisy labels (experts unsure on some cells), a perfect checker in the trial, one small test tray.
+
+## No Python on your laptop? Run it in the browser with GitHub Codespaces
+vscode.dev alone cannot run this project (it has no terminal). GitHub Codespaces can: it is VS Code in a browser tab on a cloud computer.
+1. Make a new GitHub repository. Add these files. Put `devcontainer.json` in a folder named `.devcontainer`.
+2. On the repository page: Code → Codespaces → Create codespace. The first start installs everything and gets the photos (several minutes).
+3. In the terminal, run steps 3 to 7 above in the same order. The photo folder is already there: use `--elpv elpv-dataset/src/elpv_dataset/data`.
+   Example: `python train.py --elpv elpv-dataset/src/elpv_dataset/data`
+4. `python app.py --elpv elpv-dataset/src/elpv_dataset/data` opens the console in a new browser tab (port 7860).
+Use your own personal GitHub account: it has free Codespaces hours each month. Stop the codespace when you are done.

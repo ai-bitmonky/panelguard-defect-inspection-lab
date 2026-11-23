@@ -132,7 +132,7 @@ expect(await F.locator('#retake8 [data-q8]').count() === wrongN && wrongN === 4 
 await answer(QS[4], 1, true); const rq = (await mech('8g')).rq[QS[4].id];
 expect(rq && rq.locked && rq.good === 1, '8g retake question (other values) answered and checked');
 expect(await pend('8g') === null && await F.locator('#done8').count() === 1, '8g done: course complete card'); await F.locator('#retake8').scrollIntoViewIfNeeded(); await shot('8g_retake'); await top(); await shot('8g_score');
-expect(await F.locator('[data-file8]').count() === 6 && await F.locator('#limits8').count() === 1, '8g take-home project (6 files with Copy buttons) + limits card');
+expect(await F.locator('[data-file8]').count() === 7 && await F.locator('#limits8').count() === 1, '8g take-home project (7 files with Copy buttons) + limits card');
 await F.locator('[data-file8="train.py"]').scrollIntoViewIfNeeded(); await F.locator('[data-file8="train.py"] summary').click(); await page.waitForTimeout(200); await F.locator('[data-file8="train.py"] button').click(); await page.waitForTimeout(400);
 expect(/Copied|blocked/.test(await F.locator('[data-file8="train.py"] button').innerText()), '8g Copy button on train.py works (' + await F.locator('[data-file8="train.py"] button').innerText() + ')'); await shot('8g_takehome');
 const np = await ev(() => window.PG.ORDER.filter((i) => !window.PG.passed(i))); expect(np.length === 0, 'Steps 0-8 all passed (' + JSON.stringify(np) + ')');
