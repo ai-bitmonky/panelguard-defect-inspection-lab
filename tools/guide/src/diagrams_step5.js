@@ -441,9 +441,9 @@ D.register('5d', {
     svg: function (c) {
       var fx = A.fx(), Q = cells5d(), st = c.state, s = A.stage() + fx.defs; if (!Q) return s;
       s += track5d(fx, null) + gates5d(Q.L) + yards5d(st.cnt, fx);
-      var W = shift5(Q.L), x = 60, y = 380, w = 640;
-      s += A.glass(40, 360, 700, 156, { fx: fx, col: '#2b4157' }) + t(60, 392, 'ALL ' + W.n + ' VALIDATION CELLS, PER 1,000', { size: 14, f: 'h', fill: C.dim, ls: '.08em' });
-      var x0 = x; ['pass', 'person', 'stop'].forEach(function (k) { var ww = w * W[k] / W.n; s += '<rect class="pgd-in" x="' + x0 + '" y="' + (y + 28) + '" width="' + ww.toFixed(1) + '" height="40" fill="' + LCOL[k] + '" fill-opacity=".8"/>' + t(x0 + 10, y + 56, String(Math.round(1000 * W[k] / W.n)), { size: 20, f: 'm', w: 700, fill: '#05070b' }) + t(x0 + 10, y + 96, LNAME[k].toLowerCase(), { size: 15, fill: LCOL[k] }); x0 += ww; });
+      var W = shift5(Q.L), x = 56, w = 250;
+      s += A.glass(40, 326, 380, 190, { fx: fx, col: '#2b4157' }) + t(56, 356, 'ALL ' + W.n + ' CELLS, PER 1,000', { size: 14, f: 'h', fill: C.dim, ls: '.06em' });
+      ['pass', 'person', 'stop'].forEach(function (k, j) { var y = 376 + j * 44, v = Math.round(1000 * W[k] / W.n), ww = w * v / 1000; s += '<rect class="pgd-in" x="' + x + '" y="' + y + '" width="' + ww.toFixed(1) + '" height="30" rx="5" fill="' + LCOL[k] + '" fill-opacity=".85"/>' + t(x + ww + 10, y + 22, String(v), { size: 20, f: 'm', w: 700, fill: '#fff' }) + t(404, y + 22, { pass: 'pass', person: 'person', stop: 'stop' }[k], { size: 15, a: 'end', fill: LCOL[k] }); });
       return s;
     },
     work: function (c) {
@@ -505,7 +505,7 @@ D.register('5e', {
       if (!st.crash) s += A.target('run', '<rect x="700" y="330" width="200" height="60" rx="14" fill="#0b121b" stroke="#ffb547" stroke-width="2.5"/>', 'let it run', 800, 420, { inner: t(800, 368, 'LET IT RUN', { size: 18, a: 'middle', f: 'h', fill: C.am }) });
       return s;
     },
-    work: function (c) { var lim = F5().recursionLimit || 25; return [{ h: 'The run' }, { v: '7 + 2 + 2 + …', k: 'steps keep adding up' }, { v: String(lim), k: 'LangGraph’s step limit (recursion limit)', res: true }]; },
+    work: function (c) { var lim = F5().recursionLimit || 25; return [{ h: 'The run' }, { v: '1 + 2 + 2 + …', k: 'steps keep adding up: 2 per lap' }, { v: String(lim), k: 'LangGraph’s step limit (recursion limit)', res: true }]; },
     on: { run: function (c) { c.state.crash = 1; c.next(); } }, auto: function (c) { c.state.crash = 1; } },
   { cap: 'Stopped by LangGraph: an error, not an answer',
     note: 'At the limit LangGraph throws the run away with an error. Nobody looked at the cell and nothing went into the logbook. The loop needs its own way out.',
@@ -556,6 +556,7 @@ D.register('5e', {
 });
 
 /* ============================ 5f  Stop and wait for a person ============================ */
+function seen5f() { return !!D.liveRes('5f'); }   // the expert labels of the 5 cells the student decides in the lab show only after 5f is passed
 function unsure5f() { var L = L5(); if (!L) return null; var ids = L.unsure(5); return { L: L, cells: ids.map(function (id) { var i = L.at[id]; return { id: id, p: L.s[i], y: L.y[i], kind: L.v.kind[i] === 'p' ? 'poly' : 'mono' }; }) }; }
 function snap5f(q, x, y, fx, o) {   // the saved card on the shelf
   o = o || {};
@@ -612,7 +613,7 @@ D.register('5f', {
       s += A.target('more', '<rect x="560" y="462" width="370" height="50" rx="12" fill="#0b121b" stroke="#ffb547" stroke-width="2.5"/>', 'the next 4 unsure cells', 745, 534 > 530 ? 528 : 534, { inner: t(745, 494, 'NEXT 4 CELLS', { size: 17, a: 'middle', f: 'h', fill: C.am }) });
       return s;
     },
-    work: function (c) { var U = unsure5f(), st = c.state; if (!U) return []; var q = U.cells[0]; return [{ h: 'Your answer' }, { v: st.ans || '–', k: 'written into the saved card' }, { v: q.y ? 'defect' : 'good', k: 'what the expert label says' }, { v: (st.ans === 'stop') === (q.y === 1) ? 'agree' : 'disagree', k: 'you and the label', res: true }]; },
+    work: function (c) { var U = unsure5f(), st = c.state; if (!U) return []; var q = U.cells[0]; return clean([{ h: 'Your answer' }, { v: st.ans || '–', k: 'written into the saved card' }, seen5f() ? { v: q.y ? 'defect' : 'good', k: 'what the expert label says' } : { t: 'The expert label of this cell shows after you pass 5f in the lab.' }, seen5f() ? { v: (st.ans === 'stop') === (q.y === 1) ? 'agree' : 'disagree', k: 'you and the label', res: true } : null, { t: 'The flow did not start again: it went on from the person desk.' }]); },
     on: { more: function (c) { c.next(); } } },
   { cap: 'One thread tag per cell: many cells can wait at once',
     note: 'Five unsure cells, five saved cards. Each tag finds its own card, so an answer always goes back to the right cell.',
@@ -624,13 +625,13 @@ D.register('5f', {
         s += A.glass(x, y, 170, 440, { fx: fx, col: '#7a5a2a' }) + A.cell(q.id, x + 15, y + 16, 140, { full: true });
         s += '<rect x="' + (x + 15) + '" y="' + (y + 170) + '" width="140" height="28" rx="5" fill="#ffb547"/>' + t(x + 85, y + 190, 'cell-' + q.id, { size: 15, a: 'middle', f: 'm', w: 700, fill: '#1a1103' });
         s += t(x + 15, y + 232, 'score ' + f3(q.p), { size: 15, f: 'm', fill: '#fff' }) + t(x + 15, y + 258, q.kind, { size: 15, fill: C.dim });
-        s += t(x + 15, y + 300, 'expert label', { size: 14, fill: C.dim }) + t(x + 15, y + 324, q.y ? 'defect' : 'good', { size: 17, w: 700, fill: q.y ? '#ff8aa0' : C.gr });
+        s += t(x + 15, y + 300, 'expert label', { size: 14, fill: C.dim }) + (seen5f() ? t(x + 15, y + 324, q.y ? 'defect' : 'good', { size: 17, w: 700, fill: q.y ? '#ff8aa0' : C.gr }) : A.lock(x + 15, y + 326, 'after 5f'));
         if (j === 0 && st.ans) s += t(x + 15, y + 366, 'you said ' + st.ans, { size: 15, w: 700, fill: '#ffcf6b' });
         s += t(x + 15, y + 420, j === 0 && st.ans ? 'done' : 'waiting', { size: 14, f: 'm', fill: j === 0 && st.ans ? C.gr : C.dim });
       });
       return s;
     },
-    work: function (c) { var U = unsure5f(); if (!U) return []; var nd = U.cells.filter(function (q) { return q.y; }).length; return clean([{ h: 'Five paused flows' }, { v: '5', k: 'saved cards, one thread tag each' }, { v: nd + ' of 5', k: 'are real defects (expert label)' }, { t: 'Spread over the person lane: from just above the pass gate to just under the stop gate.' }, srcTag(U.L.you), refNote(U.L.you)]); } }
+    work: function (c) { var U = unsure5f(); if (!U) return []; var nd = U.cells.filter(function (q) { return q.y; }).length; return clean([{ h: 'Five paused flows' }, { v: '5', k: 'saved cards, one thread tag each' }, seen5f() ? { v: nd + ' of 5', k: 'are real defects (expert label)' } : { t: 'The expert labels show after you decide these 5 cells in the lab (5f).' }, { t: 'Spread over the person lane: from just above the pass gate to just under the stop gate.' }, srcTag(U.L.you), refNote(U.L.you)]); } }
   ]
 });
 
