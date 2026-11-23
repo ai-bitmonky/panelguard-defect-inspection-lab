@@ -238,4 +238,350 @@ D.register('3b', {
     } }
   ]
 });
+
+/* ============================ 3c  Build the network ============================ */
+function net3c() {
+  var r = D.liveRes('3c'), F = F3(), L, total, you = false;
+  if (r && r.layers && r.layers.length) { L = r.layers.map(function (l) { return { cls: l.cls, out: l.out, params: l.params }; }); total = r.total; you = true; }
+  else { L = (F.layers || []).map(function (l) { return { cls: l.cls, out: l.out, params: l.params }; }); total = F.total; }
+  var B = [], cur = null;
+  L.forEach(function (l) {
+    if (l.cls === 'Conv2D') { cur = { conv: l.params, bn: 0, filt: l.out[3], size: l.out[1] }; B.push(cur); }
+    else if (l.cls === 'BatchNormalization' && cur) cur.bn = l.params;
+    else if (l.cls === 'MaxPooling2D' && cur) cur.out = l.out[1];
+    else if (l.cls === 'Dense') B.head = l.params;
+  });
+  return { B: B, total: total, you: you, open: you };   // open: block 3's filter count may show (the student passed 3c)
+}
+var SLOT = [{ x: 214, f: 120 }, { x: 372, f: 92 }, { x: 514, f: 68 }, { x: 642, f: 48 }];
+function slab3c(x, yc, f, sheets, face, col, o) {
+  o = o || {}; var s = '', d = 5;
+  for (var k = sheets - 1; k >= 0; k--) {
+    var sx = x + k * d, sy = yc - f / 2 - k * d * 0.75;
+    s += '<rect x="' + sx + '" y="' + sy + '" width="' + f + '" height="' + f + '" rx="3" fill="' + (k ? '#0f2233' : '#0a1622') + '" stroke="' + col + '" stroke-opacity="' + (k ? .35 : .9) + '"/>';
+  }
+  if (face) s += '<image href="' + face + '" x="' + x + '" y="' + (yc - f / 2) + '" width="' + f + '" height="' + f + '" style="image-rendering:pixelated"/>' + '<rect x="' + x + '" y="' + (yc - f / 2) + '" width="' + f + '" height="' + f + '" rx="3" fill="none" stroke="' + col + '" stroke-width="2"/>';
+  return s;
+}
+function thumb3c(b, ch) { var T = F3().thumbs; if (!T || !T[b]) return ''; var q = T[b][ch || 0]; return mapURL(q.v, q.size, 't3c' + b + '_' + (ch || 0)); }
+var BCOL = ['#46e3ff', '#3dffa0', '#a98bff', '#ffb547'];
+function scene3c(c, fx, o) {
+  o = o || {}; var N = net3c(), st = c.state, s = A.stage() + fx.defs, yc = 186;
+  s += t(40, 42, 'THE NETWORK, LEFT TO RIGHT', { size: 14, f: 'h', fill: C.dim, ls: '.12em' });
+  // input photo slab
+  s += slab3c(36, yc, 150, 1, D.fullURL ? D.fullURL(6) : '', '#8d9bb0') + t(111, yc + 100, N.open ? '64 × 64 × 1' : '64 × 64 photo', { size: 16, a: 'middle', f: 'm', w: 700, fill: '#c7d4e4' }) + t(111, yc + 122, 'input', { size: 14, a: 'middle', fill: C.dim });
+  var prevX = 186;
+  N.B.forEach(function (b, k) {
+    var sl = SLOT[k], placed = st.n > k, hide = k === 2 && !N.open, sheets = [3, 5, 8, 12][k];
+    if (!placed) { s += '<rect x="' + sl.x + '" y="' + (yc - sl.f / 2) + '" width="' + sl.f + '" height="' + sl.f + '" rx="4" fill="none" stroke="' + (st.n === k ? '#ffb547' : '#2b3a4c') + '" stroke-width="2" stroke-dasharray="5 5"/>' + (st.n === k ? t(sl.x + sl.f / 2, yc + 6, 'drop', { size: 14, a: 'middle', fill: C.am }) : ''); return; }
+    s += A.arrow(prevX + 4, yc, sl.x - 6, yc, '#5d6b80', { w: 2, head: 8 });
+    s += '<g class="' + (st.n === k + 1 && st.acted ? 'pgd-pop' : '') + '">' + slab3c(sl.x, yc, sl.f, sheets, thumb3c(k), BCOL[k]) + '</g>';
+    s += t(sl.x + sl.f / 2 + sheets * 2.5, yc + 96, b.out + ' × ' + b.out + ' × ' + (hide ? '?' : b.filt), { size: 15, a: 'middle', f: 'm', w: 700, fill: BCOL[k] });
+    s += t(sl.x + sl.f / 2 + sheets * 2.5, yc + 118, (hide ? '?' : fmt(b.conv + b.bn)) + ' weights', { size: 14, a: 'middle', f: 'm', fill: C.dim });
+    prevX = sl.x + sl.f + sheets * 5;
+  });
+  if (!o.head) s += '<rect x="770" y="' + (yc - 66) + '" width="160" height="132" rx="12" fill="none" stroke="#2b3a4c" stroke-width="2" stroke-dasharray="5 5"/>' + t(850, yc - 4, 'score head', { size: 15, a: 'middle', fill: C.dim2 }) + t(850, yc + 18, 'comes last', { size: 14, a: 'middle', fill: C.dim2 });
+  if (o.head) {
+    s += A.arrow(prevX + 4, yc, 760, yc, '#5d6b80', { w: 2, head: 8 });
+    s += '<g class="pgd-in">' + A.glass(764, yc - 70, 168, 140, { fx: fx, col: '#ff4d6a' }) + t(848, yc - 42, 'average each map', { size: 14, a: 'middle', fill: C.dim }) + t(848, yc - 20, '→ 128 numbers', { size: 15, a: 'middle', f: 'm', fill: '#c7d4e4' }) +
+      t(848, yc + 8, '→ 1 score', { size: 20, a: 'middle', f: 'm', w: 700, fill: '#ff8aa0' }) + t(848, yc + 32, '0 = good, 1 = defect', { size: 14, a: 'middle', fill: C.dim }) + t(848, yc + 56, fmt(N.B.head || 129) + ' weights', { size: 14, a: 'middle', f: 'm', fill: C.dim }) + '</g>';
+  }
+  // the shelf of blocks
+  s += A.glass(28, 336, 904, 184, { fx: fx, col: '#22384d' }) + t(46, 362, o.head ? 'WEIGHTS PER BLOCK' : 'THE SHELF: FILTER BLOCKS', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+  if (!o.head) N.B.forEach(function (b, k) {
+    var x = 60 + k * 214, y = 384, hide = k === 2 && !N.open;
+    if (st.n > k) { s += '<rect x="' + x + '" y="' + y + '" width="190" height="104" rx="12" fill="none" stroke="' + BCOL[k] + '" stroke-opacity=".35" stroke-dasharray="5 5"/>' + t(x + 95, y + 58, 'in the network ✓', { size: 15, a: 'middle', fill: BCOL[k] }); return; }
+    var brick = '<g' + (st.n === k ? '' : ' opacity=".45"') + '><rect x="' + x + '" y="' + y + '" width="190" height="104" rx="12" fill="#0b121b" stroke="' + BCOL[k] + '" stroke-width="2"/>' +
+      [0, 1, 2].map(function (i) { return '<rect x="' + (x + 14 + i * 6) + '" y="' + (y + 18 - i * 4) + '" width="44" height="44" rx="3" fill="#0f2233" stroke="' + BCOL[k] + '" stroke-opacity=".6"/>'; }).join('') +
+      t(x + 80, y + 34, 'block ' + (k + 1), { size: 17, w: 700, fill: BCOL[k] }) + t(x + 80, y + 58, (hide ? '?' : b.filt) + ' filters', { size: 15, f: 'm', fill: '#c7d4e4' }) +
+      t(x + 14, y + 90, '3 × 3 each, then halve', { size: 14, fill: C.dim }) + '</g>';
+    if (st.n === k) s += A.target('blk', '<rect x="' + (x - 4) + '" y="' + (y - 4) + '" width="198" height="112" rx="15" fill="none" stroke="#ffb547" stroke-width="2.5"/>', 'drag into the network', x + 95, y - 12, { kind: 'drag', to: snapTo(x + 95, y + 52, SLOT[k].x + SLOT[k].f / 2, yc, 24), inner: brick });
+    else s += brick;
+  });
+  else {   // bar chart of the weights per block
+    var ch = A.chart({ x: 170, y: 378, w: 720, h: 100, xd: [0, 80000], yd: [0, 5], xt: [0, 20000, 40000, 60000, 80000], fx: function (v) { return v ? (v / 1000) + 'k' : '0'; } });
+    s += ch.svg.replace(/<rect[^>]*opacity=".55"\/>/, '');
+    N.B.concat([{ head: 1 }]).forEach(function (b, k) {
+      var y = 384 + k * 19, v = b.head ? (N.B.head || 129) : b.conv + b.bn, hide = k === 2 && !N.open;
+      s += t(160, y + 13, b.head ? 'score head' : 'block ' + (k + 1), { size: 14, a: 'end', fill: b.head ? '#ff8aa0' : BCOL[k] });
+      if (!hide) s += '<rect class="pgd-in" x="170" y="' + y + '" width="' + Math.max(2, ch.X(v) - 170) + '" height="14" rx="3" fill="' + (b.head ? '#ff4d6a' : BCOL[k]) + '"/>' + t(ch.X(v) + 8, y + 12, fmt(v), { size: 14, f: 'm', fill: '#c7d4e4' });
+      else s += A.lock(180, y + 12, 'after you pass 3c');
+    });
+  }
+  return s;
+}
+function bind3c(c, root) {
+  var st = c.state, k = st.n, x = 60 + k * 214, yc = 186, sl = SLOT[k];
+  dragTo(c, root, 'blk', x + 95, 436, 24, null, function (p) { if (Math.abs(p.x - (sl.x + sl.f / 2)) < 70 && Math.abs(p.y - yc) < 80) { st.n++; st.acted = 1; c.next(); return true; } return false; });
+}
+function work3c(c) {
+  var N = net3c(), k = c.state.n - 1, r = [];
+  if (k < 0) return [{ h: 'The input' }, { v: '64 × 64', k: 'one gray photo goes in' }, { t: 'Each block: 3 × 3 filters look at every place, then the photo is halved.' }, srcTag(N.you)];
+  var b = N.B[k], hide = k === 2 && !N.open, inC = k === 0 ? 1 : N.B[k - 1].filt, hideIn = k === 3 && !N.open, hideIn1 = k === 0 && !N.open;
+  r.push({ h: 'Block ' + (k + 1) + ' weights' });
+  r.push({ v: '3 × 3 × ' + (hideIn || hideIn1 ? '?' : inC) + ' × ' + (hide ? '?' : b.filt), k: 'filter size × channels in × filters' }, { op: '=', v: hide || hideIn ? '?' : fmt(b.conv), k: 'filter weights', res: true });
+  r.push({ v: '4 × ' + (hide ? '?' : b.filt) + ' = ' + (hide ? '?' : fmt(b.bn)), k: 'batch-norm numbers (4 per filter)' });
+  r.push({ h: 'Size' }, { v: b.size + ' → ' + b.out, k: 'pooling halves rows and columns' });
+  if (hide || hideIn || hideIn1) r.push({ t: 'The “?” shows after you pass 3c in the lab.' });
+  r.push(srcTag(N.you)); return r;
+}
+D.register('3c', {
+  init: function () { return { n: 0, acted: 0 }; },
+  frames: [
+  { cap: 'One photo goes in: add the first block',
+    note: 'The network starts with one gray 64 × 64 photo. Block 1 slides 16 small filters over it, then halves its size.',
+    svg: function (c) { return scene3c(c, A.fx()); }, work: work3c, bind: bind3c, auto: function (c) { c.state.n = 1; } },
+  { cap: 'Block 2: half the size, twice the filters',
+    note: 'Each block halves rows and columns and doubles the filters. The maps get smaller but say more.',
+    svg: function (c) { return scene3c(c, A.fx()); }, work: work3c, bind: bind3c, auto: function (c) { c.state.n = 2; } },
+  { cap: 'Block 3: the maps shrink again',
+    note: 'Each filter now looks at all the maps of the block before. Its weights grow with every channel that comes in.',
+    svg: function (c) { return scene3c(c, A.fx()); }, work: work3c, bind: bind3c, auto: function (c) { c.state.n = 3; } },
+  { cap: 'Block 4: tiny maps, many filters',
+    note: 'The last block has the most channels in and the most filters out, so it holds the most weights.',
+    svg: function (c) { return scene3c(c, A.fx()); }, work: work3c, bind: bind3c, auto: function (c) { c.state.n = 4; } },
+  { cap: 'Average each map, then one score per cell',
+    note: 'Each of the last maps is averaged to one number. One last layer turns those numbers into one defect score between 0 and 1.',
+    svg: function (c) { return scene3c(c, A.fx(), { head: 1 }); },
+    work: function (c) { var N = net3c(); return clean([{ h: 'The score head' }, { v: '4 × 4 × 128 → 128', k: 'one average per map' }, { v: '128 + 1 = ' + (N.B.head || 129), k: 'weights + one bias in the last layer' }, { h: 'All weights' }, { v: fmt(N.total), k: 'learned in 3e, not set by hand', res: true }, srcTag(N.you)]); } }
+  ]
+});
+/* ============================ 3d  Make more photos for free ============================ */
+var P3D = { x: 138, y: 96, s: 230 };
+function img3d(id, x, y, sz, flip, o) {   // flip: '', 'lr', 'ud', 'both'
+  o = o || {}; var sx = flip === 'lr' || flip === 'both' ? -1 : 1, sy = flip === 'ud' || flip === 'both' ? -1 : 1, cx = x + sz / 2, cy = y + sz / 2;
+  return '<g transform="translate(' + cx + ' ' + cy + ') scale(' + sx + ' ' + sy + ') translate(' + (-cx) + ' ' + (-cy) + ')"' + (o.clip ? ' clip-path="url(#' + o.clip + ')"' : '') + '>' + A.cell(id, x, y, sz, { full: true }) + '</g>';
+}
+function scene3d(c, fx, mode) {
+  var st = c.state, s = A.stage() + fx.defs, X = P3D.x, Y = P3D.y, S = P3D.s, id = 6;
+  // the turntable
+  s += '<ellipse cx="' + (X + S / 2) + '" cy="' + (Y + S + 46) + '" rx="190" ry="34" fill="' + 'url(#' + fx.mt + ')' + '" stroke="#5d6b80"/><ellipse cx="' + (X + S / 2) + '" cy="' + (Y + S + 40) + '" rx="176" ry="28" fill="#141c26" stroke="#3a4757"/>';
+  s += '<ellipse cx="' + (X + S / 2) + '" cy="' + (Y + S + 84) + '" rx="200" ry="14" fill="#000" opacity=".45"/>';
+  var shown = st.view || '';
+  s += '<g filter="url(#' + fx.sh + ')"><rect x="' + (X - 8) + '" y="' + (Y - 8) + '" width="' + (S + 16) + '" height="' + (S + 16) + '" rx="8" fill="#0b121b" stroke="#2b4157"/></g>';
+  s += '<g class="' + (st.acted ? 'pgd-flip' : '') + '">' + img3d(id, X, Y, S, shown) + '</g>';
+  if (mode === 'patch') s += '<rect x="' + (X + 120) + '" y="' + (Y + 110) + '" width="70" height="60" fill="#0a0a0a" class="pgd-pop"/>';
+  s += t(X + S / 2, Y - 22, 'REAL CELL 6 · cracked', { size: 14, f: 'h', a: 'middle', fill: C.dim, ls: '.08em' });
+  // version gallery
+  var V = [['', 'as taken'], ['lr', 'left-right'], ['ud', 'up-down'], ['both', 'both']];
+  s += A.glass(560, 26, 372, 236, { fx: fx, col: '#2b4157' }) + t(580, 54, 'VERSIONS THE CAMERA COULD TAKE', { size: 13.5, f: 'h', fill: C.dim, ls: '.08em' });
+  V.forEach(function (v, k) {
+    var x = 580 + k * 88, y = 70, have = !v[0] || st.have.indexOf(v[0]) >= 0;
+    s += have ? '<g class="' + (st.justGot === v[0] && v[0] ? 'pgd-pop' : '') + '">' + img3d(id, x, y, 76, v[0]) + '<rect x="' + x + '" y="' + y + '" width="76" height="76" fill="none" stroke="#3dffa0" stroke-width="1.5"/></g>' : '<rect x="' + x + '" y="' + y + '" width="76" height="76" rx="4" fill="#0a1019" stroke="#2b3a4c" stroke-dasharray="4 4"/>' + t(x + 38, y + 44, '?', { size: 20, a: 'middle', f: 'h', fill: C.dim2 });
+    s += t(x + 38, y + 98, v[1], { size: 14, a: 'middle', fill: have ? '#c7d4e4' : C.dim2 });
+  });
+  s += t(580, 204, 'Busbars stay flat, the crack stays a crack,', { size: 15, fill: C.dim }) + t(580, 226, 'the label (defect) stays true.', { size: 15, fill: C.dim });
+  return s;
+}
+function judge3d(c, yes) {   // two answer buttons; the right one is first in the DOM
+  var s = '<g class="pgd-chip"><rect x="560" y="290" width="372" height="32" rx="16" fill="#ffb547"/>' + t(746, 312, 'COULD THE CAMERA TAKE THIS PHOTO?', { size: 14, a: 'middle', w: 700, fill: '#1a1103', ls: '.04em' }) + '</g>';
+  var bY = '<rect x="560" y="336" width="178" height="58" rx="12" fill="#0b1f17" stroke="#3dffa0" stroke-width="2"/>' + t(649, 372, 'YES, IT COULD', { size: 16, a: 'middle', f: 'h', fill: C.gr });
+  var bN = '<rect x="754" y="336" width="178" height="58" rx="12" fill="#1f0b12" stroke="#ff4d6a" stroke-width="2"/>' + t(843, 372, 'NO', { size: 16, a: 'middle', f: 'h', fill: C.rd });
+  var tY = A.target('yes', '<rect x="556" y="332" width="186" height="66" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { cls: 'pgd-nochip', inner: bY });
+  var tN = A.target('no', '<rect x="750" y="332" width="186" height="66" rx="15" fill="none" stroke="#ffb547" stroke-width="2"/>', '', 0, 0, { cls: 'pgd-nochip', inner: bN });
+  s += yes ? tY + tN : tN + tY;
+  if (c.state.wrong) s += t(746, 424, c.state.wrong, { size: 15, a: 'middle', fill: '#ff8aa0', cls: 'pgd-shake' });
+  return s;
+}
+function mirror3d(c, dir) {   // the mirror bar to drag across the photo
+  var X = P3D.x, Y = P3D.y, S = P3D.s, cid = A.uid('mir'), s = '';
+  s += '<defs><clipPath id="' + cid + '"><rect id="' + cid + 'r" x="' + X + '" y="' + Y + '" width="' + (dir === 'lr' ? 0 : S) + '" height="' + (dir === 'lr' ? S : 0) + '"/></clipPath></defs>';
+  s += img3d(6, X, Y, S, dir, { clip: cid });
+  var bar = dir === 'lr' ? '<rect x="' + (X - 14) + '" y="' + (Y - 20) + '" width="10" height="' + (S + 40) + '" rx="5" fill="#bfefff" opacity=".9"/><rect x="' + (X - 24) + '" y="' + (Y + S / 2 - 22) + '" width="30" height="44" rx="8" fill="#ffb547"/>'
+    : '<rect x="' + (X - 20) + '" y="' + (Y - 14) + '" width="' + (S + 40) + '" height="10" rx="5" fill="#bfefff" opacity=".9"/><rect x="' + (X + S / 2 - 22) + '" y="' + (Y - 24) + '" width="44" height="30" rx="8" fill="#ffb547"/>';
+  var to = dir === 'lr' ? snapTo(X - 9, Y + S / 2, X + S + 12, Y + S / 2, 24) : snapTo(X + S / 2, Y - 9, X + S / 2, Y + S + 12, 24);
+  s += A.target('mirror', bar, dir === 'lr' ? 'drag the mirror across' : 'drag the mirror down', dir === 'lr' ? X + S / 2 : X + S / 2, dir === 'lr' ? Y + S + 28 : Y + S + 28, { kind: 'drag', to: to });
+  c._mir = { cid: cid, dir: dir };
+  return s;
+}
+function bindMirror(c, root) {
+  var m = c._mir; if (!m) return; var X = P3D.x, Y = P3D.y, S = P3D.s, r = root.querySelector('#' + m.cid + 'r'), st = c.state;
+  var sx = m.dir === 'lr' ? X - 9 : X + S / 2, sy = m.dir === 'lr' ? Y + S / 2 : Y - 9;
+  var el = root.querySelector('[data-pgd-t=mirror]');
+  var drag = D.onDrag(root, el, { start: { x: sx, y: sy }, step: 24, live: false,
+    clamp: function (p) { return m.dir === 'lr' ? { x: Math.max(sx, Math.min(X + S + 30, p.x)), y: sy } : { x: sx, y: Math.max(sy, Math.min(Y + S + 30, p.y)) }; },
+    move: function (p) { if (m.dir === 'lr') { el.setAttribute('transform', 'translate(' + (p.x - sx) + ' 0)'); r.setAttribute('width', Math.max(0, Math.min(S, p.x - X))); } else { el.setAttribute('transform', 'translate(0 ' + (p.y - sy) + ')'); r.setAttribute('height', Math.max(0, Math.min(S, p.y - Y))); } },
+    drop: function (p) { var far = m.dir === 'lr' ? p.x >= X + S - 10 : p.y >= Y + S - 10; if (far) { st.view = m.dir; st.mirrored = 1; st.acted = 1; c.redraw(true); } } });
+  void drag;
+}
+function onJudge(c, right, ok, msg) {
+  return function () {
+    var st = c.state;
+    if (right !== ok) { st.wrong = msg; c.redraw(true); return; }
+    st.wrong = ''; st.acted = 0;
+    if (st.view && st.have.indexOf(st.view) < 0) { st.have.push(st.view); st.justGot = st.view; }
+    if (st.have.indexOf('lr') >= 0 && st.have.indexOf('ud') >= 0 && st.have.indexOf('both') < 0) st.have.push('both');
+    st.mirrored = 0; st.view = ''; c.next();
+  };
+}
+function work3d(c, k) {
+  var F = F3(), n = F.nTrain || 1574, r = [];
+  if (k === 0) r = [{ h: 'A left-right mirror' }, { t: 'Every pixel swaps sides: column 0 ↔ column 63, column 1 ↔ column 62 …' }, { v: '64 − 1 − column', k: 'new column of each pixel' }, { t: 'Cells sit either way round in a module, so the camera sees both.' }];
+  if (k === 1) r = [{ h: 'An up-down mirror' }, { v: '64 − 1 − row', k: 'new row of each pixel' }, { t: 'Busbars stay flat (left-right). The crack is still a crack.' }];
+  if (k === 2) r = [{ h: 'A pasted dark patch' }, { t: 'A dark area looks like a <b>dead part</b> of a cell: a defect. A good cell with this patch would carry the wrong label.' }, { t: 'Rule: only make changes the camera could really produce, and that keep the label true.' }];
+  if (k === 3) r = [{ h: 'Photos for free' }, { v: fmt(n), k: 'train photos' }, { op: '×', v: '4', k: 'versions: as taken, left-right, up-down, both' }, { op: '=', v: fmt(4 * n), k: 'different photos the network can see', res: true },
+    { v: fmt(n) + ' × 30', k: 'each epoch: every photo with new coin flips' }, { op: '=', v: fmt(30 * n), k: 'photo views in 30 epochs', res: true }];
+  r.push({ tag: 'typical value' }); return r;
+}
+D.register('3d', {
+  init: function () { return { view: '', have: [], mirrored: 0, wrong: '', acted: 0 }; },
+  frames: [
+  { cap: 'Mirror the photo left to right',
+    note: 'Drag the mirror across the real cell. Then judge: could the camera have taken this photo?',
+    svg: function (c) { var fx = A.fx(), st = c.state, s = scene3d(c, fx); s += st.mirrored ? judge3d(c, true) : mirror3d(c, 'lr'); return s; },
+    work: function (c) { return work3d(c, 0); },
+    bind: function (c, root) { if (!c.state.mirrored) bindMirror(c, root); else { D.onTap(root.querySelector('[data-pgd-t=yes]'), onJudge(c, true, true)); D.onTap(root.querySelector('[data-pgd-t=no]'), onJudge(c, true, false, 'Look again: the busbars are still flat and the crack is still there.')); } },
+    auto: function (c) { c.state.view = ''; c.state.have = ['lr']; c.state.mirrored = 0; } },
+  { cap: 'Mirror it top to bottom',
+    note: 'Drag the mirror down. An up-down mirror also gives a photo the camera could take.',
+    svg: function (c) { var fx = A.fx(), st = c.state, s = scene3d(c, fx); s += st.mirrored ? judge3d(c, true) : mirror3d(c, 'ud'); return s; },
+    work: function (c) { return work3d(c, 1); },
+    bind: function (c, root) { if (!c.state.mirrored) bindMirror(c, root); else { D.onTap(root.querySelector('[data-pgd-t=yes]'), onJudge(c, true, true)); D.onTap(root.querySelector('[data-pgd-t=no]'), onJudge(c, true, false, 'Look again: the busbars stay flat and the label stays true.')); } },
+    auto: function (c) { c.state.have = ['lr', 'ud', 'both']; c.state.view = ''; } },
+  { cap: 'Not every change is allowed',
+    note: 'A dark patch pasted on a photo looks like a dead area, a real defect. The camera would not make it, and the label could become wrong.',
+    svg: function (c) { var fx = A.fx(), s = scene3d(c, fx, 'patch'); s += judge3d(c, false); return s; },
+    work: function (c) { return work3d(c, 2); },
+    bind: function (c, root) { D.onTap(root.querySelector('[data-pgd-t=no]'), onJudge(c, false, false)); D.onTap(root.querySelector('[data-pgd-t=yes]'), onJudge(c, false, true, 'A dark patch looks like a dead area: a defect. It can make the label wrong.')); },
+    init: null },
+  { cap: 'Four versions of every photo, new flips every epoch',
+    note: 'Each epoch, every train photo gets new coin flips: as taken, left-right, up-down or both. The network sees more variety without one new photo being taken.',
+    svg: function (c) {
+      var fx = A.fx(), F = F3(), n = F.nTrain || 1574, s = A.stage() + fx.defs;
+      [['', 'as taken'], ['lr', 'left-right'], ['ud', 'up-down'], ['both', 'both']].forEach(function (v, k) { var x = 60 + k * 128; s += '<g class="pgd-in">' + img3d(6, x, 70, 110, v[0]) + '<rect x="' + x + '" y="70" width="110" height="110" fill="none" stroke="#3dffa0" stroke-width="1.5"/></g>' + t(x + 55, 204, v[1], { size: 15, a: 'middle', fill: '#c7d4e4' }); });
+      s += t(60, 46, 'ONE REAL CELL, FOUR PHOTOS', { size: 14, f: 'h', fill: C.dim, ls: '.1em' });
+      // coin flips per photo
+      s += A.glass(580, 40, 352, 180, { fx: fx, col: '#2b4157' }) + t(600, 70, 'EACH PHOTO, EACH EPOCH', { size: 14, f: 'h', fill: C.dim, ls: '.08em' });
+      s += '<circle cx="640" cy="130" r="28" fill="#2b2410" stroke="#ffb547" stroke-width="2"/>' + t(640, 136, 'L-R?', { size: 14, a: 'middle', f: 'm', w: 700, fill: C.am }) + '<circle cx="720" cy="130" r="28" fill="#2b2410" stroke="#ffb547" stroke-width="2"/>' + t(720, 136, 'U-D?', { size: 14, a: 'middle', f: 'm', w: 700, fill: C.am });
+      s += t(770, 124, 'two coins:', { size: 15, fill: C.dim }) + t(770, 146, 'each 1 in 2', { size: 15, fill: C.dim }) + t(600, 196, 'label never changes', { size: 15, w: 700, fill: C.gr });
+      // bar chart: photo counts
+      var ch = A.chart({ x: 250, y: 262, w: 640, h: 200, xd: [0, 50000], yd: [0, 3], xt: [0, 10000, 20000, 30000, 40000, 50000], fx: function (v) { return v ? (v / 1000) + 'k' : '0'; }, xl: 'photos' });
+      s += ch.svg;
+      [['train photos taken', n, '#8fb0cf'], ['different versions', 4 * n, C.gr], ['views in 30 epochs', 30 * n, C.cy]].forEach(function (b, k) {
+        var y = 280 + k * 62; s += t(240, y + 26, b[0], { size: 16, a: 'end', fill: b[2] }) + '<rect class="pgd-in' + (k ? String(Math.min(3, k + 1)) : '') + '" x="250" y="' + y + '" width="' + (ch.X(b[1]) - 250) + '" height="38" rx="5" fill="' + b[2] + '" fill-opacity=".8"/>' + t(ch.X(b[1]) + 10, y + 26, fmt(b[1]), { size: 18, f: 'm', w: 700, fill: '#fff' });
+      });
+      return s;
+    },
+    work: function (c) { return work3d(c, 3); } }
+  ]
+});
+/* ============================ 3e  Train it ============================ */
+function hist3e() {
+  var r = D.liveRes('3e'), F = F3();
+  if (r && r.hist && r.hist.length) return { h: r.hist.map(function (q) { return [q.epoch, q.loss, q.valAuc]; }), best: r.best ? [r.best.epoch, r.best.valAuc] : null, you: true, nTrain: r.nTrain, nDef: r.nDef };
+  var b = null; (F.hist || []).forEach(function (q) { if (!b || q[2] > b[1]) b = [q[0], q[2]]; });
+  return { h: F.hist || [], best: b, you: false, nTrain: F.nTrain || 1574, nDef: F.defTrain || 492 };
+}
+var RING = { x: 206, y: 286, r: 124 };
+var STN = [{ k: 'predict', a: -90, lab: 'PREDICT', sub: 'scores for 32 photos', col: '#46e3ff' }, { k: 'compare', a: 0, lab: 'COMPARE', sub: 'score vs label → loss', col: '#ff8aa0' },
+  { k: 'nudge', a: 90, lab: 'NUDGE', sub: 'move every weight a bit', col: '#ffb547' }, { k: 'validate', a: 180, lab: 'CHECK', sub: 'score validation', col: '#3dffa0' }];
+function stPos(i) { var a = STN[i % 4].a * Math.PI / 180; return [RING.x + RING.r * Math.cos(a), RING.y + RING.r * Math.sin(a)]; }
+function ring3e(c, fx, o) {
+  o = o || {}; var st = c.state, s = '', at = st.at % 4;
+  s += '<circle cx="' + RING.x + '" cy="' + RING.y + '" r="' + RING.r + '" fill="none" stroke="#1d3046" stroke-width="16"/>';
+  s += '<circle cx="' + RING.x + '" cy="' + RING.y + '" r="' + RING.r + '" fill="none" stroke="#46e3ff" stroke-opacity=".35" stroke-width="3" stroke-dasharray="8 10" class="' + (st.acted ? 'pgd-flowonce' : '') + '"/>';
+  for (var k = 0; k < 4; k++) { var a0 = (STN[k].a + 20) * Math.PI / 180, a1 = (STN[k].a + 70) * Math.PI / 180; s += A.arrow(RING.x + RING.r * Math.cos(a0), RING.y + RING.r * Math.sin(a0), RING.x + RING.r * Math.cos(a1), RING.y + RING.r * Math.sin(a1), '#2b4f6a', { w: 3, head: 10 }); }
+  STN.forEach(function (q, i) {
+    var p = stPos(i), on = i === at, w = 150, h = 62, x = p[0] - w / 2, y = p[1] - h / 2;
+    s += '<g' + (on && st.acted ? ' class="pgd-pop"' : '') + '>' + A.glass(x, y, w, h, { fx: fx, col: on ? q.col : '#2b4157', r: 12 }) + t(p[0], y + 26, q.lab, { size: 15, f: 'h', a: 'middle', fill: on ? q.col : C.dim, ls: '.08em' }) + t(p[0], y + 48, q.sub, { size: 13.5, a: 'middle', fill: on ? '#c7d4e4' : C.dim2 }) + '</g>';
+  });
+  s += t(RING.x, RING.y - 8, 'epoch', { size: 15, a: 'middle', fill: C.dim }) + t(RING.x, RING.y + 26, String(st.ep), { size: 34, a: 'middle', f: 'm', w: 700, fill: '#fff' }).replace('<text ', '<text data-pgd-from="' + (st.ep0 == null ? st.ep : st.ep0) + '" ');
+  return s;
+}
+function chart3e(c, fx, o) {
+  o = o || {}; var H = hist3e(), E = H.h.length || 30, st = c.state, show = D.predDone('3e'), s = '', n = Math.min(st.ep, E);
+  s += A.glass(452, 22, 480, 498, { fx: fx, col: '#22384d' });
+  var xt = E <= 10 ? H.h.map(function (q) { return q[0]; }) : [1, 5, 10, 15, 20, 25, 30].filter(function (e) { return e <= E; });
+  var c1 = A.chart({ x: 520, y: 62, w: 390, h: 150, xd: [1, E], yd: [0.4, 0.7], yt: [0.4, 0.5, 0.6, 0.7], fy: function (v) { return v.toFixed(1); } });
+  var c2 = A.chart({ x: 520, y: 276, w: 390, h: 170, xd: [1, E], yd: [0.4, 0.9], xt: xt, yt: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9], fy: function (v) { return v.toFixed(1); }, xl: 'epoch' });
+  s += c1.svg + c2.svg + t(470, 50, 'TRAIN LOSS (LOWER = BETTER)', { size: 13.5, f: 'h', fill: C.am, ls: '.08em' }) + t(470, 264, 'VALIDATION RANKING SCORE', { size: 13.5, f: 'h', fill: C.gr, ls: '.08em' });
+  var pl = H.h.slice(0, n).map(function (q) { return c1.X(q[0]).toFixed(1) + ',' + c1.Y(q[1]).toFixed(1); }), pv = H.h.slice(0, n).map(function (q) { return c2.X(q[0]).toFixed(1) + ',' + c2.Y(q[2]).toFixed(1); });
+  if (pl.length > 1) s += '<polyline points="' + pl.join(' ') + '" fill="none" stroke="' + C.am + '" stroke-width="2.5"/>';
+  H.h.slice(0, n).forEach(function (q, i) { s += '<circle cx="' + c1.X(q[0]) + '" cy="' + c1.Y(q[1]) + '" r="' + (i === n - 1 ? 5 : 2.5) + '" fill="' + C.am + '"' + (i === n - 1 ? ' class="pgd-pop"' : '') + '/>'; });
+  if (n) s += A.tag(Math.min(c1.X(H.h[n - 1][0]) + 8, 850), c1.Y(H.h[n - 1][1]) - 10, H.h[n - 1][1].toFixed(3), C.am, { size: 13 });
+  if (show) {
+    if (pv.length > 1) s += '<polyline points="' + pv.join(' ') + '" fill="none" stroke="' + C.gr + '" stroke-width="2.5"/>';
+    H.h.slice(0, n).forEach(function (q) { s += '<circle cx="' + c2.X(q[0]) + '" cy="' + c2.Y(q[2]) + '" r="2.5" fill="' + C.gr + '"/>'; });
+    if (o.best && H.best) { var bx = c2.X(H.best[0]), by = c2.Y(H.best[1]); s += '<line x1="' + bx + '" x2="' + bx + '" y1="' + c2.Y(0.9) + '" y2="' + c2.Y(0.4) + '" stroke="#fff" stroke-dasharray="4 4"/><circle class="pgd-pop" cx="' + bx + '" cy="' + by + '" r="9" fill="none" stroke="#fff" stroke-width="2.5"/>' + A.tag(bx - 10, by - 14, 'best: epoch ' + H.best[0] + ' · ' + H.best[1].toFixed(3), '#fff', { a: 'end', size: 13 }); }
+    else if (n === 1) s += A.tag(c2.X(1) + 10, c2.Y(H.h[0][2]) - 10, H.h[0][2].toFixed(3), C.gr, { size: 13 });
+  } else {
+    s += '<rect x="521" y="277" width="388" height="168" fill="#060b12" opacity=".85"/>' + A.lock(600, 368, 'shows after your 3e drawing');
+  }
+  return s;
+}
+D.register('3e', {
+  init: function () { return { at: 0, ep: 0, ep0: null, acted: 0 }; },
+  frames: [
+  { cap: 'One epoch is one lap of the loop',
+    note: 'Push the token around: predict scores for a batch, compare them with the labels (the loss), nudge every weight a little, and after all batches check the validation tray.',
+    svg: function (c) {
+      var fx = A.fx(), st = c.state, s = A.stage() + fx.defs + t(40, 42, 'THE TRAINING LOOP', { size: 14, f: 'h', fill: C.dim, ls: '.12em' }) + ring3e(c, fx) + chart3e(c, fx);
+      var p = stPos(st.at), q = stPos(st.at + 1);
+      s += A.target('tok', '<circle cx="' + p[0] + '" cy="' + (p[1] - 44) + '" r="15" fill="#ffb547" stroke="#fff" stroke-width="2"/>', st.at ? 'push on' : 'push the token', p[0] + (st.at === 1 ? -20 : 0), p[1] - (st.at === 2 ? -52 : 74), { kind: 'drag', to: snapTo(p[0], p[1] - 44, q[0], q[1] - 44, 20), la: st.at === 1 ? 'end' : 'middle' });
+      return s;
+    },
+    work: function (c) {
+      var H = hist3e(), st = c.state, n = H.nTrain, d = H.nDef, e1 = H.h[0] || [1, 0, 0], r = [{ h: STN[st.at % 4].lab.toLowerCase() }];
+      if (st.at === 0) r.push({ v: fmt(n) + ' ÷ 32 → ' + Math.ceil(n / 32), k: 'batches of 32 flipped photos per epoch' }, { t: 'The network gives each photo a defect score from 0 to 1.' });
+      if (st.at === 1) r.push({ t: 'The yes/no loss is small when the score is near the label, big when it is far.' }, { v: fmt(n) + ' ÷ (2 × ' + d + ') = ' + (n / (2 * d)).toFixed(2), k: 'weight of each defect (rare, so it counts more)' }, { v: fmt(n) + ' ÷ (2 × ' + (n - d) + ') = ' + (n / (2 * (n - d))).toFixed(2), k: 'weight of each good cell' });
+      if (st.at === 2) r.push({ t: 'Each weight moves a small step in the direction that lowers the loss (Adam, step size 0.001).' });
+      if (st.at === 3) r.push({ v: e1[1].toFixed(3), k: 'train loss after epoch 1' }, { t: 'Then all 525 validation cells are scored.' });
+      r.push(srcTag(H.you)); var rn = refNote(H.you); if (rn) r.push(rn); return r;
+    },
+    bind: function (c, root) {
+      var st = c.state, p = stPos(st.at), q = stPos(st.at + 1);
+      dragTo(c, root, 'tok', p[0], p[1] - 44, 20, null, function (pt) { if (Math.hypot(pt.x - q[0], pt.y - (q[1] - 44)) < 60) { st.at++; st.acted = 1; if (st.at >= 4) { st.at = 0; st.ep = 1; c.next(); } else c.redraw(true); return true; } return false; });
+    },
+    auto: function (c) { c.state.at = 0; c.state.ep = 1; } },
+  { cap: 'Pull the lever: ten more laps each time',
+    note: 'The loop now runs on its own. Each pull runs ten more epochs. Watch the train loss fall.',
+    svg: function (c) {
+      var fx = A.fx(), st = c.state, H = hist3e(), E = H.h.length || 30, s = A.stage() + fx.defs + t(40, 42, 'THE TRAINING LOOP', { size: 14, f: 'h', fill: C.dim, ls: '.12em' }) + ring3e(c, fx) + chart3e(c, fx);
+      var lx = 426, ly = 330;
+      s += '<rect x="' + (lx - 8) + '" y="' + (ly - 90) + '" width="16" height="200" rx="8" fill="#111824" stroke="#3a4757"/>';
+      s += A.target('lever', '<rect x="' + (lx - 16) + '" y="' + (ly - 104) + '" width="32" height="32" rx="16" fill="#ffb547" stroke="#fff" stroke-width="2"/>', 'pull down: +' + Math.ceil(E / 3), lx + 14, ly + 146, { kind: 'drag', to: lx + ',' + (ly - 88 + 160), la: 'end' });
+      return s;
+    },
+    work: function (c) {
+      var H = hist3e(), st = c.state, n = Math.min(st.ep, H.h.length), q = H.h[n - 1] || [0, 0, 0], f = H.h[0] || q;
+      return clean([{ h: 'After ' + n + (n === 1 ? ' epoch' : ' epochs') }, { v: f[1].toFixed(3) + ' → ' + q[1].toFixed(3), k: 'train loss: epoch 1 → epoch ' + n }, { t: 'The train loss keeps falling: the network fits the train photos better and better.' }, srcTag(H.you), refNote(H.you)]);
+    },
+    bind: function (c, root) {
+      var st = c.state, H = hist3e(), E = H.h.length || 30, lx = 426, ly = 330;
+      dragTo(c, root, 'lever', lx, ly - 88, 20, null, function (p) { if (p.y > ly + 20) { st.ep0 = st.ep; st.ep = Math.min(E, st.ep === 1 ? Math.ceil(E / 3) : st.ep + Math.ceil(E / 3)); st.acted = 1; if (st.ep >= E) c.next(); else c.redraw(true); return true; } return false; });
+    },
+    auto: function (c) { var H = hist3e(); c.state.ep = H.h.length || 30; } },
+  { cap: 'Train loss vs validation: which epoch to keep?',
+    note: 'The train loss only tells how well the network fits photos it has seen. The validation score tells how it does on new photos.',
+    svg: function (c) {
+      var fx = A.fx(), H = hist3e(), show = D.predDone('3e'), s = A.stage() + fx.defs + t(40, 42, 'THE TRAINING LOOP', { size: 14, f: 'h', fill: C.dim, ls: '.12em' }) + ring3e(c, fx) + chart3e(c, fx);
+      var E = H.h.length, c2x = function (e) { return 520 + (e - 1) / Math.max(1, E - 1) * 390; };
+      if (show && H.best) { var y = 446 - (H.best[1] - 0.4) / 0.5 * 170; s += A.target('best', '<circle cx="' + c2x(H.best[0]) + '" cy="' + y + '" r="14" fill="none" stroke="#ffb547" stroke-width="3"/>', 'tap the best epoch', c2x(H.best[0]) - 20, y - 30, { la: 'end' }); }
+      else { var last = H.h[E - 1], y1 = 212 - (last[1] - 0.4) / 0.3 * 150; s += A.target('best', '<circle cx="' + c2x(E) + '" cy="' + y1 + '" r="14" fill="none" stroke="#ffb547" stroke-width="3"/>', 'tap the last epoch', c2x(E) - 20, y1 + 40, { la: 'end' }); }
+      return s;
+    },
+    work: function (c) {
+      var H = hist3e(), show = D.predDone('3e'), last = H.h[H.h.length - 1];
+      if (!show) return [{ h: 'Train loss' }, { v: H.h[0][1].toFixed(3) + ' → ' + last[1].toFixed(3), k: 'falls almost every epoch' }, { t: 'The validation line shows here after you draw your guess in 3e.' }, srcTag(H.you)];
+      return clean([{ h: 'Validation score' }, { v: H.h[0][2].toFixed(3), k: 'epoch 1' }, { v: H.best[1].toFixed(3), k: 'highest: epoch ' + H.best[0] }, { v: last[2].toFixed(3), k: 'last: epoch ' + last[0] }, { t: 'It does not rise every epoch. The last epoch is not the best one.' }, srcTag(H.you), refNote(H.you)]);
+    },
+    on: { best: function (c) { c.next(); } } },
+  { cap: 'Keep the weights of the best epoch',
+    note: 'After training, the weights from the epoch with the best validation score are put back. Those are the weights you keep.',
+    svg: function (c) {
+      var fx = A.fx(), H = hist3e(), show = D.predDone('3e'), s = A.stage() + fx.defs + chart3e(c, fx, { best: 1 });
+      s += A.glass(28, 60, 404, 400, { fx: fx, col: '#2f6b55' }) + t(48, 92, 'KEPT', { size: 15, f: 'h', fill: C.gr, ls: '.12em' });
+      // a vault of weights
+      for (var i = 0; i < 6; i++) for (var j = 0; j < 9; j++) s += '<rect x="' + (56 + j * 40) + '" y="' + (112 + i * 34) + '" width="32" height="26" rx="4" fill="#123326" stroke="#3dffa0" stroke-opacity=".5" class="' + ((i + j) % 3 ? '' : 'pgd-fade') + '"/>';
+      s += t(48, 344, show ? 'weights of epoch ' + H.best[0] : 'weights of the best epoch', { size: 20, w: 700, fill: '#fff' }) + t(48, 372, fmt(F3().total || 98001) + ' numbers put back', { size: 16, f: 'm', fill: C.dim });
+      s += show ? t(48, 420, 'validation ' + H.best[1].toFixed(3) + ' (last epoch ' + H.h[H.h.length - 1][2].toFixed(3) + ')', { size: 16, f: 'm', fill: C.gr }) : A.lock(56, 420, 'after your 3e drawing');
+      return s;
+    },
+    work: function (c) {
+      var H = hist3e(), show = D.predDone('3e'), last = H.h[H.h.length - 1];
+      return clean([{ h: 'Keep the best' }, show ? { v: H.best[1].toFixed(3) + ' vs ' + last[2].toFixed(3), k: 'best epoch ' + H.best[0] + ' vs last epoch ' + last[0], res: true } : { t: 'The numbers show after you answer the 3e drawing.' },
+        { t: 'Train on train. Choose on validation. The test tray stays sealed.' }, srcTag(H.you), refNote(H.you)]);
+    } }
+  ]
+});
 })();
