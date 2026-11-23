@@ -252,6 +252,8 @@ details[open]>summary::before{transform:rotate(90deg)}
   .pgd-print .pgd-pstage{filter:invert(.93) hue-rotate(180deg) saturate(1.4)}
   .pgd-print .pgd-pstage .pgd-bg{display:none}
   .pgd-print .pgd-pstage image{filter:invert(1) hue-rotate(180deg)}
+  .pgd-print .pgd-pstage .pgd-keep{filter:invert(1) hue-rotate(180deg)}   /* light paper, heat maps: keep their real colours in print */
+  .pgd-print .pgd-pstage .pgd-keep image{filter:none}
   .pgd-print .pgd-wt b,.pgd-print summary,.pgd-print .pgd-qq,.pgd-print .pgd-bt{color:#000!important}
   .pgd-print .pgd-wtag{color:#333!important;border-color:#999!important}
   .pgd-print .pgd-pnote{margin:4pt 0 0;font-size:11pt}

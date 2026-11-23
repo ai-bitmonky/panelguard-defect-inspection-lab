@@ -11,7 +11,8 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(here, '../../../dist/PanelGuard_Refined_Student_Lab_v' + (process.env.GV || '2.3') + '.html');
 const SHOTS = path.resolve(here, '../shots'); fs.mkdirSync(SHOTS, { recursive: true });
 const NEW = ['0a', '0b', '0c', '0d', '1a', '1b', '1c', '1d', '1e', '2a', '2b', '2c', '2d', '2e', '3a', '3b', '3c', '3d', '3e', '3f', '3g',
-  '4a', '4b', '4c', '4d', '4e', '4f', '5a', '5b', '5c', '5d', '5e', '5f', '5g'];
+  '4a', '4b', '4c', '4d', '4e', '4f', '5a', '5b', '5c', '5d', '5e', '5f', '5g',
+  '6a', '6b', '6c', '6d', '6e', '6f', '6g', '7a', '7b', '7c', '7d', '7e', '7f', '7g'];
 const MODES = (process.env.MODES || 'mouse,keyboard').split(',');
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : NEW;
 const PARTS = (process.env.PARTS || '1,2,3,4,5').split(',').map(Number);
@@ -189,7 +190,7 @@ if (PARTS.includes(5)) {
     const r = await page.evaluate((i) => ({ printed: window.__printed, frames: document.querySelectorAll('.pgd-print .pgd-pframe').length, n: document.querySelector('#pgd-panel')._pgd.n,
       empty: [...document.querySelectorAll('.pgd-print .pgd-pstage')].filter((s) => s.innerHTML.length < 800).length }), id);
     expect(r.frames === r.n && r.empty === 0 && r.printed > 0, `${id} print: ${r.frames}/${r.n} frames as static pictures (empty ${r.empty})`);
-    if (id === '1a' || id === '0b' || id === '2d' || id === '3g' || id === '4b' || id === '5a') { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
+    if (['1a', '0b', '2d', '3g', '4b', '5a', '6f', '6c', '7e', '7f'].includes(id)) { await page.emulateMedia({ media: 'print' }); await page.screenshot({ path: `${SHOTS}/g_print_${id}.png`, fullPage: true }); await page.emulateMedia({ media: 'screen' }); }
     await page.evaluate(() => { document.body.classList.remove('pgd-printing'); });
   }
   await page.emulateMedia({ reducedMotion: 'reduce' });

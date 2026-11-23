@@ -81,13 +81,15 @@ function map4b(V, st, o) {
   o = o || {}; var s = '', mx = maxOf(V.map).v || 1;
   s += t(MB.x, MB.y - 30, 'COVER-UP MAP', { size: 14, f: 'h', fill: C.dim, ls: '.1em' }) + t(MB.x + 15 * MB.cs, MB.y - 30, '15 × 15 spots', { size: 14, a: 'end', f: 'm', fill: C.dim2 });
   s += '<rect x="' + (MB.x - 4) + '" y="' + (MB.y - 4) + '" width="' + (15 * MB.cs + 8) + '" height="' + (15 * MB.cs + 8) + '" rx="6" fill="#04070c" stroke="#22384d"/>';
+  s += '<g class="pgd-keep">';
   for (var r = 0; r < 15; r++) for (var c = 0; c < 15; c++) {
     var k = r * 15 + c, seen = o.all || st.seen.indexOf(k) >= 0, v = V.map[k], x = MB.x + c * MB.cs, y = MB.y + r * MB.cs;
     s += '<rect x="' + x + '" y="' + y + '" width="' + (MB.cs - 1.5) + '" height="' + (MB.cs - 1.5) + '" rx="2" fill="' + (seen ? hex(inferno(0.1 + 0.9 * Math.max(0, v) / mx)) : '#0b121b') + '"' + (seen ? '' : ' stroke="#15202d"') +
       (o.all && o.seq ? ' class="pgd-seq" style="animation-delay:' + (r * 70) + 'ms"' : '') + '/>';
   }
+  s += '</g>';
   if (!o.noCur) { var cx = MB.x + st.c * MB.cs, cy = MB.y + st.r * MB.cs; s += '<rect x="' + (cx - 2) + '" y="' + (cy - 2) + '" width="' + (MB.cs + 2.5) + '" height="' + (MB.cs + 2.5) + '" rx="3" fill="none" stroke="#ffb547" stroke-width="2.5"/>'; }
-  s += scaleBar(MB.x, MB.y + 15 * MB.cs + 30, 15 * MB.cs, mx, 'score drop');
+  s += '<g class="pgd-keep">' + scaleBar(MB.x, MB.y + 15 * MB.cs + 30, 15 * MB.cs, mx, 'score drop') + '</g>';
   return s;
 }
 function photo4b(fx, st, o) {

@@ -89,7 +89,7 @@ function paperSheet(text, P, fx, o) {
     }).join('');
     s += '<text x="' + (o.x + 18) + '" y="' + y + '" font-family="' + A.FM + '" font-size="' + fs + '" fill="#1f2937" xml:space="preserve" data-row="' + i + '">' + sp + '</text>';
   });
-  return { svg: s, rows: rows, y0: y0, lh: lh, last: y0 + (rows.length - 2) * lh, cnt: cnt };
+  return { svg: '<g class="pgd-keep">' + s + '</g>', rows: rows, y0: y0, lh: lh, last: y0 + (rows.length - 2) * lh, cnt: cnt };
 }
 function marks(text, P, upto) {   // every checked number token up to row y (for the work strip / ledger)
   var rows = layout(text, P, 58), out = [], y0 = 0;
@@ -297,7 +297,7 @@ function scene6a(c, fx, k) {
   var K = crew6(), st = c.state, s = A.stage({ floor: 300 }) + fx.defs;
   s += t(26, 30, 'CONTROL ROOM · WHO MAY USE WHICH TOOL', { size: 15, f: 'h', fill: C.dim, ls: '.08em' });
   X6A.forEach(function (x, i) { s += worker(x, 214, i, { fx: fx, glow: i === k, dim: k != null && i !== k && !st.done, sub: (K.workers[i] || {}).goal ? K.workers[i].goal.split(',')[0].replace(/\.$/, '').slice(0, 34) + '…' : '' }); });
-  s += '<rect x="14" y="368" width="932" height="160" rx="12" fill="#070b11" stroke="#1b2b3c"/>' + t(30, 386, 'TOOL WALL', { size: 14, f: 'h', fill: '#5d6b80', ls: '.12em' });
+  s += '<rect x="14" y="368" width="932" height="160" rx="12" fill="#070b11" stroke="#1b2b3c"/>' + t(930, 386, 'TOOL WALL', { size: 14, a: 'end', f: 'h', fill: '#5d6b80', ls: '.12em' });
   TOOLN.forEach(function (n) { var b = CAB6A[n], lit = st.plugs.some(function (q) { return q[1] === n; }); s += cabinet(b[0], b[1], n, { fx: fx, w: 212, h: 124, lit: lit, col: lit ? WCOL[TOOLW[n]] : undefined, sub: SHORT6A[n] }); s += '<circle cx="' + sock6a(n)[0] + '" cy="' + sock6a(n)[1] + '" r="9" fill="#05080d" stroke="' + (lit ? '#3dffa0' : '#8d9bb0') + '" stroke-width="2.5"/>'; });
   st.plugs.forEach(function (q) { var a = jack6a(q[0]), b = sock6a(q[1]); s += '<path d="M' + a[0] + ' ' + a[1] + 'C' + a[0] + ' ' + (a[1] + 80) + ' ' + b[0] + ' ' + (b[1] - 90) + ' ' + b[0] + ' ' + b[1] + '" stroke="' + WCOL[q[0]] + '" stroke-width="5" fill="none" stroke-linecap="round"' + (st.last === q[1] ? ' class="pgd-draw" style="--len:500"' : '') + '/><circle cx="' + b[0] + '" cy="' + b[1] + '" r="7" fill="' + WCOL[q[0]] + '"/>'; });
   X6A.forEach(function (x, i) { var a = jack6a(i); s += '<rect x="' + (a[0] - 12) + '" y="' + (a[1] - 8) + '" width="24" height="16" rx="4" fill="#0b121b" stroke="' + WCOL[i] + '" stroke-width="2"/>'; });
@@ -342,7 +342,7 @@ D.register('6a', {
     note: 'Each worker has its own job and only its own tools. The writer will need the others’ answers: that is the job order (6d).',
     svg: function (c) {
       var fx = A.fx(), K = crew6(); c.state.done = 1; var s = scene6a(c, fx, null);
-      K.jobs.forEach(function (j, i) { var x = X6A[i] - 76; var d = j.desc.split(/[:.]/)[0], cut = d.lastIndexOf(' ', 28); s += '<g class="pgd-seq" style="animation-delay:' + (i * .15) + 's"><rect x="' + (x - 24) + '" y="34" width="210" height="72" rx="6" fill="#efe9da" stroke="#b9b09c"/>' + t(x - 12, 54, 'JOB ' + (i + 1), { size: 14, f: 'h', fill: '#2a3444' }) + t(x - 12, 76, d.length > 28 ? d.slice(0, cut) : d, { size: 15, fill: '#3a4656' }) + t(x - 12, 96, d.length > 28 ? d.slice(cut + 1) : '', { size: 15, fill: '#3a4656' }) + '</g>'; });
+      K.jobs.forEach(function (j, i) { var x = X6A[i] - 76; var d = j.desc.split(/[:.]/)[0], cut = d.lastIndexOf(' ', 28); s += '<g class="pgd-seq pgd-keep" style="animation-delay:' + (i * .15) + 's"><rect x="' + (x - 24) + '" y="34" width="210" height="72" rx="6" fill="#efe9da" stroke="#b9b09c"/>' + t(x - 12, 54, 'JOB ' + (i + 1), { size: 14, f: 'h', fill: '#2a3444' }) + t(x - 12, 76, d.length > 28 ? d.slice(0, cut) : d, { size: 15, fill: '#3a4656' }) + t(x - 12, 96, d.length > 28 ? d.slice(cut + 1) : '', { size: 15, fill: '#3a4656' }) + '</g>'; });
       return s;
     },
     work: function (c) { var K = crew6(); return clean(work6a(c).concat([{ h: 'Their jobs' }]).concat(K.jobs.map(function (j, i) { return { v: WNAME[i].toLowerCase(), k: j.desc }; })).concat([srcTag(K.you.workers), refNote(K.you.workers)])); } }
@@ -388,7 +388,7 @@ D.register('6b', {
       s += vend(40, 30, fx, { name: nameOK6b() ? 'shift_stats' : null, desc: (F6().toolDesc || {}).shift_stats, lit: true });
       s += '<path d="M370 120C440 120 450 150 520 150" stroke="#46e3ff" stroke-width="2" stroke-dasharray="5 5" fill="none"/>' + A.glass(520, 40, 200, 176, { fx: fx, col: '#2b4760' }) + t(540, 70, 'THE MODEL SEES', { size: 14, f: 'h', fill: '#46e3ff', ls: '.08em' }) + t(540, 100, '• the name', { size: 16, fill: '#dbe6f2' }) + t(540, 126, '• the description', { size: 16, fill: '#dbe6f2' }) + t(540, 160, 'NOT the function', { size: 16, w: 700, fill: '#ff8aa0' }) + t(540, 184, 'NOT the logbook', { size: 16, w: 700, fill: '#ff8aa0' });
       s += t(736, 50, 'THE 3 READY-MADE TOOLS', { size: 14, f: 'h', fill: C.dim, ls: '.06em' }) + ledger6b(fx, 732, 64);
-      s += A.target('ticket', '<g><rect x="520" y="300" width="190" height="62" rx="6" fill="#efe9da" stroke="#b9b09c"/>' + t(544, 326, 'REQUEST', { size: 14, f: 'h', fill: '#2a3444' }) + t(544, 350, 'arguments: none {}', { size: 15, f: 'm', fill: '#4a5668' }) + '</g>', 'feed the request', 610, 400, { kind: 'drag', to: snapTo(610, 331, 130, 410, 16) });
+      s += A.target('ticket', '<g class="pgd-keep"><rect x="520" y="300" width="190" height="62" rx="6" fill="#efe9da" stroke="#b9b09c"/>' + t(544, 326, 'REQUEST', { size: 14, f: 'h', fill: '#2a3444' }) + t(544, 350, 'arguments: none {}', { size: 15, f: 'm', fill: '#4a5668' }) + '</g>', 'feed the request', 610, 400, { kind: 'drag', to: snapTo(610, 331, 130, 410, 16) });
       return s;
     },
     work: function (c) { var K = crew6(); return clean([{ h: 'What the model is given' }, { v: nameOK6b() ? 'shift_stats' : '? (gap 1)', k: 'the name the workers call' }, { v: ((F6().toolDesc || {}).shift_stats || '').length + ' characters', k: 'the description: when to call it' }, { t: 'The arguments are an empty object: this tool needs nothing, it always reads the last shift.' }, srcTag(K.you.tools)]); },
@@ -422,7 +422,7 @@ D.register('6b', {
       var fx = A.fx(), s = A.stage({ floor: 500 }) + fx.defs, R = toolRes6b();
       s += vend(40, 30, fx, { name: nameOK6b() ? 'shift_stats' : null, desc: (F6().toolDesc || {}).shift_stats, knob: 270 });
       var rows = [['cells', R.cells], ['defects', R.defects], ['defects_passed', R.defects_passed], ['defects_passed_per_100', R.defects_passed_per_100], ['target_max_per_100', R.target_max_per_100], ['good_cells_stopped', R.good_cells_stopped], ['person_checks', R.person_checks], ['per_1000', R.per_1000 ? R.per_1000.pass + ' / ' + R.per_1000.person + ' / ' + R.per_1000.stop : '']];
-      s += '<g class="pgd-drop"><g filter="url(#' + fx.sh + ')"><path d="M410 40h380v' + (rows.length * 30 + 70) + 'l-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-20 -8z" fill="#f1ecdf"/></g>' + t(430, 74, 'TOOL RESULT', { size: 16, f: 'h', fill: '#2a3444', ls: '.08em' });
+      s += '<g class="pgd-drop pgd-keep"><g filter="url(#' + fx.sh + ')"><path d="M410 40h380v' + (rows.length * 30 + 70) + 'l-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-12 -8-12 8-20 -8z" fill="#f1ecdf"/></g>' + t(430, 74, 'TOOL RESULT', { size: 16, f: 'h', fill: '#2a3444', ls: '.08em' });
       rows.forEach(function (q, i) { s += t(430, 110 + i * 30, q[0], { size: 15, f: 'm', fill: '#4a5668' }) + t(772, 110 + i * 30, String(q[1]), { size: 17, a: 'end', f: 'm', w: 700, fill: '#0f5a8a' }); });
       s += '</g>' + A.target('panel', '<rect x="58" y="258" width="294" height="130" rx="8" fill="#46e3ff" fill-opacity=".06" stroke="#ffb547" stroke-width="2" stroke-dasharray="6 5"/>', 'open the back panel', 205, 342, {});
       s += t(820, 120, '', {});
@@ -451,7 +451,7 @@ D.register('6b', {
 /* ============================ 6c  Hire the workers ============================ */
 var PIECE6C = [['role', '#46e3ff'], ['backstory', '#a98bff'], ['goal', '#ffb547'], ['tools', '#3dffa0']];
 function badge6c(x, y, w, k, fx, o) {   // an ID badge on a lanyard. o: {front: true, hi: piece index, lockRole}
-  o = o || {}; var K = crew6(), W = K.workers[k] || {}, s = '', h = o.h || 300, col = WCOL[k];
+  o = o || {}; var K = crew6(), W = K.workers[k] || {}, s = '<g class="pgd-keep">', h = o.h || 300, col = WCOL[k];
   s += '<path d="M' + (x + w / 2 - 30) + ' ' + (y - 40) + 'L' + (x + w / 2) + ' ' + y + 'L' + (x + w / 2 + 30) + ' ' + (y - 40) + '" stroke="' + col + '" stroke-width="6" fill="none"/>';
   s += '<g filter="url(#' + fx.sh + ')"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="14" fill="#f4f1ea"/></g><rect x="' + x + '" y="' + y + '" width="' + w + '" height="44" rx="14" fill="' + col + '"/><rect x="' + x + '" y="' + (y + 30) + '" width="' + w + '" height="14" fill="' + col + '"/>';
   s += '<rect x="' + (x + w / 2 - 20) + '" y="' + (y + 10) + '" width="40" height="8" rx="4" fill="#0b121b" opacity=".5"/>' + t(x + 16, y + 38, 'PANELGUARD CREW', { size: 14, f: 'h', fill: '#0b121b', ls: '.08em' });
@@ -468,7 +468,7 @@ function badge6c(x, y, w, k, fx, o) {   // an ID badge on a lanyard. o: {front: 
     if (line) s += t(x + 16, ly, line.length > max ? line.slice(0, max - 1) + '…' : line, { size: fs, f: i === 3 ? 'm' : 'b', fill: '#1f2937' });
     yy += 66;
   });
-  return s;
+  return s + '</g>';
 }
 function back6c(x, y, w, h, fx, hi) {   // the back of the badge: the exact prompt text built from the pieces
   var K = crew6(), W = K.workers[0], pr = W.prompt || F6().prompts[0], s = '';
@@ -560,7 +560,7 @@ D.register('6c', {
 var JOB6D = ['READ THE SHIFT FACTS', 'FIND THE CAUSES', 'WRITE THE REPORT'];
 function folder6d(x, y, k, o) {
   o = o || {}; var col = WCOL[k], s = '';
-  s += '<g' + (o.cls ? ' class="' + o.cls + '"' : '') + '><path d="M' + x + ' ' + (y + 14) + 'h60l12 -14h60l8 14h90v120h-230z" fill="' + col + '" fill-opacity=".9"/><rect x="' + x + '" y="' + (y + 24) + '" width="230" height="120" rx="6" fill="#f1ecdf"/>';
+  s += '<g class="pgd-keep' + (o.cls ? ' ' + o.cls : '') + '"><path d="M' + x + ' ' + (y + 14) + 'h60l12 -14h60l8 14h90v120h-230z" fill="' + col + '" fill-opacity=".9"/><rect x="' + x + '" y="' + (y + 24) + '" width="230" height="120" rx="6" fill="#f1ecdf"/>';
   s += t(x + 14, y + 54, 'JOB · ' + WNAME[k], { size: 14, f: 'h', fill: '#2a3444', ls: '.04em' }) + t(x + 14, y + 82, JOB6D[k], { size: 16, w: 700, fill: '#1f2937' });
   s += t(x + 14, y + 110, o.reads != null ? 'reads: ' + o.reads : '', { size: 14, fill: '#4a5668' }) + '<circle cx="' + (x + 214) + '" cy="' + (y + 130) + '" r="7" fill="#5d6b80"/></g>';
   return s;
@@ -568,7 +568,7 @@ function folder6d(x, y, k, o) {
 var SLOT6D = [40, 340, 640], RAIL6D = 120;
 function rail6d(fx) { return '<rect x="20" y="' + (RAIL6D - 26) + '" width="920" height="10" rx="5" fill="url(#' + fx.mt + ')" stroke="#5d6b80"/>' + [0, 1, 2].map(function (i) { return t(SLOT6D[i] + 115, RAIL6D - 40, (i + 1) + (i ? (i === 1 ? 'nd' : 'rd') : 'st'), { size: 15, a: 'middle', f: 'h', fill: C.dim }); }).join(''); }
 function report6d(txt, x, y, w, fx, locked) {
-  var s = '<g filter="url(#' + fx.sh + ')"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="230" rx="4" fill="#f1ecdf"/></g>' + t(x + 16, y + 28, 'THE REPORT', { size: 15, f: 'h', fill: '#2a3444', ls: '.06em' });
+  var s = '<g class="pgd-keep"><g filter="url(#' + fx.sh + ')"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="230" rx="4" fill="#f1ecdf"/></g>' + t(x + 16, y + 28, 'THE REPORT', { size: 15, f: 'h', fill: '#2a3444', ls: '.06em' });
   var L = (txt || '').split('\n'), keys = [['RESULT', /^RESULT: /], ['COST', /^COST: /], ['WHERE IT FAILS', /^WHERE IT FAILS: /], ['ACTION LIST', /^• (Work the action list|Sort the mistakes)/]];
   keys.forEach(function (k, i) {
     var line = L.filter(function (l) { return k[1].test(l); })[0] || '', miss = /not known/.test(line), yy = y + 66 + i * 40; if (!locked && k[0] === 'ACTION LIST' && /^• Sort/.test(line)) miss = false;
@@ -577,7 +577,7 @@ function report6d(txt, x, y, w, fx, locked) {
     s += '<rect x="' + (x + 166) + '" y="' + (yy - 18) + '" width="' + (w - 182) + '" height="26" rx="4" fill="' + (miss ? '#ff4d6a' : '#3dffa0') + '" fill-opacity=".18" stroke="' + (miss ? '#c01a36' : '#0f7a48') + '" stroke-opacity=".5"/>' +
       t(x + 176, yy, miss ? 'not known' : (function (z) { var M = Math.floor((w - 196) / 8.6); return z.length > M ? z.slice(0, M - 1) + '…' : z; })(line.replace(k[1], '').replace(/^Work the action list: /, '')), { size: 14, f: 'm', w: 700, fill: miss ? '#b0102e' : '#0f5a3a' });
   });
-  return s;
+  return s + '</g>';
 }
 D.register('6d', {
   init: function () { return { order: [2, 0, 1], strings: [] }; },
@@ -653,7 +653,7 @@ D.register('6d', {
 /* ============================ 6e  Kick off ============================ */
 var DESK6E = [[170, 300], [480, 300], [790, 300]];
 function bubble(x, y, w, kind, text, col, o) {   // a speech bubble on the scene
-  o = o || {}; var lines = [], words = String(text).split(' '), line = '', max = Math.floor((w - 24) / 7.6);
+  o = o || {}; var lines = [], words = String(text).split(' '), line = '', max = Math.floor((w - 24) / (o.mono ? 8.7 : 7.6));
   words.forEach(function (wd) { if ((line + ' ' + wd).length > max) { lines.push(line); line = wd; } else line = line ? line + ' ' + wd : wd; }); if (line) lines.push(line);
   lines = lines.slice(0, o.max || 3); var h = 34 + lines.length * 19, s = '<g class="pgd-seq"' + (o.delay != null ? ' style="animation-delay:' + o.delay + 's"' : '') + '>';
   s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="#0b121b" stroke="' + col + '" stroke-width="1.6"/>' + t(x + 12, y + 20, kind, { size: 14, f: 'h', fill: col, ls: '.06em' });
@@ -708,12 +708,12 @@ D.register('6e', {
     note: 'The last answer is the report. The trace kept every step: thoughts, tool calls, tool results and answers.',
     svg: function (c) {
       var fx = A.fx(), K = crew6(), s = room6e(fx, -1, 2), L = (K.outs[2] || '').split('\n');
-      s += '<g filter="url(#' + fx.sh + ')"><rect x="250" y="24" width="460" height="290" rx="4" fill="#f1ecdf" class="pgd-drop"/></g>' + t(270, 54, L[0] || '', { size: 15, f: 'h', fill: '#2a3444' });
+      s += '<g class="pgd-keep"><g filter="url(#' + fx.sh + ')"><rect x="250" y="24" width="460" height="290" rx="4" fill="#f1ecdf" class="pgd-drop"/></g>' + t(270, 54, L[0] || '', { size: 15, f: 'h', fill: '#2a3444' });
       L.slice(1, 4).forEach(function (l, i) { s += t(270, 90 + i * 26, l.length > 52 ? l.slice(0, 51) + '…' : l, { size: 14, f: 'm', fill: '#1f2937' }); });
       s += t(270, 190, 'TRACE', { size: 14, f: 'h', fill: '#2a3444' });
       var types = ['thought', 'tool_call', 'tool_result', 'answer'], cnt = types.map(function (ty) { return K.trace.filter(function (e) { return e[0] === ty; }).length; });
       types.forEach(function (ty, i) { s += t(270 + i * 110, 222, String(cnt[i]), { size: 24, f: 'm', w: 700, fill: '#0f5a8a' }) + t(270 + i * 110, 244, ty.replace('_', ' '), { size: 14, fill: '#4a5668' }); });
-      s += t(270, 290, K.trace.length + ' steps in all (with 3 job starts)', { size: 15, fill: '#4a5668' });
+      s += t(270, 290, K.trace.length + ' steps in all (with 3 job starts)', { size: 15, fill: '#4a5668' }) + '</g>';
       return s;
     },
     work: function (c) { var K = crew6(); return clean([{ h: 'The whole run' }, { v: '3 jobs', k: 'inspector → analyst → writer' }, { v: String(K.trace.filter(function (e) { return e[0] === 'tool_call'; }).length), k: 'tool calls' }, { v: String(K.trace.length), k: 'steps in the trace' }, { t: 'Agent loop: decide → tool → result → answer. The trace shows every step.' }, srcTag(K.you.trace), refNote(K.you.trace)]); } }
