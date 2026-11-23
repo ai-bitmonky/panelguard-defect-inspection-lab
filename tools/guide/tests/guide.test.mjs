@@ -47,7 +47,7 @@ async function act(page, t, mode) {
     else if (t.act === 'drag') { await page.mouse.move(t.x, t.y); await page.mouse.down(); await page.mouse.move(t.tx, t.ty, { steps: 14 }); await page.mouse.up(); }
     return;
   }
-  await page.focus(sel);
+  if (!(await page.focus(sel, { timeout: 2000 }).then(() => true, () => false))) return;
   if (t.act === 'tap') await page.keyboard.press('Enter');
   else if (t.act === 'hold') { await page.keyboard.down('Space'); await page.waitForTimeout(1400); await page.keyboard.up('Space'); }
   else if (t.act === 'drag') {
@@ -56,7 +56,7 @@ async function act(page, t, mode) {
       const cur = (await targets(page)).find((q) => q.key === t.key); if (!cur) return;   // frame moved on (live drags)
       const dx = cur.tx - cur.x, dy = cur.ty - cur.y;
       if (Math.abs(dx) < 9 && Math.abs(dy) < 9) break;
-      await page.focus(sel);
+      if (!(await page.focus(sel, { timeout: 2000 }).then(() => true, () => false))) return;
       await page.keyboard.press(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : (dy > 0 ? 'ArrowDown' : 'ArrowUp'));
       const f1 = await frameOf(page); if (f1.i !== f0.i) return;
     }

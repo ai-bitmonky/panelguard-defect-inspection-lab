@@ -118,6 +118,7 @@ function hit(id, u, v) {
 }
 function spotCenter(id) { var s = SPOTS[id]; if (s.kind === 'bar') return [0.5, s.ys[1]]; if (s.kind === 'seg') return [(s.seg[0] + s.seg[2]) / 2, (s.seg[1] + s.seg[3]) / 2]; return [s.u, s.v]; }
 var LZ = 2.6, LR = 64;
+function chipX(label, x) { var h = (label.length * 10.4 + 50) / 2 + 8; return Math.max(h, Math.min(960 - h, x)); }
 /* one lens frame: photos = [[id, x, y, size]], seek = id to search */
 function lensFrame(photos, seek, find, cap, note, start) {
   return {
@@ -138,13 +139,13 @@ function lensFrame(photos, seek, find, cap, note, start) {
         '<circle id="' + g + 'r" cx="' + L.x + '" cy="' + L.y + '" r="' + LR + '" fill="none" stroke="#c6d2e2" stroke-width="5"/>' +
         '<path id="' + g + 'h" d="M' + (L.x + LR * .72) + ' ' + (L.y + LR * .72) + 'l34 34" stroke="#8d9bb0" stroke-width="11" stroke-linecap="round"/></g>';
       var P0 = photos.filter(function (p) { return p[0] === seek; })[0], sc0 = spotCenter(seek);
-      s += A.target('lens', '<circle cx="' + L.x + '" cy="' + L.y + '" r="' + (LR + 6) + '" fill="none" stroke="#ffb547" stroke-width="3" class="pgd-lring"/>', find, Math.min(840, Math.max(130, L.x)), Math.min(526, L.y + LR + 50),
+      s += A.target('lens', '<circle cx="' + L.x + '" cy="' + L.y + '" r="' + (LR + 6) + '" fill="none" stroke="#ffb547" stroke-width="3" class="pgd-lring"/>', find, chipX(find, L.x), Math.min(526, L.y + LR + 50),
         { kind: 'drag', inner: lens, to: (P0[1] + sc0[0] * P0[3]) + ',' + (P0[2] + sc0[1] * P0[3]) });
-      c._lens = { g: g, photos: photos, seek: seek, L: L };
+      c._lens = { g: g, photos: photos, seek: seek, L: L }; c._L0 = L;
       return s;
     },
     work: function (c) {
-      var m = D.meta(seek), L = c.state.lens, rows = [{ h: 'Cell ' + seek }, { v: m ? m.kind : '…', k: 'cell type' }, { v: m ? String(m.prob) : '…', k: 'expert defect score (0 to 1)' }, { v: m ? label(m.prob) : '…', k: 'what the experts say', col: m && m.prob >= 0.5 ? C.rd : C.gr }];
+      var m = D.meta(seek), L = c.state.lens || c._L0, rows = [{ h: 'Cell ' + seek }, { v: m ? m.kind : '…', k: 'cell type' }, { v: m ? m.score : '…', k: 'expert defect score (0 to 1)' }, { v: m ? label(m.prob) : '…', k: 'what the experts say', col: m && m.prob >= 0.5 ? C.rd : C.gr }];
       var P = photos.filter(function (p) { return p[0] === seek; })[0], u = L ? (L.x - P[1]) / P[3] : null, v = L ? (L.y - P[2]) / P[3] : null, all = meanAll(seek);
       rows.push({ h: 'Brightness (0 dark … 255 white)' });
       if (u != null && u > 0 && u < 1 && v > 0 && v < 1) rows.push({ v: String(meanIn(seek, u, v, LR / LZ / P[3])), k: 'inside the lens (x ' + u.toFixed(2) + ', y ' + v.toFixed(2) + ')' });
@@ -164,7 +165,7 @@ function lensFrame(photos, seek, find, cap, note, start) {
           zz.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ') scale(' + LZ + ') translate(' + (-p.x) + ' ' + (-p.y) + ')');
           cc.setAttribute('cx', p.x); cc.setAttribute('cy', p.y); rr.setAttribute('cx', p.x); rr.setAttribute('cy', p.y); ring.setAttribute('cx', p.x); ring.setAttribute('cy', p.y);
           hh.setAttribute('d', 'M' + (p.x + LR * .72) + ' ' + (p.y + LR * .72) + 'l34 34');
-          chip.setAttribute('transform', 'translate(' + (Math.min(840, Math.max(130, p.x)) - Math.min(840, Math.max(130, o.L.x))) + ' ' + (Math.min(526, p.y + LR + 50) - Math.min(526, o.L.y + LR + 50)) + ')');
+          chip.setAttribute('transform', 'translate(' + (chipX(find, p.x) - chipX(find, o.L.x)) + ' ' + (Math.min(526, p.y + LR + 50) - Math.min(526, o.L.y + LR + 50)) + ')');
           c.state.lens = { x: p.x, y: p.y };
           var q = uv(p), on = hit(o.seek, q[0], q[1]); rr.setAttribute('stroke', on ? C.gr : '#c6d2e2');
           c.rework();
@@ -186,7 +187,7 @@ function gallery(c, x0) {
     var sp = SPOTS[p.id], m = D.meta(p.id), cx = x0 + 50, cy = y + 49, R = 38, Z = 300;
     s += '<g class="' + (i === pins.length - 1 && c.enter ? 'pgd-grow' : '') + '"><defs><clipPath id="' + g + '"><circle cx="' + cx + '" cy="' + cy + '" r="' + R + '"/></clipPath></defs>' +
       '<g clip-path="url(#' + g + ')">' + A.cell(p.id, cx - p.u * Z, cy - p.v * Z, Z, { full: true }) + '</g><circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="' + (sp.what === 'normal' ? C.gr : C.rd) + '" stroke-width="3"/>' +
-      t(x0 + 102, y + 40, sp.name, { size: 21, w: 700 }) + t(x0 + 102, y + 68, sp.what === 'normal' ? 'normal · cell ' + p.id : 'defect · cell ' + p.id + ' · score ' + (m ? m.prob : ''), { size: 15, fill: sp.what === 'normal' ? C.gr : C.rd }) + '</g>';
+      t(x0 + 102, y + 40, sp.name, { size: 21, w: 700 }) + t(x0 + 102, y + 68, sp.what === 'normal' ? 'normal · cell ' + p.id : 'defect · cell ' + p.id + ' · score ' + (m ? m.score : ''), { size: 15, fill: sp.what === 'normal' ? C.gr : C.rd }) + '</g>';
   }
   return s;
 }
@@ -204,7 +205,7 @@ D.register('0b', {
         s += t(60, 70, 'Also look for', { size: 18, fill: C.dim, w: 700 });
         s += A.cell(1, 60, 92, 230, { full: true }) + '<rect x="60" y="92" width="230" height="230" fill="none" stroke="#263346"/>';
         s += '<circle cx="' + (60 + 0.27 * 230) + '" cy="' + (92 + 0.5 * 230) + '" r="22" fill="none" stroke="' + C.rd + '" stroke-width="2.5"/>';
-        s += t(310, 130, 'finger breaks', { size: 22, w: 700 }) + t(310, 160, 'short dark dashes', { size: 18, fill: C.dim }) + t(310, 186, 'cell 1 · score ' + (D.meta(1) ? D.meta(1).prob : ''), { size: 15, fill: C.rd, f: 'm' });
+        s += t(310, 130, 'finger breaks', { size: 22, w: 700 }) + t(310, 160, 'short dark dashes', { size: 18, fill: C.dim }) + t(310, 186, 'cell 1 · score ' + (D.meta(1) ? D.meta(1).score : ''), { size: 15, fill: C.rd, f: 'm' });
         s += '<g class="pgd-in"><rect x="60" y="360" width="540" height="140" rx="12" fill="#0a1019" stroke="#263346"/>' +
           '<circle cx="92" cy="402" r="8" fill="' + C.gr + '"/>' + t(110, 408, 'normal: busbars, spotty poly glow', { size: 19 }) +
           '<circle cx="92" cy="448" r="8" fill="' + C.rd + '"/>' + t(110, 454, 'defect: crack, dark area, broken part, finger break', { size: 19 }) + '</g>';
@@ -247,8 +248,8 @@ function lanes(c, o) {
     (o.scale >= 1 ? '<g class="' + (o.scale === 1 && c.enter ? 'pgd-grow' : '') + '"><rect x="-108" y="14" width="44" height="26" rx="3" fill="' + C.rd + '"/><rect x="-104" y="-8" width="36" height="22" rx="3" fill="#c23a52"/></g>' : '') +
     (o.scale >= 2 ? '<g class="' + (c.enter ? 'pgd-grow' : '') + '"><rect x="74" y="28" width="24" height="12" rx="2" fill="' + C.am + '"/></g>' : '') + '</g>' +
     '<circle cx="0" cy="0" r="5" fill="#c6d2e2"/></g>';
-  if (o.scale >= 1) s += t(546, 356, 'missed defect', { size: 15, fill: C.rd, a: 'middle', w: 700 });
-  if (o.scale >= 2) s += t(736, 356, 'false alarm', { size: 15, fill: C.am, a: 'middle', w: 700 });
+  if (o.scale >= 1) s += t(552, 384, 'missed defect', { size: 15, fill: C.rd, a: 'middle', w: 700 });
+  if (o.scale >= 2) s += t(730, 384, 'false alarm', { size: 15, fill: C.am, a: 'middle', w: 700 });
   return s;
 }
 function token(id, x, y, key, label, to) {
@@ -273,17 +274,17 @@ D.register('0c', {
   { cap: 'Send a real defect down the PASS lane',
     note: 'Cell 23 has a dead area (expert score 1.0). Send it to PASS on purpose and watch what happens.',
     svg: function (c) { return lanes(c, {}) + token(23, 60, 244, 'bad', 'drag it to PASS', '528,150'); },
-    work: function () { var m = D.meta(23); return [{ h: 'Cell 23' }, { v: String(m ? m.prob : '…'), k: 'expert defect score' }, { v: 'defect', k: 'what the experts say', col: C.rd }, { t: 'You are the inspector. This time you make a mistake on purpose.' }]; },
+    work: function () { var m = D.meta(23); return [{ h: 'Cell 23' }, { v: (m ? m.score : '…'), k: 'expert defect score' }, { v: 'defect', k: 'what the experts say', col: C.rd }, { t: 'You are the inspector. This time you make a mistake on purpose.' }]; },
     auto: function () {},
     bind: laneDrag('bad', 'pass') },
   { cap: 'A missed defect ships to a customer',
     note: 'The bad cell went into a panel on a roof. Its dead area makes less power for years. That is a warranty claim.',
     svg: function (c) {
-      return lanes(c, { roof: 1, scale: 1 }) + '<g class="pgd-in"><rect x="770" y="282" width="112" height="40" rx="8" fill="#2a0e15" stroke="' + C.rd + '"/>' + t(826, 308, 'less power', { size: 16, a: 'middle', fill: '#ff9aac', w: 700 }) + '</g>' +
+      return lanes(c, { roof: 1, scale: 1 }) + '<g class="pgd-in"><rect x="770" y="258" width="112" height="34" rx="8" fill="#2a0e15" stroke="' + C.rd + '"/>' + t(826, 281, 'less power', { size: 16, a: 'middle', fill: '#ff9aac', w: 700 }) + '</g>' +
         token(447, 60, 244, 'good', 'drag it to STOP', '528,430');
     },
     work: function () {
-      return [{ h: 'Missed defect' }, { t: 'A <b>defect</b> that gets <b>PASS</b>.' }, { t: 'It ships. The customer finds it. Hard to fix, costly, bad name.' }, { h: 'Next: cell 447' }, { v: String(D.meta(447) ? D.meta(447).prob : '…'), k: 'expert defect score' }, { v: 'OK', k: 'a good cell', col: C.gr }];
+      return [{ h: 'Missed defect' }, { t: 'A <b>defect</b> that gets <b>PASS</b>.' }, { t: 'It ships. The customer finds it. Hard to fix, costly, bad name.' }, { h: 'Next: cell 447' }, { v: (D.meta(447) ? D.meta(447).score : '…'), k: 'expert defect score' }, { v: 'OK', k: 'a good cell', col: C.gr }];
     },
     bind: laneDrag('good', 'stop') },
   { cap: 'A false alarm costs a second look',

@@ -69,7 +69,7 @@ D.register('1a', {
     on: { byte: function (c) { c.next(); } } },
 
   { cap: 'Fold the line: 64 bytes make one row',
-    note: 'Byte 1,294 sits in row 20, column 14 of photo 1. Folding the line every 64 bytes builds the photo row by row.',
+    note: 'Byte 1,297 sits in row 20, column 17 of photo 1. Folding the line every 64 bytes builds the photo row by row.',
     svg: function (c) {
       var s = A.stage(), v = byteAt(B0 + 3), b = B0 + 3, r = Math.floor(b / 64), cl = b % 64;
       // left: the byte and the gray scale
@@ -172,13 +172,13 @@ D.register('1a', {
       s += A.arrow(FX - 16, FY, FX - 16, FY + S, C.cy, { w: 2.2 }) + '<text x="' + (FX - 26) + '" y="' + (FY + S / 2) + '" font-family="' + A.FB + '" font-size="16" font-weight="600" fill="' + C.cy + '" text-anchor="middle" transform="rotate(-90 ' + (FX - 26) + ' ' + (FY + S / 2) + ')">rows (axis 1)</text>';
       s += A.arrow(FX, FY + S + 16, FX + S, FY + S + 16, C.cy, { w: 2.2 }) + t(FX + S / 2, FY + S + 40, 'columns (axis 2)', { size: 16, fill: C.cy, a: 'middle' });
       // right panel: the shape, colour-coded
-      var RX = 610;
-      s += '<g class="pgd-in" transform="translate(0 214)"><rect x="' + RX + '" y="96" width="310" height="190" rx="14" fill="#0a1019" stroke="#263346"/>' +
+      var RX = 600;
+      s += '<g class="pgd-in"><g transform="translate(0 234)"><rect x="' + RX + '" y="96" width="310" height="190" rx="14" fill="#0a1019" stroke="#263346"/>' +
         t(RX + 22, 132, 'X.shape', { size: 20, f: 'm', fill: C.dim }) +
         t(RX + 22, 180, '(', { size: 34, f: 'm', w: 700 }) + t(RX + 46, 180, '2624', { size: 34, f: 'm', w: 700, fill: C.vi }) + t(RX + 134, 180, ',', { size: 34, f: 'm', w: 700 }) +
         t(RX + 158, 180, '64', { size: 34, f: 'm', w: 700, fill: C.cy }) + t(RX + 202, 180, ',', { size: 34, f: 'm', w: 700 }) + t(RX + 224, 180, '64', { size: 34, f: 'm', w: 700, fill: C.cy }) + t(RX + 268, 180, ')', { size: 34, f: 'm', w: 700 }) +
         t(RX + 22, 226, '● photos', { size: 18, fill: C.vi, w: 700 }) + t(RX + 22, 256, '● rows, columns', { size: 18, fill: C.cy, w: 700 }) +
-        '</g>';
+        '</g></g>';
       return s;
     },
     work: function (c) {
@@ -202,7 +202,7 @@ D.register('1a', {
         s += t(70, y + 50, String(i), { size: 26, a: 'middle', f: 'm', w: 700, fill: hl ? C.am : C.ink });
         s += px(r[0], 150, y + 2, 80, { r: 2 });
         s += A.arrow(250, y + 42, 330, y + 42, hl ? C.am : '#33455c', { w: 2 });
-        s += t(400, y + 50, String(r[0]), { size: 24, a: 'middle', f: 'm', w: 700 }) + t(560, y + 50, String(r[1]), { size: 24, a: 'middle', f: 'm', w: 700, fill: r[1] >= 0.5 ? C.rd : C.gr }) + t(720, y + 50, String(r[2]), { size: 24, a: 'middle', f: 'm', w: 700, fill: C.vi });
+        s += t(400, y + 50, String(r[0]), { size: 24, a: 'middle', f: 'm', w: 700 }) + t(560, y + 50, r[1] === 1 ? '1.0' : String(r[1]), { size: 24, a: 'middle', f: 'm', w: 700, fill: r[1] >= 0.5 ? C.rd : C.gr }) + t(720, y + 50, String(r[2]), { size: 24, a: 'middle', f: 'm', w: 700, fill: C.vi });
         s += '</g>';
       }
       s += t(480, 512, 'Same position i → same cell. Never sort one without the other.', { size: 19, a: 'middle', fill: C.dim });
@@ -210,7 +210,7 @@ D.register('1a', {
     },
     work: function (c) {
       var r = D.meta(3);
-      return [{ h: 'Photo X[2]' }, { v: 'cell_id[2] = 3', k: 'which cell it is' }, { v: 'prob[2] = ' + (r ? r.prob : '…'), k: 'expert defect score' }, { v: 'kind[2] = ' + (r ? r.kind : '…'), k: 'cell type' },
+      return [{ h: 'Photo X[2]' }, { v: 'cell_id[2] = 3', k: 'which cell it is' }, { v: 'prob[2] = ' + (r ? r.score : '…'), k: 'expert defect score' }, { v: 'kind[2] = ' + (r ? r.kind : '…'), k: 'cell type' },
         { t: fmt(c.counts.n) + ' photos and ' + fmt(c.counts.n) + ' label rows: one each.' }];
     } }
   ]
@@ -476,14 +476,14 @@ function patch() {   // the 8 x 8 patch of cell 6 (rows 24-31, columns 28-35): t
   return { raw: v, sc: sc, live: live };
 }
 function grid8(c, mode, rowsGone, tgtRow) {
-  var P = patch(), s = '', S = 44, X0 = 60, Y0 = 60;
+  var P = patch(), s = '', S = 50, X0 = 60, Y0 = 56;
   for (var r = 0; r < 8; r++) {
     if (r < rowsGone) { s += '<rect x="' + X0 + '" y="' + (Y0 + r * S) + '" width="' + 8 * S + '" height="' + S + '" fill="none" stroke="#1b2533" stroke-dasharray="4 5"/>'; continue; }
     var row = '';
     for (var k = 0; k < 8; k++) {
       var v = P.raw[r][k], x = X0 + k * S, y = Y0 + r * S;
       row += '<rect x="' + x + '" y="' + y + '" width="' + S + '" height="' + S + '" fill="' + gray(v) + '" stroke="#05070b"/>' +
-        t(x + S / 2, y + S / 2 + 6, mode === 'raw' ? String(v) : P.sc[r][k].toFixed(2), { size: mode === 'raw' ? 16 : 14, a: 'middle', f: 'm', w: 700, fill: ink(v) });
+        t(x + S / 2, y + S / 2 + 6, mode === 'raw' ? String(v) : P.sc[r][k].toFixed(2), { size: mode === 'raw' ? 18 : 16, a: 'middle', f: 'm', w: 700, fill: ink(v) });
     }
     if (r === tgtRow) s += A.target('row', '<rect x="' + (X0 - 4) + '" y="' + (Y0 + r * S - 3) + '" width="' + (8 * S + 8) + '" height="' + (S + 6) + '" rx="5" fill="none" stroke="#ffb547" stroke-width="3"/>', 'tap row ' + r, X0 + 8 * S + 16, Y0 + r * S + S / 2 + 4, { la: 'start', inner: row });
     else s += row;
@@ -492,7 +492,7 @@ function grid8(c, mode, rowsGone, tgtRow) {
   return s;
 }
 function flatLine(c, n, P) {   // the first n rows laid end to end
-  var s = '', S = 13.5, X0 = 48, Y = 470;
+  var s = '', S = 13.5, X0 = 48, Y = 494;
   s += '<rect x="' + (X0 - 4) + '" y="' + (Y - 4) + '" width="' + (64 * S + 8) + '" height="' + (S + 8) + '" rx="4" fill="none" stroke="#263346"/>';
   for (var r = 0; r < n; r++) for (var k = 0; k < 8; k++) { var v = P.raw[r][k]; s += '<rect x="' + (X0 + (r * 8 + k) * S) + '" y="' + Y + '" width="' + (S - 1) + '" height="' + S + '" fill="' + gray(v) + '"' + (r === n - 1 && c.enter ? ' class="pgd-grow"' : '') + '/>'; }
   for (var q = 0; q < n; q++) s += t(X0 + q * 8 * S + 4 * S, Y + 36, 'row ' + q, { size: 12, a: 'middle', f: 'm', fill: C.dim2 });
@@ -509,7 +509,11 @@ D.register('1e', {
       s += px(6, X, Y, 64 * Z) + '<rect x="' + X + '" y="' + Y + '" width="' + 64 * Z + '" height="' + 64 * Z + '" fill="none" stroke="#263346"/>';
       s += A.target('patch', '<rect x="' + (X + PC * Z - 3) + '" y="' + (Y + PR * Z - 3) + '" width="' + (8 * Z + 6) + '" height="' + (8 * Z + 6) + '" fill="none" stroke="#ffb547" stroke-width="3"/>', 'tap the patch', X + PC * Z + 24, Y + PR * Z - 22, {});
       s += A.tag(X + PC * Z + 60, Y + PR * Z + 40, '(row 24, col 28)', C.am, { size: 14 });
-      s += t(520, 120, 'cell 6', { size: 24, w: 700 }) + t(520, 152, '64 × 64 pixels', { size: 19, fill: C.dim }) + t(520, 182, 'values 0 (black) … 255 (white)', { size: 19, fill: C.dim });
+      s += t(520, 120, 'cell 6', { size: 24, w: 700 }) + t(520, 152, '64 × 64 pixels', { size: 19, fill: C.dim });
+      var gid = A.uid('g6'), p6 = D.pixels(6), mn = 255, mx = 0; if (p6) for (var k = 0; k < 4096; k++) { mn = Math.min(mn, p6[k]); mx = Math.max(mx, p6[k]); }
+      s += '<defs><linearGradient id="' + gid + '"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><rect x="520" y="230" width="380" height="26" rx="4" fill="url(#' + gid + ')"/>' +
+        t(520, 280, '0', { size: 15, f: 'm', fill: C.dim }) + t(900, 280, '255', { size: 15, f: 'm', fill: C.dim, a: 'end' }) + t(520, 216, 'how bright a pixel can be', { size: 17, fill: C.dim });
+      if (p6) [[mn, 'darkest'], [mx, 'brightest']].forEach(function (q, j) { var xx = 520 + 380 * q[0] / 255; s += '<path d="M' + xx + ' 224v38" stroke="#ffb547" stroke-width="3"/>' + A.tag(xx, 312 + j * 34, q[1] + ' ' + q[0], C.am, { a: 'middle', size: 14 }); });
       return s;
     },
     work: function (c) { var m = D.pixels(6), mn = 255, mx = 0; if (m) for (var k = 0; k < 4096; k++) { mn = Math.min(mn, m[k]); mx = Math.max(mx, m[k]); } return [{ h: 'Cell 6' }, { v: m ? mn + ' … ' + mx : '…', k: 'darkest … brightest pixel' }, { v: '0 … 255', k: 'what any pixel can be' }]; },
@@ -518,7 +522,7 @@ D.register('1e', {
     note: 'Dark spot = small numbers, bright glass = big numbers. Next: put every number on a 0 to 1 scale.',
     svg: function (c) {
       var s = A.stage() + grid8(c, 'raw', 0, -1);
-      s += A.target('div', '<rect x="560" y="200" width="200" height="80" rx="40" fill="#0c1520" stroke="#ffb547" stroke-width="3"/>', 'tap to scale', 660, 320, { inner: t(660, 252, '÷ 255', { size: 34, a: 'middle', f: 'm', w: 700, fill: C.am }) });
+      s += A.target('div', '<rect x="600" y="200" width="200" height="80" rx="40" fill="#0c1520" stroke="#ffb547" stroke-width="3"/>', 'tap to scale', 700, 320, { inner: t(700, 252, '÷ 255', { size: 34, a: 'middle', f: 'm', w: 700, fill: C.am }) });
       return s;
     },
     work: function () { var P = patch(), mn = Math.min.apply(null, [].concat.apply([], P.raw)), mx = Math.max.apply(null, [].concat.apply([], P.raw)); return [{ h: 'In this patch' }, { v: String(mn), k: 'darkest (the dark spot)' }, { v: String(mx), k: 'brightest' }, { h: 'The goal' }, { t: 'Brightest possible pixel 255 should become <b>1.0</b>, black 0 stays <b>0</b>.' }]; },

@@ -29,7 +29,7 @@ function labels() {
   if (LAB) { ID2I = {}; LAB.rows.forEach(function (r, i) { ID2I[r[0]] = i; }); }
   return LAB;
 }
-function meta(id) { var L = labels(); if (!L || ID2I[id] == null) return null; var r = L.rows[ID2I[id]]; return { id: r[0], prob: r[1], kind: r[2], i: ID2I[id] }; }
+function meta(id) { var L = labels(); if (!L || ID2I[id] == null) return null; var r = L.rows[ID2I[id]]; return { id: r[0], prob: r[1], score: r[1] === 1 ? '1.0' : String(r[1]), kind: r[2], i: ID2I[id] }; }
 /* every count a Step 0/1 diagram shows, computed from labels.json */
 var COUNTS = null;
 function counts() {

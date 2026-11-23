@@ -231,6 +231,10 @@ details[open]>summary::before{transform:rotate(90deg)}
   .pgd-print .pgd-pk{margin:0;font:700 8pt var(--fh);letter-spacing:.16em;color:#666}
   .pgd-print .pgd-pstage{width:100%;height:auto;border:1px solid #333;border-radius:6pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .pgd-print .pgd-pstage .pgd-chip{display:none}
+  .pgd-print .pgd-pstage{filter:invert(.93) hue-rotate(180deg) saturate(1.4)}
+  .pgd-print .pgd-pstage image{filter:invert(1) hue-rotate(180deg)}
+  .pgd-print .pgd-wt b,.pgd-print summary,.pgd-print .pgd-qq,.pgd-print .pgd-bt{color:#000!important}
+  .pgd-print .pgd-wtag{color:#333!important;border-color:#999!important}
   .pgd-print .pgd-pnote{margin:4pt 0 0;font-size:11pt}
   .pgd-print .pgd-pf-work{border:1px solid #bbb;border-radius:6pt;padding:6pt 8pt;font-size:11pt}
   .pgd-print .pgd-pf-work h4{margin:0 0 4pt;font:700 9pt var(--fh);letter-spacing:.14em}
