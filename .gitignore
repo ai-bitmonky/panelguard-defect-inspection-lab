@@ -10,3 +10,9 @@ tools/audit/shots_v12/
 # student run outputs
 tools/takehome/elpv-dataset/
 tools/takehome/.venv/
+tools/takehome/__pycache__/
+tools/takehome/cnn.keras
+tools/takehome/svc.joblib
+tools/takehome/settings.json
+tools/takehome/trial.json
+tools/takehome/logbook*.json
