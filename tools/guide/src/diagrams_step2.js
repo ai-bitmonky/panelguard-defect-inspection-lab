@@ -501,6 +501,110 @@ D.register('2c', {
   ]
 });
 
+
+/* ============================ 2e  Write the report card ============================ */
+function card2e() {
+  var w = walk(); if (!w) return null;
+  var v = w.v, cut = w.at(w.maxPass).cut, r = D.M.rates(v.y, v.svc, cut), you = v.youSvc, L = D.liveRes('2e');
+  if (L && L.n) { r = { tp: L.tp, fn: L.fn, fp: L.fp, tn: L.tn, rec: L.rec, far: L.far }; you = true; }
+  var n = r.tp + r.fn + r.fp + r.tn, pick = function (t, p) { var o = []; for (var i = 0; i < v.y.length && o.length < 3; i++) if (v.y[i] === t && ((v.svc[i] >= cut) ? 1 : 0) === p) o.push(v.id[i]); return o; };
+  return { r: r, n: n, you: you, k: 1000 / n, cells: { tp: pick(1, 1), fn: pick(1, 0), fp: pick(0, 1), tn: pick(0, 0) } };
+}
+var BOX = { tp: { x: 150, y: 86, lab: 'caught', col: C.rd }, fn: { x: 330, y: 86, lab: 'missed', col: '#ff8aa0' }, fp: { x: 150, y: 290, lab: 'false alarms', col: C.am }, tn: { x: 330, y: 290, lab: 'passed, correct', col: C.gr } };
+var SENT = [{ k: 'tp', pre: 'In every 1,000 cells we stop', post: 'real defects,' }, { k: 'fn', pre: 'and', post: 'defects slip through.' }, { k: 'fp', pre: '', post: 'good cells stopped to re-check.' }];
+function scene2e(c, fx) {
+  var R = card2e(), st = c.state, s = A.stage() + fx.defs; if (!R) return s;
+  // the cabinet: 4 boxes
+  s += t(264, 40, 'MODEL SAYS', { size: 14, f: 'h', a: 'middle', fill: C.dim, ls: '.12em' }) + t(174, 66, 'STOP', { size: 17, f: 'h', a: 'middle', fill: C.rd }) + t(354, 66, 'PASS', { size: 17, f: 'h', a: 'middle', fill: C.gr });
+  s += '<text x="44" y="190" font-family="' + A.FH + '" font-size="14" font-weight="700" fill="#ff8aa0" text-anchor="middle" transform="rotate(-90 44 190)">REAL DEFECT</text><text x="44" y="392" font-family="' + A.FH + '" font-size="14" font-weight="700" fill="#8fb0cf" text-anchor="middle" transform="rotate(-90 44 392)">REAL GOOD</text>';
+  s += '<path d="M66 82H492" stroke="#2b4157"/>';
+  ['tp', 'fn', 'fp', 'tn'].forEach(function (k) {
+    var b = BOX[k], used = st.used.indexOf(k) >= 0;
+    s += A.glass(b.x - 80 + 64 - 40, b.y, 160, 186, { fx: fx, col: b.col, op: .7 });
+    var bx = b.x - 56;
+    R.cells[k].forEach(function (id, j) { s += A.cell(id, bx + 6 + j * 48, b.y + 14, 42, { r: 2 }); });
+    s += t(bx + 80, b.y + 92, b.lab, { size: 16, a: 'middle', w: 700, fill: b.col });
+    s += t(bx + 80, b.y + 116, k.toUpperCase(), { size: 13, a: 'middle', f: 'm', fill: C.dim2 });
+    var pill = '<rect x="' + (bx + 30) + '" y="' + (b.y + 130) + '" width="100" height="40" rx="20" fill="' + (used ? '#0b121b' : b.col) + '" fill-opacity="' + (used ? 1 : .2) + '" stroke="' + b.col + '" stroke-width="2"' + (used ? ' stroke-dasharray="4 4"' : '') + '/>' + t(bx + 80, b.y + 157, String(R.r[k]), { size: 21, a: 'middle', f: 'm', w: 700, fill: used ? C.dim2 : '#fff' });
+    if (!used && st.j < 3) s += A.target('t' + k, '<rect x="' + (bx + 26) + '" y="' + (b.y + 126) + '" width="108" height="48" rx="24" fill="none" stroke="#ffb547" stroke-width="2.5"/>', '', 0, 0, { kind: 'drag', cls: 'pgd-nochip', to: '0,0', inner: '<g class="pgd-pill">' + pill + '</g>' });
+    else s += pill;
+  });
+  s += t(270, 500, 'validation tray · ' + R.n + ' cells · cutoff from 2d', { size: 15, a: 'middle', fill: C.dim });
+  // the report card
+  s += '<g' + ' filter="url(#' + fx.sh + ')"><rect x="476" y="24" width="456" height="494" rx="12" fill="#0e1520" stroke="#3a4f66"/></g>';
+  s += '<rect x="476" y="24" width="456" height="56" rx="12" fill="#14202f"/>' + t(500, 60, 'REPORT CARD', { size: 18, f: 'h', fill: '#fff', ls: '.14em' }) + t(908, 60, 'per 1,000 cells', { size: 15, a: 'end', fill: C.am });
+  SENT.forEach(function (q, j) {
+    var yl = 118 + j * 92, done = j < st.j, val = done ? Math.round(R.r[q.k] * R.k) : null, bx = 500, by = yl + 14, now = st.j === j;
+    if (q.pre) s += t(500, yl, q.pre, { size: 18, fill: '#c7d4e4' }); else by = yl - 22;
+    s += '<g class="' + (now && st.wrong ? 'pgd-shake' : '') + '"><rect x="' + bx + '" y="' + by + '" width="112" height="40" rx="8" fill="' + (done ? 'rgba(70,227,255,.1)' : '#0a1019') + '" stroke="' + (done ? BOX[q.k].col : now ? '#ffb547' : '#2b3a4c') + '" stroke-width="2"' + (done ? '' : ' stroke-dasharray="5 4"') + '/>';
+    if (done) s += t(bx + 56, by + 28, String(val), { size: 22, a: 'middle', f: 'm', w: 700, fill: '#fff', cls: j === st.j - 1 ? 'pgd-pop' : '' }).replace('<text ', j === st.j - 1 ? '<text data-pgd-from="' + R.r[q.k] + '" ' : '<text ');
+    else if (now) s += t(bx + 56, by + 26, 'drop a count', { size: 14, a: 'middle', fill: C.am });
+    s += '</g>' + t(bx + 124, by + 27, q.post, { size: 18, fill: '#c7d4e4' });
+  });
+  return s;
+}
+function blankAt(j) { var yl = 118 + j * 92, by = SENT[j].pre ? yl + 14 : yl - 22; return { x: 556, y: by + 20 }; }
+function bind2e(c, root) {
+  var R = card2e(), st = c.state, want = SENT[st.j] && SENT[st.j].k;
+  root.querySelectorAll('[data-pgd-act=drag]').forEach(function (el) {
+    var k = el.getAttribute('data-pgd-t').slice(1), b = BOX[k], bx = b.x - 56, sx = bx + 80, sy = b.y + 150, bl = blankAt(st.j);
+    var dx0 = Math.round((bl.x - sx) / 32) * 32, dy0 = Math.round((bl.y - sy) / 32) * 32;
+    el.setAttribute('data-pgd-to', (sx + dx0) + ',' + (sy + dy0));
+    var drag = D.onDrag(root, el, { start: { x: sx, y: sy }, step: 32,
+      move: function (p) { el.setAttribute('transform', 'translate(' + (p.x - sx) + ' ' + (p.y - sy) + ')'); },
+      drop: function (p) {
+        if (Math.abs(p.x - bl.x) < 80 && Math.abs(p.y - bl.y) < 40) {
+          if (k === want) { st.used.push(k); st.j++; st.wrong = null; c.next(); return; }
+          st.wrong = k; c.redraw(true); return;
+        }
+        el.setAttribute('transform', ''); drag.set({ x: sx, y: sy }); el.removeAttribute('transform');
+      } });
+  });
+  void R;
+}
+function work2e(c) {
+  var R = card2e(); if (!R) return [];
+  var st = c.state, r = [{ h: 'Per 1,000 cells' }, { v: '1,000 ÷ ' + R.n + ' = ' + R.k.toFixed(3), k: 'scale from the tray to 1,000 cells' }];
+  SENT.slice(0, st.j).forEach(function (q) { r.push({ v: R.r[q.k] + ' × ' + R.k.toFixed(3), k: BOX[q.k].lab }, { op: '=', v: String(Math.round(R.r[q.k] * R.k)), k: 'per 1,000', res: true }); });
+  if (st.wrong) r.push({ t: 'That count does not fit this sentence. Read the row (real defect or good) and the column (STOP or PASS).' });
+  r.push(srcTag(R.you));
+  return r;
+}
+D.register('2e', {
+  init: function () { return { j: 0, used: [], wrong: null }; },
+  frames: [
+  { cap: 'Four boxes: every cell lands in one',
+    note: 'At the 2d cutoff every validation cell lands in one box: real defect or good, stopped or passed. Drag the right count into the first sentence.',
+    svg: function (c) { return scene2e(c, A.fx()); }, work: work2e, bind: bind2e, auto: function (c) { c.state.j = 1; c.state.used = ['tp']; } },
+  { cap: 'What slips through',
+    note: 'Defects the model passed are the dangerous mistake. Drag that count into the second sentence.',
+    svg: function (c) { return scene2e(c, A.fx()); }, work: work2e, bind: bind2e, auto: function (c) { c.state.j = 2; c.state.used = ['tp', 'fn']; } },
+  { cap: 'What it costs',
+    note: 'Good cells that were stopped cost re-check time. Drag that count into the third sentence.',
+    svg: function (c) { return scene2e(c, A.fx()); }, work: work2e, bind: bind2e, auto: function (c) { c.state.j = 3; c.state.used = ['tp', 'fn', 'fp']; } },
+  { cap: 'The report card: what you catch and what it costs',
+    note: 'Recall says how many defects are stopped. The false-alarm rate says how many good cells are stopped. Per 1,000 cells, both are easy to read on the line.',
+    svg: function (c) {
+      var R = card2e(), fx = A.fx(), s = scene2e(c, fx); if (!R) return s;
+      // rates
+      s += t(500, 356, 'recall', { size: 16, fill: C.dim }) + t(580, 358, p1(R.r.rec), { size: 24, f: 'm', w: 700, fill: C.cy });
+      s += t(700, 356, 'false alarms', { size: 16, fill: C.dim }) + t(908, 358, p1(R.r.far), { size: 24, a: 'end', f: 'm', w: 700, fill: C.am });
+      // 1,000 cells as a waffle
+      var per = ['tp', 'fn', 'fp', 'tn'].map(function (k) { return Math.round(R.r[k] * R.k); }), tot = per.reduce(function (a, b) { return a + b; }, 0), cols = [C.rd, '#ffd0d8', C.am, '#2f6b55'], k = 0, n = 0, wx = 500, wy = 384;
+      var sq = ''; for (var i = 0; i < 1000; i++) { while (k < 3 && n >= per[k]) { k++; n = 0; } n++; var col = i < tot ? cols[k] : cols[3]; sq += '<rect x="' + (wx + (i % 50) * 8.16) + '" y="' + (wy + Math.floor(i / 50) * 5.6) + '" width="7" height="4.6" rx=".8" fill="' + col + '"/>'; }
+      s += '<g class="pgd-fade">' + sq + '</g>';
+      [['caught ' + per[0], C.rd], ['missed ' + per[1], '#ffd0d8'], ['false alarms ' + per[2], C.am], ['passed ' + per[3], '#3dffa0']].forEach(function (q, j) { var lx = [500, 604, 694, 822][j]; s += '<rect x="' + lx + '" y="502" width="10" height="10" rx="2" fill="' + q[1] + '"/>' + t(lx + 14, 512, q[0], { size: 13.5, fill: q[1] }); });
+      return s;
+    },
+    work: function (c) {
+      var R = card2e(); if (!R) return [];
+      var r = R.r;
+      return [{ h: 'Recall' }, { v: r.tp + ' ÷ (' + r.tp + ' + ' + r.fn + ')', k: 'caught ÷ all real defects' }, { op: '=', v: p1(r.rec), k: 'recall', res: true },
+        { h: 'False-alarm rate' }, { v: r.fp + ' ÷ ' + (r.fp + r.tn), k: 'good cells stopped ÷ ALL good cells (stopped + passed)' }, { op: '=', v: p1(r.far), k: 'false-alarm rate', res: true }, srcTag(R.you)];
+    } }
+  ]
+});
+
 /* ============================ 2d  Hit the target ============================ */
 /* the defects of the validation tray, lowest score first; the gate sits just below defect g (g defects pass) */
 function walk() {
